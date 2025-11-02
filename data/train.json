@@ -1,0 +1,2023 @@
+[
+  {
+    "id": "1",
+    "text": "Bagaimana cara mengurus KTP baru?",
+    "answer": "Silakan datang ke kantor kelurahan dengan membawa fotokopi KK dan surat pengantar RT/RW, kemudian akan diarahkan ke Disdukcapil Balikpapan atau Sentra Pelayanan di Kecamatan untuk perekaman biometrik.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "KTP",
+      "urus",
+      "buat",
+      "baru",
+      "prosedur",
+      "syarat"
+    ]
+  },
+  {
+    "id": "J-1-N",
+    "text": "Piye carane ngurus KTP anyar?",
+    "answer": "Silakan datang ke kantor kelurahan dengan membawa fotokopi KK dan surat pengantar RT/RW, kemudian akan diarahkan ke Disdukcapil Balikpapan atau Sentra Pelayanan di Kecamatan untuk perekaman biometrik.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "KTP",
+      "urus",
+      "buat",
+      "baru",
+      "prosedur",
+      "syarat",
+      "jawa",
+      "ngoko"
+    ]
+  },
+  {
+    "id": "J-1-M",
+    "text": "Pripun carane ngurus KTP enggal?",
+    "answer": "Silakan datang ke kantor kelurahan dengan membawa fotokopi KK dan surat pengantar RT/RW, kemudian akan diarahkan ke Disdukcapil Balikpapan atau Sentra Pelayanan di Kecamatan untuk perekaman biometrik.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "KTP",
+      "urus",
+      "buat",
+      "baru",
+      "prosedur",
+      "syarat",
+      "jawa",
+      "madya"
+    ]
+  },
+  {
+    "id": "J-1-K",
+    "text": "Kados pundi caranipun ngurus KTP enggal?",
+    "answer": "Silakan datang ke kantor kelurahan dengan membawa fotokopi KK dan surat pengantar RT/RW, kemudian akan diarahkan ke Disdukcapil Balikpapan atau Sentra Pelayanan di Kecamatan untuk perekaman biometrik.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "KTP",
+      "urus",
+      "buat",
+      "baru",
+      "prosedur",
+      "syarat",
+      "jawa",
+      "krama"
+    ]
+  },
+  {
+    "id": "25",
+    "text": "Bagaimana cara mengurus kartu keluarga hilang?",
+    "answer": "Lapor kehilangan ke kepolisian untuk mendapatkan surat keterangan kehilangan, lalu bawa surat tersebut ke kelurahan untuk mendapat pengantar, dan ajukan ke Disdukcapil untuk cetak KK baru.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "KK hilang",
+      "urus",
+      "prosedur",
+      "kehilangan"
+    ]
+  },
+  {
+    "id": "J-25-N",
+    "text": "Piye carane ngurus kartu keluarga ilang?",
+    "answer": "Lapor kehilangan ke kepolisian untuk mendapatkan surat keterangan kehilangan, lalu bawa surat tersebut ke kelurahan untuk mendapat pengantar, dan ajukan ke Disdukcapil untuk cetak KK baru.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "KK hilang",
+      "urus",
+      "prosedur",
+      "kehilangan",
+      "jawa",
+      "ngoko"
+    ]
+  },
+  {
+    "id": "J-25-M",
+    "text": "Pripun carane ngurus kartu keluarga ical?",
+    "answer": "Lapor kehilangan ke kepolisian untuk mendapatkan surat keterangan kehilangan, lalu bawa surat tersebut ke kelurahan untuk mendapat pengantar, dan ajukan ke Disdukcapil untuk cetak KK baru.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "KK hilang",
+      "urus",
+      "prosedur",
+      "kehilangan",
+      "jawa",
+      "madya"
+    ]
+  },
+  {
+    "id": "J-25-K",
+    "text": "Kados pundi caranipun ngurus kartu keluarga ical?",
+    "answer": "Lapor kehilangan ke kepolisian untuk mendapatkan surat keterangan kehilangan, lalu bawa surat tersebut ke kelurahan untuk mendapat pengantar, dan ajukan ke Disdukcapil untuk cetak KK baru.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "KK hilang",
+      "urus",
+      "prosedur",
+      "kehilangan",
+      "jawa",
+      "krama"
+    ]
+  },
+  {
+    "id": "J-59-N",
+    "text": "Piye carane ngurus KK ilang?",
+    "answer": "Laporkan kehilangan ke kepolisian (opsional, seringkali cukup surat pernyataan di Disdukcapil), lalu bawa pengantar dari kelurahan, dan ajukan cetak ulang KK di Disdukcapil Balikpapan.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "KK hilang",
+      "urus",
+      "prosedur",
+      "kehilangan",
+      "jawa",
+      "ngoko"
+    ]
+  },
+  {
+    "id": "J-59-M",
+    "text": "Pripun carane ngurus KK ical?",
+    "answer": "Laporkan kehilangan ke kepolisian (opsional, seringkali cukup surat pernyataan di Disdukcapil), lalu bawa pengantar dari kelurahan, dan ajukan cetak ulang KK di Disdukcapil Balikpapan.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "KK hilang",
+      "urus",
+      "prosedur",
+      "kehilangan",
+      "jawa",
+      "madya"
+    ]
+  },
+  {
+    "id": "J-59-K",
+    "text": "Kados pundi caranipun ngurus KK ical?",
+    "answer": "Laporkan kehilangan ke kepolisian (opsional, seringkali cukup surat pernyataan di Disdukcapil), lalu bawa pengantar dari kelurahan, dan ajukan cetak ulang KK di Disdukcapil Balikpapan.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "KK hilang",
+      "urus",
+      "prosedur",
+      "kehilangan",
+      "jawa",
+      "krama"
+    ]
+  },
+  {
+    "id": "24",
+    "text": "Apakah kelurahan bisa cetak KTP?",
+    "answer": "Tidak, pencetakan KTP dilakukan oleh Disdukcapil. Kelurahan hanya memberikan pengantar dan verifikasi berkas. Namun, beberapa kecamatan mungkin memiliki sentra layanan Disdukcapil.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "cetak",
+      "KTP",
+      "kelurahan",
+      "Disdukcapil"
+    ]
+  },
+  {
+    "id": "J-24-N",
+    "text": "Kelurahan iso nyetak KTP ora?",
+    "answer": "Tidak, pencetakan KTP dilakukan oleh Disdukcapil. Kelurahan hanya memberikan pengantar dan verifikasi berkas. Namun, beberapa kecamatan mungkin memiliki sentra layanan Disdukcapil.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "cetak",
+      "KTP",
+      "kelurahan",
+      "Disdukcapil",
+      "jawa",
+      "ngoko"
+    ]
+  },
+  {
+    "id": "J-24-M",
+    "text": "Nopo kelurahan saget nyetak KTP?",
+    "answer": "Tidak, pencetakan KTP dilakukan oleh Disdukcapil. Kelurahan hanya memberikan pengantar dan verifikasi berkas. Namun, beberapa kecamatan mungkin memiliki sentra layanan Disdukcapil.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "cetak",
+      "KTP",
+      "kelurahan",
+      "Disdukcapil",
+      "jawa",
+      "madya"
+    ]
+  },
+  {
+    "id": "J-24-K",
+    "text": "Punopo kelurahan saged nyetak KTP?",
+    "answer": "Tidak, pencetakan KTP dilakukan oleh Disdukcapil. Kelurahan hanya memberikan pengantar dan verifikasi berkas. Namun, beberapa kecamatan mungkin memiliki sentra layanan Disdukcapil.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "cetak",
+      "KTP",
+      "kelurahan",
+      "Disdukcapil",
+      "jawa",
+      "krama"
+    ]
+  },
+  {
+    "id": "31",
+    "text": "Bagaimana cara memperbaiki data salah pada KTP?",
+    "answer": "Jika ada kesalahan data pada KTP, silakan ajukan perbaikan di Disdukcapil dengan membawa KTP lama, KK, dan dokumen pendukung seperti ijazah atau akta kelahiran.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "KTP salah",
+      "perbaiki",
+      "data",
+      "dokumen"
+    ]
+  },
+  {
+    "id": "J-31-N",
+    "text": "Piye carane mbenakke data salah neng KTP?",
+    "answer": "Jika ada kesalahan data pada KTP, silakan ajukan perbaikan di Disdukcapil dengan membawa KTP lama, KK, dan dokumen pendukung seperti ijazah atau akta kelahiran.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "KTP salah",
+      "perbaiki",
+      "data",
+      "dokumen",
+      "jawa",
+      "ngoko"
+    ]
+  },
+  {
+    "id": "J-31-M",
+    "text": "Pripun carane ndandosi data klentu teng KTP?",
+    "answer": "Jika ada kesalahan data pada KTP, silakan ajukan perbaikan di Disdukcapil dengan membawa KTP lama, KK, dan dokumen pendukung seperti ijazah atau akta kelahiran.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "KTP salah",
+      "perbaiki",
+      "data",
+      "dokumen",
+      "jawa",
+      "madya"
+    ]
+  },
+  {
+    "id": "J-31-K",
+    "text": "Kados pundi caranipun ndandosi data ingkang klentu wonten KTP?",
+    "answer": "Jika ada kesalahan data pada KTP, silakan ajukan perbaikan di Disdukcapil dengan membawa KTP lama, KK, dan dokumen pendukung seperti ijazah atau akta kelahiran.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "KTP salah",
+      "perbaiki",
+      "data",
+      "dokumen",
+      "jawa",
+      "krama"
+    ]
+  },
+  {
+    "id": "53",
+    "text": "Apakah saya bisa urus KTP di kantor kecamatan?",
+    "answer": "Ya, Disdukcapil Balikpapan telah mendistribusikan layanan perekaman dan pencetakan KTP ke kantor kecamatan agar warga tidak harus datang ke kantor pusat.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "KTP",
+      "urus",
+      "kecamatan",
+      "layanan"
+    ]
+  },
+  {
+    "id": "J-53-N",
+    "text": "Aku iso ngurus KTP neng kantor kecamatan ora?",
+    "answer": "Ya, Disdukcapil Balikpapan telah mendistribusikan layanan perekaman dan pencetakan KTP ke kantor kecamatan agar warga tidak harus datang ke kantor pusat.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "KTP",
+      "urus",
+      "kecamatan",
+      "layanan",
+      "jawa",
+      "ngoko"
+    ]
+  },
+  {
+    "id": "J-53-M",
+    "text": "Nopo kulo saget ngurus KTP teng kantor kecamatan?",
+    "answer": "Ya, Disdukcapil Balikpapan telah mendistribusikan layanan perekaman dan pencetakan KTP ke kantor kecamatan agar warga tidak harus datang ke kantor pusat.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "KTP",
+      "urus",
+      "kecamatan",
+      "layanan",
+      "jawa",
+      "madya"
+    ]
+  },
+  {
+    "id": "J-53-K",
+    "text": "Punopo kulo saged ngurus KTP wonten kantor kecamatan?",
+    "answer": "Ya, Disdukcapil Balikpapan telah mendistribusikan layanan perekaman dan pencetakan KTP ke kantor kecamatan agar warga tidak harus datang ke kantor pusat.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "KTP",
+      "urus",
+      "kecamatan",
+      "layanan",
+      "jawa",
+      "krama"
+    ]
+  },
+  {
+    "id": "7",
+    "text": "Bagaimana cara membuat KK baru?",
+    "answer": "Datang ke kelurahan dengan membawa surat nikah, KTP, dan surat keterangan pindah jika berasal dari luar daerah. Pengajuan akan diproses ke Disdukcapil.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "KK",
+      "buat",
+      "baru",
+      "prosedur",
+      "syarat"
+    ]
+  },
+  {
+    "id": "J-7-N",
+    "text": "Piye carane gawe KK anyar?",
+    "answer": "Datang ke kelurahan dengan membawa surat nikah, KTP, dan surat keterangan pindah jika berasal dari luar daerah. Pengajuan akan diproses ke Disdukcapil.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "KK",
+      "buat",
+      "baru",
+      "prosedur",
+      "syarat",
+      "jawa",
+      "ngoko"
+    ]
+  },
+  {
+    "id": "J-7-M",
+    "text": "Pripun carane damel KK enggal?",
+    "answer": "Datang ke kelurahan dengan membawa surat nikah, KTP, dan surat keterangan pindah jika berasal dari luar daerah. Pengajuan akan diproses ke Disdukcapil.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "KK",
+      "buat",
+      "baru",
+      "prosedur",
+      "syarat",
+      "jawa",
+      "madya"
+    ]
+  },
+  {
+    "id": "J-7-K",
+    "text": "Kados pundi caranipun ndamel KK enggal?",
+    "answer": "Datang ke kelurahan dengan membawa surat nikah, KTP, dan surat keterangan pindah jika berasal dari luar daerah. Pengajuan akan diproses ke Disdukcapil.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "KK",
+      "buat",
+      "baru",
+      "prosedur",
+      "syarat",
+      "jawa",
+      "krama"
+    ]
+  },
+  {
+    "id": "29",
+    "text": "Bagaimana cara membuat kartu identitas anak (KIA)?",
+    "answer": "Datang ke Disdukcapil dengan membawa fotokopi KK, akta kelahiran, dan pasfoto anak. Untuk anak di bawah 5 tahun cukup akta kelahiran.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "KIA",
+      "buat",
+      "syarat",
+      "anak"
+    ]
+  },
+  {
+    "id": "J-29-N",
+    "text": "Piye carane gawe kartu identitas anak (KIA)?",
+    "answer": "Datang ke Disdukcapil dengan membawa fotokopi KK, akta kelahiran, dan pasfoto anak. Untuk anak di bawah 5 tahun cukup akta kelahiran.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "KIA",
+      "buat",
+      "syarat",
+      "anak",
+      "jawa",
+      "ngoko"
+    ]
+  },
+  {
+    "id": "J-29-M",
+    "text": "Pripun carane damel kartu identitas anak (KIA)?",
+    "answer": "Datang ke Disdukcapil dengan membawa fotokopi KK, akta kelahiran, dan pasfoto anak. Untuk anak di bawah 5 tahun cukup akta kelahiran.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "KIA",
+      "buat",
+      "syarat",
+      "anak",
+      "jawa",
+      "madya"
+    ]
+  },
+  {
+    "id": "J-29-K",
+    "text": "Kados pundi caranipun ndamel kartu identitas anak (KIA)?",
+    "answer": "Datang ke Disdukcapil dengan membawa fotokopi KK, akta kelahiran, dan pasfoto anak. Untuk anak di bawah 5 tahun cukup akta kelahiran.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "KIA",
+      "buat",
+      "syarat",
+      "anak",
+      "jawa",
+      "krama"
+    ]
+  },
+  {
+    "id": "47",
+    "text": "Bagaimana cara mengurus surat kehilangan KTP?",
+    "answer": "Laporkan kehilangan ke kantor polisi untuk mendapatkan surat keterangan kehilangan, lalu ajukan ke Disdukcapil untuk cetak KTP baru.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "KTP hilang",
+      "urus",
+      "kehilangan"
+    ]
+  },
+  {
+    "id": "J-47-N",
+    "text": "Piye carane ngurus surat kelangan KTP?",
+    "answer": "Laporkan kehilangan ke kantor polisi untuk mendapatkan surat keterangan kehilangan, lalu ajukan ke Disdukcapil untuk cetak KTP baru.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "KTP hilang",
+      "urus",
+      "kehilangan",
+      "jawa",
+      "ngoko"
+    ]
+  },
+  {
+    "id": "J-47-M",
+    "text": "Pripun carane ngurus surat KTP ical?",
+    "answer": "Laporkan kehilangan ke kantor polisi untuk mendapatkan surat keterangan kehilangan, lalu ajukan ke Disdukcapil untuk cetak KTP baru.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "KTP hilang",
+      "urus",
+      "kehilangan",
+      "jawa",
+      "madya"
+    ]
+  },
+  {
+    "id": "J-47-K",
+    "text": "Kados pundi caranipun ngurus serat KTP ical?",
+    "answer": "Laporkan kehilangan ke kantor polisi untuk mendapatkan surat keterangan kehilangan, lalu ajukan ke Disdukcapil untuk cetak KTP baru.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "KTP hilang",
+      "urus",
+      "kehilangan",
+      "jawa",
+      "krama"
+    ]
+  },
+  {
+    "id": "2",
+    "text": "Apa saja syarat membuat e-KTP?",
+    "answer": "Syarat pembuatan e-KTP adalah membawa fotokopi KK, surat pengantar RT/RW, dan hadir langsung untuk perekaman sidik jari dan foto.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "e-KTP",
+      "syarat",
+      "KTP",
+      "persyaratan"
+    ]
+  },
+  {
+    "id": "J-2-N",
+    "text": "Opo wae syarate gawe e-KTP?",
+    "answer": "Syarat pembuatan e-KTP adalah membawa fotokopi KK, surat pengantar RT/RW, dan hadir langsung untuk perekaman sidik jari dan foto.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "e-KTP",
+      "syarat",
+      "KTP",
+      "persyaratan",
+      "jawa",
+      "ngoko"
+    ]
+  },
+  {
+    "id": "J-2-M",
+    "text": "Nopo mawon syarate damel e-KTP?",
+    "answer": "Syarat pembuatan e-KTP adalah membawa fotokopi KK, surat pengantar RT/RW, dan hadir langsung untuk perekaman sidik jari dan foto.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "e-KTP",
+      "syarat",
+      "KTP",
+      "persyaratan",
+      "jawa",
+      "madya"
+    ]
+  },
+  {
+    "id": "J-2-K",
+    "text": "Menopo kemawon syaratipun ndamel e-KTP?",
+    "answer": "Syarat pembuatan e-KTP adalah membawa fotokopi KK, surat pengantar RT/RW, dan hadir langsung untuk perekaman sidik jari dan foto.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "e-KTP",
+      "syarat",
+      "KTP",
+      "persyaratan",
+      "jawa",
+      "krama"
+    ]
+  },
+  {
+    "id": "17",
+    "text": "Bagaimana cara mengurus pindah alamat KTP?",
+    "answer": "Minta surat pengantar dari RT/RW, kemudian dari kelurahan, lalu ajukan ke Disdukcapil Balikpapan dengan membawa KTP lama dan KK.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "pindah",
+      "alamat",
+      "KTP",
+      "urus"
+    ]
+  },
+  {
+    "id": "J-17-N",
+    "text": "Piye carane ngurus pindah alamat KTP?",
+    "answer": "Minta surat pengantar dari RT/RW, kemudian dari kelurahan, lalu ajukan ke Disdukcapil Balikpapan dengan membawa KTP lama dan KK.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "pindah",
+      "alamat",
+      "KTP",
+      "urus",
+      "jawa",
+      "ngoko"
+    ]
+  },
+  {
+    "id": "J-17-M",
+    "text": "Pripun carane ngurus pindah alamat KTP?",
+    "answer": "Minta surat pengantar dari RT/RW, kemudian dari kelurahan, lalu ajukan ke Disdukcapil Balikpapan dengan membawa KTP lama dan KK.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "pindah",
+      "alamat",
+      "KTP",
+      "urus",
+      "jawa",
+      "madya"
+    ]
+  },
+  {
+    "id": "J-17-K",
+    "text": "Kados pundi caranipun ngurus pindah alamat KTP?",
+    "answer": "Minta surat pengantar dari RT/RW, kemudian dari kelurahan, lalu ajukan ke Disdukcapil Balikpapan dengan membawa KTP lama dan KK.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "pindah",
+      "alamat",
+      "KTP",
+      "urus",
+      "jawa",
+      "krama"
+    ]
+  },
+  {
+    "id": "22",
+    "text": "Dimana saya bisa mengurus akta kematian?",
+    "answer": "Akta kematian diurus di Disdukcapil Balikpapan dengan membawa surat keterangan kematian dari rumah sakit atau kelurahan.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "akta kematian",
+      "urus",
+      "Disdukcapil"
+    ]
+  },
+  {
+    "id": "J-22-N",
+    "text": "Neng ndi aku iso ngurus akta mati?",
+    "answer": "Akta kematian diurus di Disdukcapil Balikpapan dengan membawa surat keterangan kematian dari rumah sakit atau kelurahan.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "akta kematian",
+      "urus",
+      "Disdukcapil",
+      "jawa",
+      "ngoko"
+    ]
+  },
+  {
+    "id": "J-22-M",
+    "text": "Teng pundi kulo saget ngurus akta pati?",
+    "answer": "Akta kematian diurus di Disdukcapil Balikpapan dengan membawa surat keterangan kematian dari rumah sakit atau kelurahan.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "akta kematian",
+      "urus",
+      "Disdukcapil",
+      "jawa",
+      "madya"
+    ]
+  },
+  {
+    "id": "J-22-K",
+    "text": "Wonten pundi kulo saged ngurus akta sedan?",
+    "answer": "Akta kematian diurus di Disdukcapil Balikpapan dengan membawa surat keterangan kematian dari rumah sakit atau kelurahan.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "akta kematian",
+      "urus",
+      "Disdukcapil",
+      "jawa",
+      "krama"
+    ]
+  },
+  {
+    "id": "8",
+    "text": "Apa syarat membuat Akta Kelahiran?",
+    "answer": "Syaratnya adalah fotokopi KK, KTP orang tua, surat keterangan lahir dari bidan/rumah sakit, dan surat nikah orang tua.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "Akta Kelahiran",
+      "syarat",
+      "persyaratan",
+      "lahir"
+    ]
+  },
+  {
+    "id": "J-8-N",
+    "text": "Opo syarate gawe Akta Lahir?",
+    "answer": "Syaratnya adalah fotokopi KK, KTP orang tua, surat keterangan lahir dari bidan/rumah sakit, dan surat nikah orang tua.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "Akta Kelahiran",
+      "syarat",
+      "persyaratan",
+      "lahir",
+      "jawa",
+      "ngoko"
+    ]
+  },
+  {
+    "id": "J-8-M",
+    "text": "Nopo syarate damel Akta Lahir?",
+    "answer": "Syaratnya adalah fotokopi KK, KTP orang tua, surat keterangan lahir dari bidan/rumah sakit, dan surat nikah orang tua.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "Akta Kelahiran",
+      "syarat",
+      "persyaratan",
+      "lahir",
+      "jawa",
+      "madya"
+    ]
+  },
+  {
+    "id": "J-8-K",
+    "text": "Menopo syaratipun ndamel Akta Kelahiran?",
+    "answer": "Syaratnya adalah fotokopi KK, KTP orang tua, surat keterangan lahir dari bidan/rumah sakit, dan surat nikah orang tua.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "Akta Kelahiran",
+      "syarat",
+      "persyaratan",
+      "lahir",
+      "jawa",
+      "krama"
+    ]
+  },
+  {
+    "id": "23",
+    "text": "Apa syarat membuat akta kematian?",
+    "answer": "Syaratnya antara lain fotokopi KK, KTP almarhum, surat keterangan kematian, dan formulir permohonan dari keluarga.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "akta kematian",
+      "syarat",
+      "persyaratan"
+    ]
+  },
+  {
+    "id": "J-23-N",
+    "text": "Opo syarate gawe akta mati?",
+    "answer": "Syaratnya antara lain fotokopi KK, KTP almarhum, surat keterangan kematian, dan formulir permohonan dari keluarga.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "akta kematian",
+      "syarat",
+      "persyaratan",
+      "jawa",
+      "ngoko"
+    ]
+  },
+  {
+    "id": "J-23-M",
+    "text": "Nopo syarate damel akta pati?",
+    "answer": "Syaratnya antara lain fotokopi KK, KTP almarhum, surat keterangan kematian, dan formulir permohonan dari keluarga.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "akta kematian",
+      "syarat",
+      "persyaratan",
+      "jawa",
+      "madya"
+    ]
+  },
+  {
+    "id": "J-23-K",
+    "text": "Menopo syaratipun ndamel akta sedan?",
+    "answer": "Syaratnya antara lain fotokopi KK, KTP almarhum, surat keterangan kematian, dan formulir permohonan dari keluarga.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "akta kematian",
+      "syarat",
+      "persyaratan",
+      "jawa",
+      "krama"
+    ]
+  },
+  {
+    "id": "40",
+    "text": "Bagaimana cara mengurus surat pindah ke luar Balikpapan?",
+    "answer": "Minta surat pengantar dari RT/RW dan kelurahan, lalu ajukan surat pindah (SKPWNI) di Disdukcapil Balikpapan.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "pindah",
+      "luar daerah",
+      "urus",
+      "SKPWNI"
+    ]
+  },
+  {
+    "id": "J-40-N",
+    "text": "Piye carane ngurus surat pindah metu soko Balikpapan?",
+    "answer": "Minta surat pengantar dari RT/RW dan kelurahan, lalu ajukan surat pindah (SKPWNI) di Disdukcapil Balikpapan.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "pindah",
+      "luar daerah",
+      "urus",
+      "SKPWNI",
+      "jawa",
+      "ngoko"
+    ]
+  },
+  {
+    "id": "J-40-M",
+    "text": "Pripun carane ngurus surat pindah medal saking Balikpapan?",
+    "answer": "Minta surat pengantar dari RT/RW dan kelurahan, lalu ajukan surat pindah (SKPWNI) di Disdukcapil Balikpapan.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "pindah",
+      "luar daerah",
+      "urus",
+      "SKPWNI",
+      "jawa",
+      "madya"
+    ]
+  },
+  {
+    "id": "J-40-K",
+    "text": "Kados pundi caranipun ngurus surat pindah medal saking Balikpapan?",
+    "answer": "Minta surat pengantar dari RT/RW dan kelurahan, lalu ajukan surat pindah (SKPWNI) di Disdukcapil Balikpapan.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "pindah",
+      "luar daerah",
+      "urus",
+      "SKPWNI",
+      "jawa",
+      "krama"
+    ]
+  },
+  {
+    "id": "3",
+    "text": "Berapa lama proses pembuatan KTP elektronik?",
+    "answer": "Proses e-KTP biasanya 7 sampai 14 hari kerja, tergantung ketersediaan blanko di Disdukcapil.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "lama",
+      "proses",
+      "KTP",
+      "durasi",
+      "e-KTP"
+    ]
+  },
+  {
+    "id": "J-3-N",
+    "text": "Suwene proses gawe KTP elektronik pirang dino?",
+    "answer": "Proses e-KTP biasanya 7 sampai 14 hari kerja, tergantung ketersediaan blanko di Disdukcapil.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "lama",
+      "proses",
+      "KTP",
+      "durasi",
+      "e-KTP",
+      "jawa",
+      "ngoko"
+    ]
+  },
+  {
+    "id": "J-3-M",
+    "text": "Prosese damel KTP elektronik niku dangunipun pinten dinten?",
+    "answer": "Proses e-KTP biasanya 7 sampai 14 hari kerja, tergantung ketersediaan blanko di Disdukcapil.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "lama",
+      "proses",
+      "KTP",
+      "durasi",
+      "e-KTP",
+      "jawa",
+      "madya"
+    ]
+  },
+  {
+    "id": "J-3-K",
+    "text": "Danguning prosesipun ndamel KTP elektronik pinten dinten?",
+    "answer": "Proses e-KTP biasanya 7 sampai 14 hari kerja, tergantung ketersediaan blanko di Disdukcapil.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "lama",
+      "proses",
+      "KTP",
+      "durasi",
+      "e-KTP",
+      "jawa",
+      "krama"
+    ]
+  },
+  {
+    "id": "32",
+    "text": "Apakah KTP elektronik berlaku seumur hidup?",
+    "answer": "Ya, e-KTP berlaku seumur hidup dan tidak perlu diperpanjang, kecuali ada perubahan data.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "KTP",
+      "seumur hidup",
+      "e-KTP",
+      "perpanjang"
+    ]
+  },
+  {
+    "id": "J-32-N",
+    "text": "KTP elektronik berlaku sak lawase pora?",
+    "answer": "Ya, e-KTP berlaku seumur hidup dan tidak perlu diperpanjang, kecuali ada perubahan data.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "KTP",
+      "seumur hidup",
+      "e-KTP",
+      "perpanjang",
+      "jawa",
+      "ngoko"
+    ]
+  },
+  {
+    "id": "J-32-M",
+    "text": "Nopo KTP elektronik niku berlaku seumur hidup?",
+    "answer": "Ya, e-KTP berlaku seumur hidup dan tidak perlu diperpanjang, kecuali ada perubahan data.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "KTP",
+      "seumur hidup",
+      "e-KTP",
+      "perpanjang",
+      "jawa",
+      "madya"
+    ]
+  },
+  {
+    "id": "J-32-K",
+    "text": "Punopo KTP elektronik puniko berlaku seumur gesang?",
+    "answer": "Ya, e-KTP berlaku seumur hidup dan tidak perlu diperpanjang, kecuali ada perubahan data.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "KTP",
+      "seumur hidup",
+      "e-KTP",
+      "perpanjang",
+      "jawa",
+      "krama"
+    ]
+  },
+  {
+    "id": "18",
+    "text": "Berapa lama proses pindah alamat KTP?",
+    "answer": "Proses pindah alamat KTP biasanya 7 hari kerja setelah berkas lengkap diterima.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "lama",
+      "proses",
+      "pindah KTP",
+      "durasi"
+    ]
+  },
+  {
+    "id": "J-18-N",
+    "text": "Suwene proses pindah alamat KTP pirang dino?",
+    "answer": "Proses pindah alamat KTP biasanya 7 hari kerja setelah berkas lengkap diterima.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "lama",
+      "proses",
+      "pindah KTP",
+      "durasi",
+      "jawa",
+      "ngoko"
+    ]
+  },
+  {
+    "id": "J-18-M",
+    "text": "Prosese pindah alamat KTP niku dangune pinten dinten?",
+    "answer": "Proses pindah alamat KTP biasanya 7 hari kerja setelah berkas lengkap diterima.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "lama",
+      "proses",
+      "pindah KTP",
+      "durasi",
+      "jawa",
+      "madya"
+    ]
+  },
+  {
+    "id": "J-18-K",
+    "text": "Danguning prosesipun pindah alamat KTP pinten dinten?",
+    "answer": "Proses pindah alamat KTP biasanya 7 hari kerja setelah berkas lengkap diterima.",
+    "kategori_utama": "Kependudukan",
+    "tags": [
+      "lama",
+      "proses",
+      "pindah KTP",
+      "durasi",
+      "jawa",
+      "krama"
+    ]
+  },
+  {
+    "id": "38",
+    "text": "Bagaimana cara membuat paspor di Balikpapan?",
+    "answer": "Pembuatan paspor dilakukan di Kantor Imigrasi Kelas I Balikpapan dengan mendaftar online via aplikasi M-Paspor, lalu datang untuk wawancara dan biometrik membawa KTP, KK, dan akta lahir/ijazah.",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "paspor",
+      "buat",
+      "syarat",
+      "Imigrasi",
+      "M-Paspor"
+    ]
+  },
+  {
+    "id": "J-38-N",
+    "text": "Piye carane gawe paspor neng Balikpapan?",
+    "answer": "Pembuatan paspor dilakukan di Kantor Imigrasi Kelas I Balikpapan dengan mendaftar online via aplikasi M-Paspor, lalu datang untuk wawancara dan biometrik membawa KTP, KK, dan akta lahir/ijazah.",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "paspor",
+      "buat",
+      "syarat",
+      "Imigrasi",
+      "M-Paspor",
+      "jawa",
+      "ngoko"
+    ]
+  },
+  {
+    "id": "J-38-M",
+    "text": "Pripun carane damel paspor teng Balikpapan?",
+    "answer": "Pembuatan paspor dilakukan di Kantor Imigrasi Kelas I Balikpapan dengan mendaftar online via aplikasi M-Paspor, lalu datang untuk wawancara dan biometrik membawa KTP, KK, dan akta lahir/ijazah.",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "paspor",
+      "buat",
+      "syarat",
+      "Imigrasi",
+      "M-Paspor",
+      "jawa",
+      "madya"
+    ]
+  },
+  {
+    "id": "J-38-K",
+    "text": "Kados pundi caranipun ndamel paspor wonten Balikpapan?",
+    "answer": "Pembuatan paspor dilakukan di Kantor Imigrasi Kelas I Balikpapan dengan mendaftar online via aplikasi M-Paspor, lalu datang untuk wawancara dan biometrik membawa KTP, KK, dan akta lahir/ijazah.",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "paspor",
+      "buat",
+      "syarat",
+      "Imigrasi",
+      "M-Paspor",
+      "jawa",
+      "krama"
+    ]
+  },
+  {
+    "id": "55",
+    "text": "Bagaimana cara mengurus SIM di Balikpapan?",
+    "answer": "Pengurusan SIM baru dilakukan di Satpas SIM Polres Balikpapan dengan membawa KTP, surat keterangan sehat jasmani dan rohani (psikologi), dan mengikuti ujian teori serta praktik.",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "SIM",
+      "urus",
+      "buat",
+      "baru",
+      "prosedur"
+    ]
+  },
+  {
+    "id": "J-55-N",
+    "text": "Piye carane ngurus SIM neng Balikpapan?",
+    "answer": "Pengurusan SIM baru dilakukan di Satpas SIM Polres Balikpapan dengan membawa KTP, surat keterangan sehat jasmani dan rohani (psikologi), dan mengikuti ujian teori serta praktik.",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "SIM",
+      "urus",
+      "buat",
+      "baru",
+      "prosedur",
+      "jawa",
+      "ngoko"
+    ]
+  },
+  {
+    "id": "J-55-M",
+    "text": "Pripun carane ngurus SIM teng Balikpapan?",
+    "answer": "Pengurusan SIM baru dilakukan di Satpas SIM Polres Balikpapan dengan membawa KTP, surat keterangan sehat jasmani dan rohani (psikologi), dan mengikuti ujian teori serta praktik.",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "SIM",
+      "urus",
+      "buat",
+      "baru",
+      "prosedur",
+      "jawa",
+      "madya"
+    ]
+  },
+  {
+    "id": "J-55-K",
+    "text": "Kados pundi caranipun ngurus SIM wonten Balikpapan?",
+    "answer": "Pengurusan SIM baru dilakukan di Satpas SIM Polres Balikpapan dengan membawa KTP, surat keterangan sehat jasmani dan rohani (psikologi), dan mengikuti ujian teori serta praktik.",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "SIM",
+      "urus",
+      "buat",
+      "baru",
+      "prosedur",
+      "jawa",
+      "krama"
+    ]
+  },
+  {
+    "id": "66",
+    "text": "Bagaimana cara mengurus IMB atau PBG di Balikpapan?",
+    "answer": "Izin Mendirikan Bangunan (IMB) telah diganti menjadi PBG (Persetujuan Bangunan Gedung). Pengajuan dilakukan secara online melalui sistem SIMBG yang terintegrasi dengan DPMPT.",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "IMB",
+      "PBG",
+      "urus",
+      "gedung",
+      "SIMBG"
+    ]
+  },
+  {
+    "id": "J-66-N",
+    "text": "Piye carane ngurus IMB utowo PBG neng Balikpapan?",
+    "answer": "Izin Mendirikan Bangunan (IMB) telah diganti menjadi PBG (Persetujuan Bangunan Gedung). Pengajuan dilakukan secara online melalui sistem SIMBG yang terintegrasi dengan DPMPT.",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "IMB",
+      "PBG",
+      "urus",
+      "gedung",
+      "SIMBG",
+      "jawa",
+      "ngoko"
+    ]
+  },
+  {
+    "id": "J-66-M",
+    "text": "Pripun carane ngurus IMB utawi PBG teng Balikpapan?",
+    "answer": "Izin Mendirikan Bangunan (IMB) telah diganti menjadi PBG (Persetujuan Bangunan Gedung). Pengajuan dilakukan secara online melalui sistem SIMBG yang terintegrasi dengan DPMPT.",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "IMB",
+      "PBG",
+      "urus",
+      "gedung",
+      "SIMBG",
+      "jawa",
+      "madya"
+    ]
+  },
+  {
+    "id": "J-66-K",
+    "text": "Kados pundi caranipun ngurus IMB utawi PBG wonten Balikpapan?",
+    "answer": "Izin Mendirikan Bangunan (IMB) telah diganti menjadi PBG (Persetujuan Bangunan Gedung). Pengajuan dilakukan secara online melalui sistem SIMBG yang terintegrasi dengan DPMPT.",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "IMB",
+      "PBG",
+      "urus",
+      "gedung",
+      "SIMBG",
+      "jawa",
+      "krama"
+    ]
+  },
+  {
+    "id": "65",
+    "text": "Bagaimana cara membuat Izin Usaha (NIB)?",
+    "answer": "Pembuatan NIB (Nomor Induk Berusaha) kini terpusat dan dilakukan secara online melalui sistem OSS (Online Single Submission) yang dikelola oleh Kementerian Investasi/BKPM.",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "NIB",
+      "Izin Usaha",
+      "buat",
+      "OSS",
+      "online"
+    ]
+  },
+  {
+    "id": "J-65-N",
+    "text": "Piye carane gawe Izin Usaha (NIB)?",
+    "answer": "Pembuatan NIB (Nomor Induk Berusaha) kini terpusat dan dilakukan secara online melalui sistem OSS (Online Single Submission) yang dikelola oleh Kementerian Investasi/BKPM.",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "NIB",
+      "Izin Usaha",
+      "buat",
+      "OSS",
+      "online",
+      "jawa",
+      "ngoko"
+    ]
+  },
+  {
+    "id": "J-65-M",
+    "text": "Pripun carane damel Izin Usaha (NIB)?",
+    "answer": "Pembuatan NIB (Nomor Induk Berusaha) kini terpusat dan dilakukan secara online melalui sistem OSS (Online Single Submission) yang dikelola oleh Kementerian Investasi/BKPM.",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "NIB",
+      "Izin Usaha",
+      "buat",
+      "OSS",
+      "online",
+      "jawa",
+      "madya"
+    ]
+  },
+  {
+    "id": "J-65-K",
+    "text": "Kados pundi caranipun ndamel Izin Usaha (NIB)?",
+    "answer": "Pembuatan NIB (Nomor Induk Berusaha) kini terpusat dan dilakukan secara online melalui sistem OSS (Online Single Submission) yang dikelola oleh Kementerian Investasi/BKPM.",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "NIB",
+      "Izin Usaha",
+      "buat",
+      "OSS",
+      "online",
+      "jawa",
+      "krama"
+    ]
+  },
+  {
+    "id": "10",
+    "text": "Apa saja syarat perpanjangan SIM?",
+    "answer": "Syarat perpanjangan SIM adalah membawa fotokopi KTP, SIM lama, surat keterangan sehat, serta membayar biaya administrasi di Satpas atau mobil SIM Keliling.",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "SIM",
+      "syarat",
+      "perpanjang"
+    ]
+  },
+  {
+    "id": "J-10-N",
+    "text": "Opo wae syarate ndawakke SIM?",
+    "answer": "Syarat perpanjangan SIM adalah membawa fotokopi KTP, SIM lama, surat keterangan sehat, serta membayar biaya administrasi di Satpas atau mobil SIM Keliling.",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "SIM",
+      "syarat",
+      "perpanjang",
+      "jawa",
+      "ngoko"
+    ]
+  },
+  {
+    "id": "J-10-M",
+    "text": "Nopo mawon syarate ngurus perpanjangan SIM?",
+    "answer": "Syarat perpanjangan SIM adalah membawa fotokopi KTP, SIM lama, surat keterangan sehat, serta membayar biaya administrasi di Satpas atau mobil SIM Keliling.",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "SIM",
+      "syarat",
+      "perpanjang",
+      "jawa",
+      "madya"
+    ]
+  },
+  {
+    "id": "J-10-K",
+    "text": "Menopo kemawon syaratipun ngurus perpanjangan SIM?",
+    "answer": "Syarat perpanjangan SIM adalah membawa fotokopi KTP, SIM lama, surat keterangan sehat, serta membayar biaya administrasi di Satpas atau mobil SIM Keliling.",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "SIM",
+      "syarat",
+      "perpanjang",
+      "jawa",
+      "krama"
+    ]
+  },
+  {
+    "id": "68",
+    "text": "Bagaimana cara mengurus sertifikat tanah di Balikpapan?",
+    "answer": "Pengurusan sertifikat tanah (misalnya pendaftaran pertama kali, balik nama, atau roya) dilakukan di Kantor Badan Pertanahan Nasional (BPN) Balikpapan.",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "sertifikat tanah",
+      "urus",
+      "BPN"
+    ]
+  },
+  {
+    "id": "J-68-N",
+    "text": "Piye carane ngurus sertifikat tanah neng Balikpapan?",
+    "answer": "Pengurusan sertifikat tanah (misalnya pendaftaran pertama kali, balik nama, atau roya) dilakukan di Kantor Badan Pertanahan Nasional (BPN) Balikpapan.",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "sertifikat tanah",
+      "urus",
+      "BPN",
+      "jawa",
+      "ngoko"
+    ]
+  },
+  {
+    "id": "J-68-M",
+    "text": "Pripun carane ngurus sertifikat tanah teng Balikpapan?",
+    "answer": "Pengurusan sertifikat tanah (misalnya pendaftaran pertama kali, balik nama, atau roya) dilakukan di Kantor Badan Pertanahan Nasional (BPN) Balikpapan.",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "sertifikat tanah",
+      "urus",
+      "BPN",
+      "jawa",
+      "madya"
+    ]
+  },
+  {
+    "id": "J-68-K",
+    "text": "Kados pundi caranipun ngurus sertifikat siti wonten Balikpapan?",
+    "answer": "Pengurusan sertifikat tanah (misalnya pendaftaran pertama kali, balik nama, atau roya) dilakukan di Kantor Badan Pertanahan Nasional (BPN) Balikpapan.",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "sertifikat tanah",
+      "urus",
+      "BPN",
+      "jawa",
+      "krama"
+    ]
+  },
+  {
+    "id": "12",
+    "text": "Berapa biaya perpanjangan SIM C?",
+    "answer": "Biaya perpanjangan SIM C adalah Rp75.000 sesuai PP No. 60 Tahun 2016 tentang PNBP Polri (belum termasuk biaya tes kesehatan dan psikologi).",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "SIM C",
+      "biaya",
+      "harga",
+      "perpanjang"
+    ]
+  },
+  {
+    "id": "J-12-N",
+    "text": "Piro biayane ndawakke SIM C?",
+    "answer": "Biaya perpanjangan SIM C adalah Rp75.000 sesuai PP No. 60 Tahun 2016 tentang PNBP Polri (belum termasuk biaya tes kesehatan dan psikologi).",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "SIM C",
+      "biaya",
+      "harga",
+      "perpanjang",
+      "jawa",
+      "ngoko"
+    ]
+  },
+  {
+    "id": "J-12-M",
+    "text": "Pinten biayane ngurus perpanjangan SIM C?",
+    "answer": "Biaya perpanjangan SIM C adalah Rp75.000 sesuai PP No. 60 Tahun 2016 tentang PNBP Polri (belum termasuk biaya tes kesehatan dan psikologi).",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "SIM C",
+      "biaya",
+      "harga",
+      "perpanjang",
+      "jawa",
+      "madya"
+    ]
+  },
+  {
+    "id": "J-12-K",
+    "text": "Pinten wragadipun ngurus perpanjangan SIM C?",
+    "answer": "Biaya perpanjangan SIM C adalah Rp75.000 sesuai PP No. 60 Tahun 2016 tentang PNBP Polri (belum termasuk biaya tes kesehatan dan psikologi).",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "SIM C",
+      "biaya",
+      "harga",
+      "perpanjang",
+      "jawa",
+      "krama"
+    ]
+  },
+  {
+    "id": "27",
+    "text": "Apakah ada jadwal SIM Keliling di Balikpapan?",
+    "answer": "Ya, layanan SIM Keliling tersedia di beberapa titik Balikpapan sesuai jadwal mingguan yang diumumkan Polres.",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "SIM Keliling",
+      "jadwal",
+      "layanan"
+    ]
+  },
+  {
+    "id": "J-27-N",
+    "text": "Ono jadwal SIM Keliling neng Balikpapan ora?",
+    "answer": "Ya, layanan SIM Keliling tersedia di beberapa titik Balikpapan sesuai jadwal mingguan yang diumumkan Polres.",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "SIM Keliling",
+      "jadwal",
+      "layanan",
+      "jawa",
+      "ngoko"
+    ]
+  },
+  {
+    "id": "J-27-M",
+    "text": "Nopo wonten jadwal SIM Keliling teng Balikpapan?",
+    "answer": "Ya, layanan SIM Keliling tersedia di beberapa titik Balikpapan sesuai jadwal mingguan yang diumumkan Polres.",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "SIM Keliling",
+      "jadwal",
+      "layanan",
+      "jawa",
+      "madya"
+    ]
+  },
+  {
+    "id": "J-27-K",
+    "text": "Punopo wonten jadwal SIM Keliling wonten Balikpapan?",
+    "answer": "Ya, layanan SIM Keliling tersedia di beberapa titik Balikpapan sesuai jadwal mingguan yang diumumkan Polres.",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "SIM Keliling",
+      "jadwal",
+      "layanan",
+      "jawa",
+      "krama"
+    ]
+  },
+  {
+    "id": "16",
+    "text": "Apa syarat membuat SKCK?",
+    "answer": "Syarat membuat SKCK adalah membawa fotokopi KTP, KK, akta kelahiran, pasfoto 4x6, dan formulir permohonan.",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "SKCK",
+      "syarat",
+      "persyaratan"
+    ]
+  },
+  {
+    "id": "J-16-N",
+    "text": "Opo syarate gawe SKCK?",
+    "answer": "Syarat membuat SKCK adalah membawa fotokopi KTP, KK, akta kelahiran, pasfoto 4x6, dan formulir permohonan.",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "SKCK",
+      "syarat",
+      "persyaratan",
+      "jawa",
+      "ngoko"
+    ]
+  },
+  {
+    "id": "J-16-M",
+    "text": "Nopo syarate damel SKCK?",
+    "answer": "Syarat membuat SKCK adalah membawa fotokopi KTP, KK, akta kelahiran, pasfoto 4x6, dan formulir permohonan.",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "SKCK",
+      "syarat",
+      "persyaratan",
+      "jawa",
+      "madya"
+    ]
+  },
+  {
+    "id": "J-16-K",
+    "text": "Menopo syaratipun ndamel SKCK?",
+    "answer": "Syarat membuat SKCK adalah membawa fotokopi KTP, KK, akta kelahiran, pasfoto 4x6, dan formulir permohonan.",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "SKCK",
+      "syarat",
+      "persyaratan",
+      "jawa",
+      "krama"
+    ]
+  },
+  {
+    "id": "11",
+    "text": "Apakah perpanjangan SIM bisa dilakukan secara online?",
+    "answer": "Ya, Anda bisa menggunakan aplikasi Digital Korlantas Polri (layanan SINAR) untuk perpanjangan SIM online.",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "SIM",
+      "online",
+      "SINAR",
+      "aplikasi"
+    ]
+  },
+  {
+    "id": "J-11-N",
+    "text": "Ndawakke SIM iso online ora?",
+    "answer": "Ya, Anda bisa menggunakan aplikasi Digital Korlantas Polri (layanan SINAR) untuk perpanjangan SIM online.",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "SIM",
+      "online",
+      "SINAR",
+      "aplikasi",
+      "jawa",
+      "ngoko"
+    ]
+  },
+  {
+    "id": "J-11-M",
+    "text": "Nopo ngurus perpanjangan SIM saget online?",
+    "answer": "Ya, Anda bisa menggunakan aplikasi Digital Korlantas Polri (layanan SINAR) untuk perpanjangan SIM online.",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "SIM",
+      "online",
+      "SINAR",
+      "aplikasi",
+      "jawa",
+      "madya"
+    ]
+  },
+  {
+    "id": "J-11-K",
+    "text": "Punopo ngurus perpanjangan SIM saged online?",
+    "answer": "Ya, Anda bisa menggunakan aplikasi Digital Korlantas Polri (layanan SINAR) untuk perpanjangan SIM online.",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "SIM",
+      "online",
+      "SINAR",
+      "aplikasi",
+      "jawa",
+      "krama"
+    ]
+  },
+  {
+    "id": "43",
+    "text": "Bagaimana cara membuat surat keterangan catatan kepolisian untuk bekerja?",
+    "answer": "Anda bisa mengurus SKCK di Polres Balikpapan dengan membawa KTP, KK, pasfoto, dan melakukan sidik jari.",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "SKCK",
+      "buat",
+      "syarat",
+      "bekerja"
+    ]
+  },
+  {
+    "id": "J-43-N",
+    "text": "Piye carane gawe SKCK nggo kerjo?",
+    "answer": "Anda bisa mengurus SKCK di Polres Balikpapan dengan membawa KTP, KK, pasfoto, dan melakukan sidik jari.",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "SKCK",
+      "buat",
+      "syarat",
+      "bekerja",
+      "jawa",
+      "ngoko"
+    ]
+  },
+  {
+    "id": "J-43-M",
+    "text": "Pripun carane damel SKCK kangge nyambut gawe?",
+    "answer": "Anda bisa mengurus SKCK di Polres Balikpapan dengan membawa KTP, KK, pasfoto, dan melakukan sidik jari.",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "SKCK",
+      "buat",
+      "syarat",
+      "bekerja",
+      "jawa",
+      "madya"
+    ]
+  },
+  {
+    "id": "J-43-K",
+    "text": "Kados pundi caranipun ndamel SKCK kagem nyambut damel?",
+    "answer": "Anda bisa mengurus SKCK di Polres Balikpapan dengan membawa KTP, KK, pasfoto, dan melakukan sidik jari.",
+    "kategori_utama": "Perizinan",
+    "tags": [
+      "SKCK",
+      "buat",
+      "syarat",
+      "bekerja",
+      "jawa",
+      "krama"
+    ]
+  },
+  {
+    "id": "74",
+    "text": "Bagaimana cara melakukan pengaduan layanan publik di Balikpapan?",
+    "answer": "Anda dapat melakukan pengaduan melalui layanan LAPOR! (Layanan Aspirasi dan Pengaduan Online Rakyat) atau melalui Call Center 112 Balikpapan.",
+    "kategori_utama": "Pengaduan",
+    "tags": [
+      "pengaduan",
+      "lapor",
+      "LAPOR",
+      "Call Center 112"
+    ]
+  },
+  {
+    "id": "J-74-N",
+    "text": "Piye carane wadul layanan publik neng Balikpapan?",
+    "answer": "Anda dapat melakukan pengaduan melalui layanan LAPOR! (Layanan Aspirasi dan Pengaduan Online Rakyat) atau melalui Call Center 112 Balikpapan.",
+    "kategori_utama": "Pengaduan",
+    "tags": [
+      "pengaduan",
+      "lapor",
+      "LAPOR",
+      "Call Center 112",
+      "jawa",
+      "ngoko"
+    ]
+  },
+  {
+    "id": "J-74-M",
+    "text": "Pripun carane wadul layanan publik teng Balikpapan?",
+    "answer": "Anda dapat melakukan pengaduan melalui layanan LAPOR! (Layanan Aspirasi dan Pengaduan Online Rakyat) atau melalui Call Center 112 Balikpapan.",
+    "kategori_utama": "Pengaduan",
+    "tags": [
+      "pengaduan",
+      "lapor",
+      "LAPOR",
+      "Call Center 112",
+      "jawa",
+      "madya"
+    ]
+  },
+  {
+    "id": "J-74-K",
+    "text": "Kados pundi caranipun wadul layanan publik wonten Balikpapan?",
+    "answer": "Anda dapat melakukan pengaduan melalui layanan LAPOR! (Layanan Aspirasi dan Pengaduan Online Rakyat) atau melalui Call Center 112 Balikpapan.",
+    "kategori_utama": "Pengaduan",
+    "tags": [
+      "pengaduan",
+      "lapor",
+      "LAPOR",
+      "Call Center 112",
+      "jawa",
+      "krama"
+    ]
+  },
+  {
+    "id": "67",
+    "text": "Dimana lokasi DPMPT Balikpapan?",
+    "answer": "Kantor DPMPT (Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu) Balikpapan beralamat di Jl. Jenderal Sudirman No. 2 (Gedung Gabungan Dinas).",
+    "kategori_utama": "Lokasi Instansi",
+    "tags": [
+      "DPMPT",
+      "lokasi",
+      "alamat",
+      "perizinan"
+    ]
+  },
+  {
+    "id": "J-67-N",
+    "text": "Neng ndi DPMPT Balikpapan?",
+    "answer": "Kantor DPMPT (Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu) Balikpapan beralamat di Jl. Jenderal Sudirman No. 2 (Gedung Gabungan Dinas).",
+    "kategori_utama": "Lokasi Instansi",
+    "tags": [
+      "DPMPT",
+      "lokasi",
+      "alamat",
+      "perizinan",
+      "jawa",
+      "ngoko"
+    ]
+  },
+  {
+    "id": "J-67-M",
+    "text": "Teng pundi DPMPT Balikpapan niku?",
+    "answer": "Kantor DPMPT (Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu) Balikpapan beralamat di Jl. Jenderal Sudirman No. 2 (Gedung Gabungan Dinas).",
+    "kategori_utama": "Lokasi Instansi",
+    "tags": [
+      "DPMPT",
+      "lokasi",
+      "alamat",
+      "perizinan",
+      "jawa",
+      "madya"
+    ]
+  },
+  {
+    "id": "J-67-K",
+    "text": "Wonten pundi papanipun DPMPT Balikpapan?",
+    "answer": "Kantor DPMPT (Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu) Balikpapan beralamat di Jl. Jenderal Sudirman No. 2 (Gedung Gabungan Dinas).",
+    "kategori_utama": "Lokasi Instansi",
+    "tags": [
+      "DPMPT",
+      "lokasi",
+      "alamat",
+      "perizinan",
+      "jawa",
+      "krama"
+    ]
+  },
+  {
+    "id": "69",
+    "text": "Dimana lokasi Kantor BPN Balikpapan?",
+    "answer": "Kantor Pertanahan (BPN) Kota Balikpapan beralamat di Jl. Ruhui Rahayu I No. 1, Sepinggan, Balikpapan Selatan (bersebelahan dengan kantor PDAM).",
+    "kategori_utama": "Lokasi Instansi",
+    "tags": [
+      "BPN",
+      "lokasi",
+      "alamat",
+      "tanah"
+    ]
+  },
+  {
+    "id": "J-69-N",
+    "text": "Neng ndi Kantor BPN Balikpapan?",
+    "answer": "Kantor Pertanahan (BPN) Kota Balikpapan beralamat di Jl. Ruhui Rahayu I No. 1, Sepinggan, Balikpapan Selatan (bersebelahan dengan kantor PDAM).",
+    "kategori_utama": "Lokasi Instansi",
+    "tags": [
+      "BPN",
+      "lokasi",
+      "alamat",
+      "tanah",
+      "jawa",
+      "ngoko"
+    ]
+  },
+  {
+    "id": "J-69-M",
+    "text": "Teng pundi Kantor BPN Balikpapan niku?",
+    "answer": "Kantor Pertanahan (BPN) Kota Balikpapan beralamat di Jl. Ruhui Rahayu I No. 1, Sepinggan, Balikpapan Selatan (bersebelahan dengan kantor PDAM).",
+    "kategori_utama": "Lokasi Instansi",
+    "tags": [
+      "BPN",
+      "lokasi",
+      "alamat",
+      "tanah",
+      "jawa",
+      "madya"
+    ]
+  },
+  {
+    "id": "J-69-K",
+    "text": "Wonten pundi papanipun Kantor BPN Balikpapan?",
+    "answer": "Kantor Pertanahan (BPN) Kota Balikpapan beralamat di Jl. Ruhui Rahayu I No. 1, Sepinggan, Balikpapan Selatan (bersebelahan dengan kantor PDAM).",
+    "kategori_utama": "Lokasi Instansi",
+    "tags": [
+      "BPN",
+      "lokasi",
+      "alamat",
+      "tanah",
+      "jawa",
+      "krama"
+    ]
+  },
+  {
+    "id": "62",
+    "text": "Dimana lokasi kantor pajak daerah (BPPDRD) Balikpapan?",
+    "answer": "Kantor BPPDRD (Badan Pengelola Pajak Daerah dan Retribusi Daerah) Balikpapan beralamat di Jl. Jenderal Sudirman No. 2, Gedung Gabungan Dinas.",
+    "kategori_utama": "Lokasi Instansi",
+    "tags": [
+      "BPPDRD",
+      "lokasi",
+      "alamat",
+      "pajak daerah"
+    ]
+  },
+  {
+    "id": "J-62-N",
+    "text": "Neng ndi kantore BPPDRD Balikpapan?",
+    "answer": "Kantor BPPDRD (Badan Pengelola Pajak Daerah dan Retribusi Daerah) Balikpapan beralamat di Jl. Jenderal Sudirman No. 2, Gedung Gabungan Dinas.",
+    "kategori_utama": "Lokasi Instansi",
+    "tags": [
+      "BPPDRD",
+      "lokasi",
+      "alamat",
+      "pajak daerah",
+      "jawa",
+      "ngoko"
+    ]
+  },
+  {
+    "id": "J-62-M",
+    "text": "Teng pundi kantore BPPDRD Balikpapan?",
+    "answer": "Kantor BPPDRD (Badan Pengelola Pajak Daerah dan Retribusi Daerah) Balikpapan beralamat di Jl. Jenderal Sudirman No. 2, Gedung Gabungan Dinas.",
+    "kategori_utama": "Lokasi Instansi",
+    "tags": [
+      "BPPDRD",
+      "lokasi",
+      "alamat",
+      "pajak daerah",
+      "jawa",
+      "madya"
+    ]
+  },
+  {
+    "id": "J-62-K",
+    "text": "Wonten pundi kantoripun BPPDRD Balikpapan?",
+    "answer": "Kantor BPPDRD (Badan Pengelola Pajak Daerah dan Retribusi Daerah) Balikpapan beralamat di Jl. Jenderal Sudirman No. 2, Gedung Gabungan Dinas.",
+    "kategori_utama": "Lokasi Instansi",
+    "tags": [
+      "BPPDRD",
+      "lokasi",
+      "alamat",
+      "pajak daerah",
+      "jawa",
+      "krama"
+    ]
+  },
+  {
+    "id": "73",
+    "text": "Dimana lokasi kantor PLN Balikpapan?",
+    "answer": "Kantor PLN UP3 Balikpapan (Unit Pelaksana Pelayanan Pelanggan) beralamat di Jl. Jenderal Sudirman No. 40, Klandasan Ulu.",
+    "kategori_utama": "Lokasi Instansi",
+    "tags": [
+      "PLN",
+      "lokasi",
+      "alamat",
+      "kantor"
+    ]
+  },
+  {
+    "id": "J-73-N",
+    "text": "Neng ndi kantore PLN Balikpapan?",
+    "answer": "Kantor PLN UP3 Balikpapan (Unit Pelaksana Pelayanan Pelanggan) beralamat di Jl. Jenderal Sudirman No. 40, Klandasan Ulu.",
+    "kategori_utama": "Lokasi Instansi",
+    "tags": [
+      "PLN",
+      "lokasi",
+      "alamat",
+      "kantor",
+      "jawa",
+      "ngoko"
+    ]
+  },
+  {
+    "id": "J-73-M",
+    "text": "Teng pundi kantore PLN Balikpapan?",
+    "answer": "Kantor PLN UP3 Balikpapan (Unit Pelaksana Pelayanan Pelanggan) beralamat di Jl. Jenderal Sudirman No. 40, Klandasan Ulu.",
+    "kategori_utama": "Lokasi Instansi",
+    "tags": [
+      "PLN",
+      "lokasi",
+      "alamat",
+      "kantor",
+      "jawa",
+      "madya"
+    ]
+  },
+  {
+    "id": "J-73-K",
+    "text": "Wonten pundi kantoripun PLN Balikpapan?",
+    "answer": "Kantor PLN UP3 Balikpapan (Unit Pelaksana Pelayanan Pelanggan) beralamat di Jl. Jenderal Sudirman No. 40, Klandasan Ulu.",
+    "kategori_utama": "Lokasi Instansi",
+    "tags": [
+      "PLN",
+      "lokasi",
+      "alamat",
+      "kantor",
+      "jawa",
+      "krama"
+    ]
+  },
+  {
+    "id": "26",
+    "text": "Dimana lokasi Satpas SIM Balikpapan?",
+    "answer": "Satpas SIM Polres Balikpapan berlokasi di Jl. Jenderal Sudirman No.1, Balikpapan (di dalam kompleks Polres Balikpapan).",
+    "kategori_utama": "Lokasi Instansi",
+    "tags": [
+      "Satpas",
+      "SIM",
+      "lokasi",
+      "Polres"
+    ]
+  },
+  {
+    "id": "J-26-N",
+    "text": "Neng ndi Satpas SIM Balikpapan?",
+    "answer": "Satpas SIM Polres Balikpapan berlokasi di Jl. Jenderal Sudirman No.1, Balikpapan (di dalam kompleks Polres Balikpapan).",
+    "kategori_utama": "Lokasi Instansi",
+    "tags": [
+      "Satpas",
+      "SIM",
+      "lokasi",
+      "Polres",
+      "jawa",
+      "ngoko"
+    ]
+  },
+  {
+    "id": "J-26-M",
+    "text": "Teng pundi Satpas SIM Balikpapan niku?",
+    "answer": "Satpas SIM Polres Balikpapan berlokasi di Jl. Jenderal Sudirman No.1, Balikpapan (di dalam kompleks Polres Balikpapan).",
+    "kategori_utama": "Lokasi Instansi",
+    "tags": [
+      "Satpas",
+      "SIM",
+      "lokasi",
+      "Polres",
+      "jawa",
+      "madya"
+    ]
+  },
+  {
+    "id": "J-26-K",
+    "text": "Wonten pundi papanipun Satpas SIM Balikpapan?",
+    "answer": "Satpas SIM Polres Balikpapan berlokasi di Jl. Jenderal Sudirman No.1, Balikpapan (di dalam kompleks Polres Balikpapan).",
+    "kategori_utama": "Lokasi Instansi",
+    "tags": [
+      "Satpas",
+      "SIM",
+      "lokasi",
+      "Polres",
+      "jawa",
+      "krama"
+    ]
+  },
+  {
+    "id": "60",
+    "text": "Dimana lokasi Samsat Balikpapan?",
+    "answer": "Kantor Bersama Samsat Balikpapan beralamat di Jl. MT Haryono No.52, Damai, Balikpapan Kota, Kalimantan Timur.",
+    "kategori_utama": "Lokasi Instansi",
+    "tags": [
+      "Samsat",
+      "lokasi",
+      "alamat",
+      "pajak"
+    ]
+  },
+  {
+    "id": "J-60-N",
+    "text": "Neng ndi Samsat Balikpapan?",
+    "answer": "Kantor Bersama Samsat Balikpapan beralamat di Jl. MT Haryono No.52, Damai, Balikpapan Kota, Kalimantan Timur.",
+    "kategori_utama": "Lokasi Instansi",
+    "tags": [
+      "Samsat",
+      "lokasi",
+      "alamat",
+      "pajak",
+      "jawa",
+      "ngoko"
+    ]
+  },
+  {
+    "id": "J-60-M",
+    "text": "Teng pundi Samsat Balikpapan niku?",
+    "answer": "Kantor Bersama Samsat Balikpapan beralamat di Jl. MT Haryono No.52, Damai, Balikpapan Kota, Kalimantan Timur.",
+    "kategori_utama": "Lokasi Instansi",
+    "tags": [
+      "Samsat",
+      "lokasi",
+      "alamat",
+      "pajak",
+      "jawa",
+      "madya"
+    ]
+  },
+  {
+    "id": "J-60-K",
+    "text": "Wonten pundi papanipun Samsat Balikpapan?",
+    "answer": "Kantor Bersama Samsat Balikpapan beralamat di Jl. MT Haryono No.52, Damai, Balikpapan Kota, Kalimantan Timur.",
+    "kategori_utama": "Lokasi Instansi",
+    "tags": [
+      "Samsat",
+      "lokasi",
+      "alamat",
+      "pajak",
+      "jawa",
+      "krama"
+    ]
+  },
+  {
+    "id": "54",
+    "text": "Dimana lokasi Kantor BPJS Kesehatan Balikpapan?",
+    "answer": "Kantor BPJS Kesehatan Balikpapan beralamat di Jl. Jenderal Sudirman No. 2A, Klandasan Ilir, Balikpapan Kota.",
+    "kategori_utama": "Lokasi Instansi",
+    "tags": [
+      "lokasi",
+      "alamat",
+      "BPJS Kesehatan"
+    ]
+  },
+  {
+    "id": "52",
+    "text": "Apa jam pelayanan Disdukcapil Balikpapan?",
+    "answer": "Jam pelayanan Disdukcapil Balikpapan: Senin–Kamis pukul 08:00–15:00 WITA (Waktu Istirahat pukul 12:00–13:00 WITA), Jumat pukul 08:00–11:00 WITA.",
+    "kategori_utama": "Jam Kerja",
+    "tags": [
+      "jam",
+      "pelayanan",
+      "Disdukcapil",
+      "operasional"
+    ]
+  },
+  {
+    "id": "J-52-N",
+    "text": "Jam layanane Disdukcapil Balikpapan jam piro?",
+    "answer": "Jam pelayanan Disdukcapil Balikpapan: Senin–Kamis pukul 08:00–15:00 WITA (Waktu Istirahat pukul 12:00–13:00 WITA), Jumat pukul 08:00–11:00 WITA.",
+    "kategori_utama": "Jam Kerja",
+    "tags": [
+      "jam",
+      "pelayanan",
+      "Disdukcapil",
+      "operasional",
+      "jawa",
+      "ngoko"
+    ]
+  },
+  {
+    "id": "J-52-M",
+    "text": "Jam pelayanane Disdukcapil Balikpapan jam pinten?",
+    "answer": "Jam pelayanan Disdukcapil Balikpapan: Senin–Kamis pukul 08:00–15:00 WITA (Waktu Istirahat pukul 12:00–13:00 WITA), Jumat pukul 08:00–11:00 WITA.",
+    "kategori_utama": "Jam Kerja",
+    "tags": [
+      "jam",
+      "pelayanan",
+      "Disdukcapil",
+      "operasional",
+      "jawa",
+      "madya"
+    ]
+  },
+  {
+    "id": "J-52-K",
+    "text": "Jam pelayananipun Disdukcapil Balikpapan jam pinten?",
+    "answer": "Jam pelayanan Disdukcapil Balikpapan: Senin–Kamis pukul 08:00–15:00 WITA (Waktu Istirahat pukul 12:00–13:00 WITA), Jumat pukul 08:00–11:00 WITA.",
+    "kategori_utama": "Jam Kerja",
+    "tags": [
+      "jam",
+      "pelayanan",
+      "Disdukcapil",
+      "operasional",
+      "jawa",
+      "krama"
+    ]
+  },
+  {
+    "id": "6",
+    "text": "Apakah kantor kelurahan buka hari Sabtu?",
+    "answer": "Tidak, kantor kelurahan hanya buka Senin sampai Jumat. Sabtu, Minggu, dan hari libur nasional tutup.",
+    "kategori_utama": "Jam Kerja",
+    "tags": [
+      "Sabtu",
+      "Minggu",
+      "buka",
+      "tutup",
+      "libur"
+    ]
+  },
+  {
+    "id": "KAMUS-LENGKAP-001",
+    "indonesia": "saya",
+    "ngoko": "aku",
+    "madya": "kulo / kulo",
+    "krama": "kulo / dalem / kawulo"
+  }
+]

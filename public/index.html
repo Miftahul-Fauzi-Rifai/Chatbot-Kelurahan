@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Chatbot Kelurahan (Gemini)</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    body{font-family:system-ui,Arial;margin:0 auto;padding:20px;max-width:900px}
+    #chat{border:1px solid #ddd;padding:10px;height:400px;overflow:auto;background:#fafafa; border-radius: 8px;}
+    .msg{margin:8px 0; padding: 8px 12px; border-radius: 8px;}
+    .msg .meta{font-size:12px;color:#666; font-weight: 600;}
+    /* [PENYEMPURNAAN] Style berbeda untuk User dan Bot */
+    .msg div:first-child + div { margin-top: 4px; }
+    .msg:has(.meta:contains(Anda)) { background-color: #e1f5fe; }
+    .msg:has(.meta:contains(Bot)) { background-color: #f1f1f1; }
+    .msg:has(i) { color: #555; } /* Style untuk 'sedang berpikir' */
+    #f { display: flex; margin-top: 10px; }
+    #m { flex-grow: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+    #f button { padding: 8px 12px; margin-left: 8px; border: none; background-color: #007bff; color: white; border-radius: 4px; cursor: pointer; }
+    #f button:hover { background-color: #0056b3; }
+    .controls { margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; }
+    /* [PENYEMPURNAAN] Tombol Clear */
+    #clear { padding: 6px 10px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    #clear:hover { background: #d32f2f; }
+  </style>
+</head>
+<body>
+  <h2>Chatbot Kelurahan (Gemini)</h2>
+  <div id="chat">
+    <div class="msg" style="background-color: #f1f1f1;">
+      <div class="meta">Bot</div>
+      <div>Halo! Silakan ajukan pertanyaan Anda.</div>
+    </div>
+  </div>
+  <form id="f">
+    <input id="m" placeholder="Tulis pertanyaan..." style="width:70%"/>
+    <button type="submit">Send</button>
+  </form>
+  
+  <button id="clear" style="margin-top: 10px;">Bersihkan Chat</button>
+
+  <div class="controls">
+    <h3>Upload data training (JSON)</h3>
+    <input type="file" id="file"/>
+    <button id="up">Upload</button>
+    <p>Format contoh di <code>/data/train.json</code>. Data dengan ID yang sama akan dilewati.</p>
+  </div>
+  
+  <script src="app.js"></script>
+</body>
+</html>

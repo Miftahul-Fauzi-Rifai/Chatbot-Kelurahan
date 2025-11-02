@@ -1,0 +1,37 @@
+{
+  "name": "chatbot-kelurahan-api",
+  "version": "2.0.0",
+  "description": "Backend API for Chatbot Kelurahan - Voice Assistant with Gemini AI",
+  "type": "module",
+  "main": "server_production.js",
+  "scripts": {
+    "start": "node server_production.js",
+    "dev": "node server.js",
+    "optimize": "node optimize_data.js",
+    "rag:index": "node rag_index.js",
+    "rag:test": "node test_rag.js",
+    "test:local": "node test_local_rag.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "axios": "^1.4.0",
+    "dotenv": "^17.2.3",
+    "express": "^4.18.2",
+    "multer": "^2.0.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "chatbot",
+    "kelurahan",
+    "gemini-ai",
+    "voice-assistant",
+    "speech-recognition",
+    "text-to-speech",
+    "rag",
+    "government"
+  ],
+  "author": "Kelurahan Marga Sari",
+  "license": "MIT"
+}

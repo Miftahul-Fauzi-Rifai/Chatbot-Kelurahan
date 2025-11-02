@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chatbot Kelurahan Marga Sari - Voice Assistant</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+      width: 100%;
+      padding: 30px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .header h1 {
+      font-size: 24px;
+      color: #333;
+      margin-bottom: 5px;
+    }
+
+    .header p {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .voice-status {
+      text-align: center;
+      margin: 30px 0;
+    }
+
+    .voice-button {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: none;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      font-size: 48px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .voice-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+    }
+
+    .voice-button:active {
+      transform: scale(0.95);
+    }
+
+    .voice-button.listening {
+      animation: pulse 1.5s infinite;
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    .voice-button.processing {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      animation: rotate 2s linear infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 10px 30px rgba(240, 147, 251, 0.4);
+      }
+      50% {
+        transform: scale(1.1);
+        box-shadow: 0 15px 40px rgba(240, 147, 251, 0.8);
+      }
+    }
+
+    @keyframes rotate {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .status-text {
+      margin-top: 20px;
+      font-size: 16px;
+      color: #666;
+      min-height: 24px;
+    }
+
+    .status-text.listening {
+      color: #f5576c;
+      font-weight: bold;
+    }
+
+    .status-text.processing {
+      color: #00f2fe;
+      font-weight: bold;
+    }
+
+    .transcript {
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 15px;
+      margin: 20px 0;
+      min-height: 60px;
+      border-left: 4px solid #667eea;
+    }
+
+    .transcript-label {
+      font-size: 12px;
+      color: #666;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .transcript-text {
+      color: #333;
+      line-height: 1.6;
+    }
+
+    .response {
+      background: #e7f3ff;
+      border-radius: 10px;
+      padding: 15px;
+      margin: 20px 0;
+      min-height: 60px;
+      border-left: 4px solid #4facfe;
+    }
+
+    .response-label {
+      font-size: 12px;
+      color: #666;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .response-text {
+      color: #333;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+
+    .btn-clear {
+      background: #f44336;
+      color: white;
+    }
+
+    .btn-clear:hover {
+      background: #d32f2f;
+    }
+
+    .btn-settings {
+      background: #666;
+      color: white;
+    }
+
+    .btn-settings:hover {
+      background: #555;
+    }
+
+    .settings {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      display: none;
+    }
+
+    .settings.show {
+      display: block;
+    }
+
+    .setting-item {
+      margin-bottom: 15px;
+    }
+
+    .setting-item label {
+      display: block;
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    .setting-item input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    .setting-item select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    .error {
+      background: #ffebee;
+      color: #c62828;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 15px 0;
+      border-left: 4px solid #c62828;
+      font-size: 14px;
+    }
+
+    .info {
+      background: #e3f2fd;
+      color: #1565c0;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 15px 0;
+      border-left: 4px solid #1565c0;
+      font-size: 14px;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+      font-size: 12px;
+      color: #999;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px;
+      }
+
+      .header h1 {
+        font-size: 20px;
+      }
+
+      .voice-button {
+        width: 100px;
+        height: 100px;
+        font-size: 40px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🏛️ Chatbot Kelurahan Marga Sari</h1>
+      <p>Asisten Virtual dengan Voice Command</p>
+    </div>
+
+    <div id="error-message" class="error" style="display: none;"></div>
+    <div id="info-message" class="info" style="display: none;"></div>
+
+    <div class="voice-status">
+      <button id="voiceBtn" class="voice-button" title="Klik untuk berbicara">
+        🎤
+      </button>
+      <div id="statusText" class="status-text">
+        Klik tombol untuk mulai berbicara
+      </div>
+    </div>
+
+    <div class="transcript">
+      <div class="transcript-label">📝 Pertanyaan Anda:</div>
+      <div id="transcriptText" class="transcript-text">
+        <em>Belum ada pertanyaan...</em>
+      </div>
+    </div>
+
+    <div class="response">
+      <div class="response-label">💬 Jawaban:</div>
+      <div id="responseText" class="response-text">
+        <em>Silakan ajukan pertanyaan terlebih dahulu...</em>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button id="clearBtn" class="btn btn-clear">🗑️ Bersihkan</button>
+      <button id="settingsBtn" class="btn btn-settings">⚙️ Pengaturan</button>
+    </div>
+
+    <div id="settingsPanel" class="settings">
+      <div class="setting-item">
+        <label for="apiUrl">Backend API URL:</label>
+        <input 
+          type="text" 
+          id="apiUrl" 
+          placeholder="https://your-backend.onrender.com/chat"
+          value="http://localhost:3000/chat"
+        >
+      </div>
+      <div class="setting-item">
+        <label for="voiceSelect">Suara TTS:</label>
+        <select id="voiceSelect">
+          <option value="">Pilih suara...</option>
+        </select>
+      </div>
+      <div class="setting-item">
+        <label for="speechRate">Kecepatan Bicara: <span id="rateValue">1.0</span>x</label>
+        <input 
+          type="range" 
+          id="speechRate" 
+          min="0.5" 
+          max="2.0" 
+          step="0.1" 
+          value="1.0"
+        >
+      </div>
+    </div>
+
+    <div class="footer">
+      Kelurahan Marga Sari, Balikpapan<br>
+      Powered by Gemini AI & Web Speech API
+    </div>
+  </div>
+
+  <script src="voice-chatbot.js"></script>
+</body>
+</html>

@@ -1,0 +1,1577 @@
+[
+  {
+    "id": "KAMUS-LENGKAP-001",
+    "indonesia": "saya",
+    "ngoko": "aku",
+    "madya": "kulo / kulo",
+    "krama": "kulo / dalem / kawulo"
+  },
+  {
+    "id": "KAMUS-LENGKAP-002",
+    "indonesia": "kamu",
+    "ngoko": "kowe",
+    "madya": "sampeyan / njenengan",
+    "krama": "panjenengan / ndiko"
+  },
+  {
+    "id": "KAMUS-LENGKAP-003",
+    "indonesia": "dia",
+    "ngoko": "deweke",
+    "madya": "piyambake / piyambakipun",
+    "krama": "piyambakipun"
+  },
+  {
+    "id": "KAMUS-LENGKAP-004",
+    "indonesia": "kami / kita",
+    "ngoko": "awakdewe",
+    "madya": "awakdewe / kito",
+    "krama": "kulo sedoyo / kito sedanten"
+  },
+  {
+    "id": "KAMUS-LENGKAP-005",
+    "indonesia": "mereka",
+    "ngoko": "deweke kabeh",
+    "madya": "piyambakipun sedoyo",
+    "krama": "piyambakipun sedanten"
+  },
+  {
+    "id": "KAMUS-LENGKAP-006",
+    "indonesia": "apa",
+    "ngoko": "opo",
+    "madya": "nopo",
+    "krama": "menopo"
+  },
+  {
+    "id": "KAMUS-LENGKAP-007",
+    "indonesia": "bagaimana",
+    "ngoko": "piye / kepiye",
+    "madya": "pripun / kepripun",
+    "krama": "kados pundi"
+  },
+  {
+    "id": "KAMUS-LENGKAP-008",
+    "indonesia": "dimana",
+    "ngoko": "neng ndi / ing ndi",
+    "madya": "teng pundi / wonten pundi",
+    "krama": "wonten pundi"
+  },
+  {
+    "id": "KAMUS-LENGKAP-009",
+    "indonesia": "kapan",
+    "ngoko": "kapan",
+    "madya": "kapan",
+    "krama": "kapan"
+  },
+  {
+    "id": "KAMUS-LENGKAP-010",
+    "indonesia": "berapa",
+    "ngoko": "piro",
+    "madya": "pinten",
+    "krama": "pinten"
+  },
+  {
+    "id": "KAMUS-LENGKAP-011",
+    "indonesia": "siapa",
+    "ngoko": "sopo",
+    "madya": "sinten",
+    "krama": "sinten"
+  },
+  {
+    "id": "KAMUS-LENGKAP-012",
+    "indonesia": "mengapa / kenapa",
+    "ngoko": "nyapo / kenopo",
+    "madya": "kenging nopo / pripun kok",
+    "krama": "kenging menopo / kadosta pundi"
+  },
+  {
+    "id": "KAMUS-LENGKAP-013",
+    "indonesia": "yang mana",
+    "ngoko": "sing ndi",
+    "madya": "ingkang pundi / sing pundi",
+    "krama": "ingkang pundi"
+  },
+  {
+    "id": "KAMUS-LENGKAP-014",
+    "indonesia": "ada",
+    "ngoko": "ono",
+    "madya": "wonten / onten",
+    "krama": "wonten"
+  },
+  {
+    "id": "KAMUS-LENGKAP-015",
+    "indonesia": "tidak ada",
+    "ngoko": "ora ono",
+    "madya": "mboten wonten / mboten onten",
+    "krama": "mboten wonten"
+  },
+  {
+    "id": "KAMUS-LENGKAP-016",
+    "indonesia": "bisa",
+    "ngoko": "iso",
+    "madya": "saget",
+    "krama": "saged"
+  },
+  {
+    "id": "KAMUS-LENGKAP-017",
+    "indonesia": "tidak bisa",
+    "ngoko": "ora iso",
+    "madya": "mboten saget",
+    "krama": "mboten saged"
+  },
+  {
+    "id": "KAMUS-LENGKAP-018",
+    "indonesia": "mau / ingin",
+    "ngoko": "arep / ape / meh / pengen",
+    "madya": "ajeng / bade / kepingin",
+    "krama": "badhe / kersa / kepingin"
+  },
+  {
+    "id": "KAMUS-LENGKAP-019",
+    "indonesia": "tidak mau",
+    "ngoko": "emoh / ora arep",
+    "madya": "mboten purun / mboten ajeng",
+    "krama": "mboten kersa / mboten purun"
+  },
+  {
+    "id": "KAMUS-LENGKAP-020",
+    "indonesia": "terima kasih",
+    "ngoko": "suwun",
+    "madya": "nuwun / matur nuwun",
+    "krama": "matur nuwun / matur sembah nuwun"
+  },
+  {
+    "id": "KAMUS-LENGKAP-021",
+    "indonesia": "permisi",
+    "ngoko": "nuwun sewu",
+    "madya": "nuwun sewu / kulo nuwun / nderek langkung",
+    "krama": "nuwun sewu / kulo nuwun / ndherek langkung"
+  },
+  {
+    "id": "KAMUS-LENGKAP-022",
+    "indonesia": "lama (waktu)",
+    "ngoko": "suwe",
+    "madya": "dangu",
+    "krama": "dangu"
+  },
+  {
+    "id": "KAMUS-LENGKAP-023",
+    "indonesia": "baru",
+    "ngoko": "anyar",
+    "madya": "enggal",
+    "krama": "enggal"
+  },
+  {
+    "id": "KAMUS-LENGKAP-024",
+    "indonesia": "hilang",
+    "ngoko": "ilang",
+    "madya": "ical",
+    "krama": "ical"
+  },
+  {
+    "id": "KAMUS-LENGKAP-025",
+    "indonesia": "rusak",
+    "ngoko": "rusak / payah",
+    "madya": "risak / reksak",
+    "krama": "risak"
+  },
+  {
+    "id": "KAMUS-LENGKAP-026",
+    "indonesia": "pindah",
+    "ngoko": "pindah / ngalih",
+    "madya": "pindah / kesah",
+    "krama": "pindah / jengkar"
+  },
+  {
+    "id": "KAMUS-LENGKAP-027",
+    "indonesia": "membuat",
+    "ngoko": "gawe / nggawe",
+    "madya": "damel / ndamel",
+    "krama": "ndamel / yasa"
+  },
+  {
+    "id": "KAMUS-LENGKAP-028",
+    "indonesia": "bertanya",
+    "ngoko": "takon / nakon",
+    "madya": "tanglet / nanglet",
+    "krama": "nyuwun pirso / mundhut pirso / ndangu"
+  },
+  {
+    "id": "KAMUS-LENGKAP-029",
+    "indonesia": "membuka",
+    "ngoko": "mbukak",
+    "madya": "mbikak",
+    "krama": "mbikak"
+  },
+  {
+    "id": "KAMUS-LENGKAP-030",
+    "indonesia": "menutup",
+    "ngoko": "nutup",
+    "madya": "nutup",
+    "krama": "nutup / ngancing"
+  },
+  {
+    "id": "KAMUS-LENGKAP-031",
+    "indonesia": "sekarang",
+    "ngoko": "saiki",
+    "madya": "sakniki / saniki",
+    "krama": "sakmeniko / sameniko"
+  },
+  {
+    "id": "KAMUS-LENGKAP-032",
+    "indonesia": "besok",
+    "ngoko": "sesuk",
+    "madya": "mbenjing",
+    "krama": "mbenjing"
+  },
+  {
+    "id": "KAMUS-LENGKAP-033",
+    "indonesia": "hari ini",
+    "ngoko": "dino iki",
+    "madya": "dinten niki",
+    "krama": "dinten meniko"
+  },
+  {
+    "id": "KAMUS-LENGKAP-034",
+    "indonesia": "iya",
+    "ngoko": "yo / iyo",
+    "madya": "nggih / injih / inggih",
+    "krama": "inggih / sendika (konteks perintah)"
+  },
+  {
+    "id": "KAMUS-LENGKAP-035",
+    "indonesia": "tidak / bukan",
+    "ngoko": "ora",
+    "madya": "mboten / sanes",
+    "krama": "mboten / sanes"
+  },
+  {
+    "id": "KAMUS-LENGKAP-036",
+    "indonesia": "nama",
+    "ngoko": "jeneng",
+    "madya": "nami / asmo",
+    "krama": "asma / peparab"
+  },
+  {
+    "id": "KAMUS-LENGKAP-037",
+    "indonesia": "rumah",
+    "ngoko": "omah",
+    "madya": "griya / dalem",
+    "krama": "dalem / griyo"
+  },
+  {
+    "id": "KAMUS-LENGKAP-038",
+    "indonesia": "pergi",
+    "ngoko": "lungo",
+    "madya": "kesah / tindak",
+    "krama": "tindak / jengkar"
+  },
+  {
+    "id": "KAMUS-LENGKAP-039",
+    "indonesia": "datang / tiba",
+    "ngoko": "teko",
+    "madya": "dateng / dugi / rawuh",
+    "krama": "rawuh / sowan (menghadap)"
+  },
+  {
+    "id": "KAMUS-LENGKAP-040",
+    "indonesia": "mencari",
+    "ngoko": "golek",
+    "madya": "pados / ngupados",
+    "krama": "ngupados / pados"
+  },
+  {
+    "id": "KAMUS-LENGKAP-041",
+    "indonesia": "bertemu",
+    "ngoko": "ketemu / pethuk",
+    "madya": "kepanggih / ketemu",
+    "krama": "kepanggih / pinanggih"
+  },
+  {
+    "id": "KAMUS-LENGKAP-042",
+    "indonesia": "mengurus",
+    "ngoko": "ngurus",
+    "madya": "ngurus",
+    "krama": "ngurus / ngladosi (melayani)"
+  },
+  {
+    "id": "KAMUS-LENGKAP-043",
+    "indonesia": "masuk",
+    "ngoko": "mlebu",
+    "madya": "mlebet",
+    "krama": "mlebet"
+  },
+  {
+    "id": "KAMUS-LENGKAP-044",
+    "indonesia": "keluar",
+    "ngoko": "metu",
+    "madya": "medal",
+    "krama": "medal / mijil"
+  },
+  {
+    "id": "KAMUS-LENGKAP-045",
+    "indonesia": "air",
+    "ngoko": "banyu",
+    "madya": "toya",
+    "krama": "toya"
+  },
+  {
+    "id": "KAMUS-LENGKAP-046",
+    "indonesia": "jalan",
+    "ngoko": "dalan",
+    "madya": "mergi / ratan",
+    "krama": "mergi / ratan / margi"
+  },
+  {
+    "id": "KAMUS-LENGKAP-047",
+    "indonesia": "anak",
+    "ngoko": "anak",
+    "madya": "putro / yoga",
+    "krama": "putro / atmojo"
+  },
+  {
+    "id": "KAMUS-LENGKAP-048",
+    "indonesia": "bapak",
+    "ngoko": "bapak / pak / romo",
+    "madya": "bapak / pak",
+    "krama": "romo / rama"
+  },
+  {
+    "id": "KAMUS-LENGKAP-049",
+    "indonesia": "ibu",
+    "ngoko": "ibu / bu / mak / simbok",
+    "madya": "ibu / bu",
+    "krama": "ibu / biyung"
+  },
+  {
+    "id": "KAMUS-LENGKAP-050",
+    "indonesia": "makan",
+    "ngoko": "mangan",
+    "madya": "nedho / nedha / dhahar",
+    "krama": "dhahar / nedha"
+  },
+  {
+    "id": "KAMUS-LENGKAP-051",
+    "indonesia": "minum",
+    "ngoko": "ngombe",
+    "madya": "ngunjuk",
+    "krama": "ngunjuk"
+  },
+  {
+    "id": "KAMUS-LENGKAP-052",
+    "indonesia": "tidur",
+    "ngoko": "turu",
+    "madya": "tilem / sare",
+    "krama": "sare / nendra"
+  },
+  {
+    "id": "KAMUS-LENGKAP-053",
+    "indonesia": "bangun tidur",
+    "ngoko": "tangi",
+    "madya": "tangi / wungu",
+    "krama": "wungu"
+  },
+  {
+    "id": "KAMUS-LENGKAP-054",
+    "indonesia": "duduk",
+    "ngoko": "lungguh",
+    "madya": "lenggah / pinarak",
+    "krama": "pinarak / lenggah"
+  },
+  {
+    "id": "KAMUS-LENGKAP-055",
+    "indonesia": "berdiri",
+    "ngoko": "ngadeg",
+    "madya": "ngadeg / jumeneng",
+    "krama": "jumeneng"
+  },
+  {
+    "id": "KAMUS-LENGKAP-056",
+    "indonesia": "berjalan",
+    "ngoko": "mlaku",
+    "madya": "mlampah",
+    "krama": "mlampah"
+  },
+  {
+    "id": "KAMUS-LENGKAP-057",
+    "indonesia": "berbicara",
+    "ngoko": "ngomong / guneman",
+    "madya": "ngendikan / ngomong",
+    "krama": "ngendika / matur / pangandikan"
+  },
+  {
+    "id": "KAMUS-LENGKAP-058",
+    "indonesia": "mendengar",
+    "ngoko": "krungu / ngrungokke",
+    "madya": "mireng / midhangetaken",
+    "krama": "midhanget / midhangetaken"
+  },
+  {
+    "id": "KAMUS-LENGKAP-059",
+    "indonesia": "melihat",
+    "ngoko": "ndelok / nyawang",
+    "madya": "ningali / mriksani",
+    "krama": "mriksani / mirsani"
+  },
+  {
+    "id": "KAMUS-LENGKAP-060",
+    "indonesia": "mengerti / tahu",
+    "ngoko": "ngerti / weruh",
+    "madya": "ngertos / pirso",
+    "krama": "priksan / ngertos / pirso"
+  },
+  {
+    "id": "KAMUS-LENGKAP-061",
+    "indonesia": "memberi",
+    "ngoko": "menehi / ngekeki",
+    "madya": "maringi / nyaosi / nyukani",
+    "krama": "maringi / nyaosi / ngaturi / nyukani"
+  },
+  {
+    "id": "KAMUS-LENGKAP-062",
+    "indonesia": "meminta",
+    "ngoko": "njaluk",
+    "madya": "nyuwun / nedi",
+    "krama": "nyuwun / ngersakaken / mundhut"
+  },
+  {
+    "id": "KAMUS-LENGKAP-063",
+    "indonesia": "membeli",
+    "ngoko": "tuku",
+    "madya": "tumbas / mundhut",
+    "krama": "mundhut / tumbas"
+  },
+  {
+    "id": "KAMUS-LENGKAP-064",
+    "indonesia": "menjual",
+    "ngoko": "adol",
+    "madya": "sadé / sade",
+    "krama": "sadé / sade"
+  },
+  {
+    "id": "KAMUS-LENGKAP-065",
+    "indonesia": "jauh",
+    "ngoko": "adoh",
+    "madya": "tebih",
+    "krama": "tebih"
+  },
+  {
+    "id": "KAMUS-LENGKAP-066",
+    "indonesia": "dekat",
+    "ngoko": "cedhak",
+    "madya": "celak / caket",
+    "krama": "celak / caket"
+  },
+  {
+    "id": "KAMUS-LENGKAP-067",
+    "indonesia": "besar",
+    "ngoko": "gedhe",
+    "madya": "ageng",
+    "krama": "ageng"
+  },
+  {
+    "id": "KAMUS-LENGKAP-068",
+    "indonesia": "kecil",
+    "ngoko": "cilik",
+    "madya": "alit",
+    "krama": "alit"
+  },
+  {
+    "id": "KAMUS-LENGKAP-069",
+    "indonesia": "banyak",
+    "ngoko": "akeh",
+    "madya": "kathah",
+    "krama": "kathah"
+  },
+  {
+    "id": "KAMUS-LENGKAP-070",
+    "indonesia": "sedikit",
+    "ngoko": "sethithik / sithik",
+    "madya": "sekedhik / sakedhik",
+    "krama": "sekedhik"
+  },
+  {
+    "id": "KAMUS-LENGKAP-071",
+    "indonesia": "baik",
+    "ngoko": "apik / becik",
+    "madya": "sae / saé / becik",
+    "krama": "sae / saé"
+  },
+  {
+    "id": "KAMUS-LENGKAP-072",
+    "indonesia": "buruk / jelek",
+    "ngoko": "elek / olo",
+    "madya": "awon",
+    "krama": "awon"
+  },
+  {
+    "id": "KAMUS-LENGKAP-073",
+    "indonesia": "benar",
+    "ngoko": "bener",
+    "madya": "leres / estu / leres",
+    "krama": "leres / estu"
+  },
+  {
+    "id": "KAMUS-LENGKAP-074",
+    "indonesia": "salah / keliru",
+    "ngoko": "salah / kleru",
+    "madya": "klentu / lepat",
+    "krama": "klentu / lepat"
+  },
+  {
+    "id": "KAMUS-LENGKAP-075",
+    "indonesia": "cepat",
+    "ngoko": "cepet",
+    "madya": "cepet / enggal",
+    "krama": "enggal / sigro"
+  },
+  {
+    "id": "KAMUS-LENGKAP-076",
+    "indonesia": "lambat / pelan",
+    "ngoko": "alon",
+    "madya": "alon / rindhik",
+    "krama": "rindhik / alon"
+  },
+  {
+    "id": "KAMUS-LENGKAP-077",
+    "indonesia": "sulit / susah",
+    "ngoko": "angel / abot",
+    "madya": "angel / awrat",
+    "krama": "awrat / rekaos"
+  },
+  {
+    "id": "KAMUS-LENGKAP-078",
+    "indonesia": "mudah / gampang",
+    "ngoko": "gampang",
+    "madya": "gampil",
+    "krama": "gampil"
+  },
+  {
+    "id": "KAMUS-LENGKAP-079",
+    "indonesia": "sakit",
+    "ngoko": "lara",
+    "madya": "sakit / gerah",
+    "krama": "gerah"
+  },
+  {
+    "id": "KAMUS-LENGKAP-080",
+    "indonesia": "sembuh / sehat",
+    "ngoko": "mari / waras",
+    "madya": "mantun / saras",
+    "krama": "dhangan / saras / waluyo"
+  },
+  {
+    "id": "KAMUS-LENGKAP-081",
+    "indonesia": "mati / meninggal",
+    "ngoko": "mati",
+    "madya": "pejah / seda / ninggal",
+    "krama": "seda / surud / wafat / kondur"
+  },
+  {
+    "id": "KAMUS-LENGKAP-082",
+    "indonesia": "hidup",
+    "ngoko": "urip",
+    "madya": "gesang / sugeng",
+    "krama": "sugeng / gesang"
+  },
+  {
+    "id": "KAMUS-LENGKAP-083",
+    "indonesia": "tua (usia)",
+    "ngoko": "tuwo",
+    "madya": "sepuh / yuswo",
+    "krama": "sepuh / yuswo"
+  },
+  {
+    "id": "KAMUS-LENGKAP-084",
+    "indonesia": "muda (usia)",
+    "ngoko": "enom",
+    "madya": "nem / timur",
+    "krama": "timur"
+  },
+  {
+    "id": "KAMUS-LENGKAP-085",
+    "indonesia": "surat",
+    "ngoko": "surat",
+    "madya": "serat / layang",
+    "krama": "serat / nawala"
+  },
+  {
+    "id": "KAMUS-LENGKAP-086",
+    "indonesia": "uang",
+    "ngoko": "duwit",
+    "madya": "arto / yotro",
+    "krama": "arto / yatra / arta"
+  },
+  {
+    "id": "KAMUS-LENGKAP-087",
+    "indonesia": "kerja",
+    "ngoko": "kerjo / nyambut gawe",
+    "madya": "nyambut damel / ngasto",
+    "krama": "ngasto damel / ayahan"
+  },
+  {
+    "id": "KAMUS-LENGKAP-088",
+    "indonesia": "naik (kendaraan)",
+    "ngoko": "numpak",
+    "madya": "nitih",
+    "krama": "nitih / numpak"
+  },
+  {
+    "id": "KAMUS-LENGKAP-089",
+    "indonesia": "turun (kendaraan)",
+    "ngoko": "mudhun",
+    "madya": "mandhap",
+    "krama": "mandhap"
+  },
+  {
+    "id": "KAMUS-LENGKAP-090",
+    "indonesia": "satu",
+    "ngoko": "siji",
+    "madya": "setunggal / siji",
+    "krama": "setunggal / setunggil"
+  },
+  {
+    "id": "KAMUS-LENGKAP-091",
+    "indonesia": "dua",
+    "ngoko": "loro",
+    "madya": "kalih",
+    "krama": "kalih"
+  },
+  {
+    "id": "KAMUS-LENGKAP-092",
+    "indonesia": "tiga",
+    "ngoko": "telu",
+    "madya": "tigo / tiga",
+    "krama": "tigo / tiga"
+  },
+  {
+    "id": "KAMUS-LENGKAP-093",
+    "indonesia": "empat",
+    "ngoko": "papat",
+    "madya": "sekawan",
+    "krama": "sekawan"
+  },
+  {
+    "id": "KAMUS-LENGKAP-094",
+    "indonesia": "lima",
+    "ngoko": "limo",
+    "madya": "gangsal",
+    "krama": "gangsal"
+  },
+  {
+    "id": "KAMUS-LENGKAP-095",
+    "indonesia": "enam",
+    "ngoko": "enem",
+    "madya": "enem",
+    "krama": "enem"
+  },
+  {
+    "id": "KAMUS-LENGKAP-096",
+    "indonesia": "tujuh",
+    "ngoko": "pitu",
+    "madya": "pitu",
+    "krama": "pitu"
+  },
+  {
+    "id": "KAMUS-LENGKAP-097",
+    "indonesia": "delapan",
+    "ngoko": "wolu",
+    "madya": "wolu",
+    "krama": "wolu"
+  },
+  {
+    "id": "KAMUS-LENGKAP-098",
+    "indonesia": "sembilan",
+    "ngoko": "songo",
+    "madya": "songo / sanga",
+    "krama": "songo / sanga"
+  },
+  {
+    "id": "KAMUS-LENGKAP-099",
+    "indonesia": "sepuluh",
+    "ngoko": "sepuluh",
+    "madya": "sedoso / sedasa",
+    "krama": "sedoso / sedasa"
+  },
+  {
+    "id": "KAMUS-LENGKAP-100",
+    "indonesia": "sebelas",
+    "ngoko": "sewelas",
+    "madya": "sewelas",
+    "krama": "sewelas"
+  },
+  {
+    "id": "KAMUS-LENGKAP-101",
+    "indonesia": "dua belas",
+    "ngoko": "rolas",
+    "madya": "kalih welas",
+    "krama": "kalih welas"
+  },
+  {
+    "id": "KAMUS-LENGKAP-102",
+    "indonesia": "dua puluh",
+    "ngoko": "rongpuluh",
+    "madya": "kalih doso / kalih dasa",
+    "krama": "kalih doso / kalih dasa"
+  },
+  {
+    "id": "KAMUS-LENGKAP-103",
+    "indonesia": "lima puluh",
+    "ngoko": "seket",
+    "madya": "setangkep / gangsal doso",
+    "krama": "setangkep / gangsal dasa"
+  },
+  {
+    "id": "KAMUS-LENGKAP-104",
+    "indonesia": "seratus",
+    "ngoko": "satus",
+    "madya": "setunggal atus",
+    "krama": "setunggal atus"
+  },
+  {
+    "id": "KAMUS-LENGKAP-105",
+    "indonesia": "seribu",
+    "ngoko": "sewu",
+    "madya": "setunggal ewu",
+    "krama": "setunggal ewu"
+  },
+  {
+    "id": "KAMUS-LENGKAP-106",
+    "indonesia": "pagi",
+    "ngoko": "isuk",
+    "madya": "enjing / enjang",
+    "krama": "enjing / enjang"
+  },
+  {
+    "id": "KAMUS-LENGKAP-107",
+    "indonesia": "siang",
+    "ngoko": "awan",
+    "madya": "siyang / siang",
+    "krama": "siyang"
+  },
+  {
+    "id": "KAMUS-LENGKAP-108",
+    "indonesia": "sore",
+    "ngoko": "sore",
+    "madya": "sonten",
+    "krama": "sonten"
+  },
+  {
+    "id": "KAMUS-LENGKAP-109",
+    "indonesia": "malam",
+    "ngoko": "bengi",
+    "madya": "dalu",
+    "krama": "dalu"
+  },
+  {
+    "id": "KAMUS-LENGKAP-110",
+    "indonesia": "nanti",
+    "ngoko": "mengko",
+    "madya": "mangke",
+    "krama": "mangke"
+  },
+  {
+    "id": "KAMUS-LENGKAP-111",
+    "indonesia": "tadi",
+    "ngoko": "mau",
+    "madya": "wau",
+    "krama": "wau"
+  },
+  {
+    "id": "KAMUS-LENGKAP-112",
+    "indonesia": "sini",
+    "ngoko": "kene / rene",
+    "madya": "mriki / ngriki",
+    "krama": "mriki"
+  },
+  {
+    "id": "KAMUS-LENGKAP-113",
+    "indonesia": "situ / sana",
+    "ngoko": "kono / rono",
+    "madya": "mriko / ngriko",
+    "krama": "mriko"
+  },
+  {
+    "id": "KAMUS-LENGKAP-114",
+    "indonesia": "itu (dekat)",
+    "ngoko": "iku",
+    "madya": "niku / niko",
+    "krama": "puniko"
+  },
+  {
+    "id": "KAMUS-LENGKAP-115",
+    "indonesia": "itu (jauh)",
+    "ngoko": "kae",
+    "madya": "niku / niko",
+    "krama": "meniko"
+  },
+  {
+    "id": "KAMUS-LENGKAP-116",
+    "indonesia": "ini",
+    "ngoko": "iki",
+    "madya": "niki / niki",
+    "krama": "meniko"
+  },
+  {
+    "id": "KAMUS-LENGKAP-117",
+    "indonesia": "semua",
+    "ngoko": "kabeh",
+    "madya": "sedanten / sedoyo",
+    "krama": "sedanten / sedaya"
+  },
+  {
+    "id": "KAMUS-LENGKAP-118",
+    "indonesia": "sendiri",
+    "ngoko": "dewekan",
+    "madya": "piyambak",
+    "krama": "piyambak"
+  },
+  {
+    "id": "KAMUS-LENGKAP-119",
+    "indonesia": "laki-laki",
+    "ngoko": "lanang",
+    "madya": "jaler / kakung",
+    "krama": "kakung / jaler"
+  },
+  {
+    "id": "KAMUS-LENGKAP-120",
+    "indonesia": "perempuan",
+    "ngoko": "wedok",
+    "madya": "estri / putri / setri",
+    "krama": "estri / putri"
+  },
+  {
+    "id": "KAMUS-LENGKAP-121",
+    "indonesia": "kepala",
+    "ngoko": "sirah",
+    "madya": "sirah / mustoko",
+    "krama": "mustoko / sirah"
+  },
+  {
+    "id": "KAMUS-LENGKAP-122",
+    "indonesia": "mata",
+    "ngoko": "mripat",
+    "madya": "mripat / soca",
+    "krama": "soca / paningal"
+  },
+  {
+    "id": "KAMUS-LENGKAP-123",
+    "indonesia": "telinga",
+    "ngoko": "kuping",
+    "madya": "kuping / talingan",
+    "krama": "talingan"
+  },
+  {
+    "id": "KAMUS-LENGKAP-124",
+    "indonesia": "hidung",
+    "ngoko": "irung",
+    "madya": "irung / grono",
+    "krama": "grono"
+  },
+  {
+    "id": "KAMUS-LENGKAP-125",
+    "indonesia": "mulut",
+    "ngoko": "cangkem",
+    "madya": "cangkem / tutuk",
+    "krama": "tutuk / lathi (bibir)"
+  },
+  {
+    "id": "KAMUS-LENGKAP-126",
+    "indonesia": "gigi",
+    "ngoko": "untu",
+    "madya": "untu / wojo",
+    "krama": "wojo"
+  },
+  {
+    "id": "KAMUS-LENGKAP-127",
+    "indonesia": "tangan",
+    "ngoko": "tangan",
+    "madya": "tangan / asto",
+    "krama": "asto"
+  },
+  {
+    "id": "KAMUS-LENGKAP-128",
+    "indonesia": "kaki",
+    "ngoko": "sikil",
+    "madya": "sikil / samparan",
+    "krama": "samparan / ampeyan"
+  },
+  {
+    "id": "KAMUS-LENGKAP-129",
+    "indonesia": "baju / pakaian",
+    "ngoko": "klambi",
+    "madya": "rasukan / ageman / pengagem",
+    "krama": "rasukan / ageman / busono"
+  },
+  {
+    "id": "KAMUS-LENGKAP-130",
+    "indonesia": "dingin",
+    "ngoko": "adhem",
+    "madya": "asrep",
+    "krama": "asrep"
+  },
+  {
+    "id": "KAMUS-LENGKAP-131",
+    "indonesia": "panas",
+    "ngoko": "panas",
+    "madya": "benther / benter",
+    "krama": "benther"
+  },
+  {
+    "id": "KAMUS-LENGKAP-132",
+    "indonesia": "hujan",
+    "ngoko": "udan",
+    "madya": "jawuh",
+    "krama": "jawuh / jawah"
+  },
+  {
+    "id": "KAMUS-LENGKAP-133",
+    "indonesia": "selamat pagi",
+    "ngoko": "sugeng isuk",
+    "madya": "sugeng enjing",
+    "krama": "sugeng enjang"
+  },
+  {
+    "id": "KAMUS-LENGKAP-134",
+    "indonesia": "selamat siang",
+    "ngoko": "sugeng awan",
+    "madya": "sugeng siang / siyang",
+    "krama": "sugeng siyang"
+  },
+  {
+    "id": "KAMUS-LENGKAP-135",
+    "indonesia": "selamat sore",
+    "ngoko": "sugeng sore",
+    "madya": "sugeng sonten",
+    "krama": "sugeng sonten"
+  },
+  {
+    "id": "KAMUS-LENGKAP-136",
+    "indonesia": "selamat malam",
+    "ngoko": "sugeng bengi",
+    "madya": "sugeng dalu",
+    "krama": "sugeng dalu"
+  },
+  {
+    "id": "KAMUS-LENGKAP-137",
+    "indonesia": "sama-sama (jawaban terima kasih)",
+    "ngoko": "podo-podo / iyo",
+    "madya": "sami-sami / sami sami",
+    "krama": "sami-sami"
+  },
+  {
+    "id": "KAMUS-LENGKAP-138",
+    "indonesia": "maaf",
+    "ngoko": "sepuro / ngapuro / punten",
+    "madya": "ngapunten / nyuwun pangapunten",
+    "krama": "nyuwun pangapunten / nyuwun pangaksami"
+  },
+  {
+    "id": "KAMUS-LENGKAP-139",
+    "indonesia": "tolong",
+    "ngoko": "tulung / njaluk tulung",
+    "madya": "nyuwun tulung / njaluk tulung",
+    "krama": "nyuwun pitulungan / nyuwun pitulung"
+  },
+  {
+    "id": "KAMUS-LENGKAP-140",
+    "indonesia": "butuh",
+    "ngoko": "butuh",
+    "madya": "betah / butuh",
+    "krama": "betahaken / mbetahaken"
+  },
+  {
+    "id": "KAMUS-LENGKAP-141",
+    "indonesia": "bawa",
+    "ngoko": "gowo / ngasta",
+    "madya": "bekto / ngasta / asta",
+    "krama": "asto / ngasto"
+  },
+  {
+    "id": "KAMUS-LENGKAP-142",
+    "indonesia": "pulang",
+    "ngoko": "mulih",
+    "madya": "mantuk / kondur",
+    "krama": "kondur / mantuk"
+  },
+  {
+    "id": "KAMUS-LENGKAP-143",
+    "indonesia": "mengambil",
+    "ngoko": "njupuk",
+    "madya": "mendhet / mundhut",
+    "krama": "mundhut / mendhet"
+  },
+  {
+    "id": "KAMUS-LENGKAP-144",
+    "indonesia": "menaruh / meletakkan",
+    "ngoko": "ndeleh / ndokok / nyeleh",
+    "madya": "mapanaken / nyukakaken / nyelehaken",
+    "krama": "mapanaken / nyukakaken / maringaken"
+  },
+  {
+    "id": "KAMUS-LENGKAP-145",
+    "indonesia": "kertas",
+    "ngoko": "dlancang / kertas",
+    "madya": "dlancang / kertas",
+    "krama": "dlancang"
+  },
+  {
+    "id": "KAMUS-LENGKAP-146",
+    "indonesia": "menulis",
+    "ngoko": "nulis",
+    "madya": "nulis / nyerat",
+    "krama": "nyerat"
+  },
+  {
+    "id": "KAMUS-LENGKAP-147",
+    "indonesia": "membaca",
+    "ngoko": "moco",
+    "madya": "maos",
+    "krama": "maos"
+  },
+  {
+    "id": "KAMUS-LENGKAP-148",
+    "indonesia": "mengantar",
+    "ngoko": "ngeterke / ngeterne",
+    "madya": "nderekaken / ngeteraken",
+    "krama": "ndherekaken"
+  },
+  {
+    "id": "KAMUS-LENGKAP-149",
+    "indonesia": "ikut",
+    "ngoko": "melu",
+    "madya": "tumut / nderek / ndherek",
+    "krama": "ndherek / tumut"
+  },
+  {
+    "id": "KAMUS-LENGKAP-150",
+    "indonesia": "menunggu",
+    "ngoko": "ngenteni",
+    "madya": "ngentosi / ngantosi",
+    "krama": "ngentosi / ngantu-antu"
+  },
+  {
+    "id": "KAMUS-LENGKAP-151",
+    "indonesia": "dulu / dahulu",
+    "ngoko": "mbiyen / ndisek",
+    "madya": "rumiyin / riyin",
+    "krama": "rumiyin / kala rumiyin"
+  },
+  {
+    "id": "KAMUS-LENGKAP-152",
+    "indonesia": "kemarin",
+    "ngoko": "wingi",
+    "madya": "wingi / kalawingi",
+    "krama": "kalawingi / kawingking"
+  },
+  {
+    "id": "KAMUS-LENGKAP-153",
+    "indonesia": "lusa",
+    "ngoko": "sesuk mbene / rong dino maneh",
+    "madya": "mbenjing wingkingipun / kalih dinten malih",
+    "krama": "mbenjing wingkingipun / kalih dinten malih"
+  },
+  {
+    "id": "KAMUS-LENGKAP-154",
+    "indonesia": "selalu / sering",
+    "ngoko": "mesthi / kerep",
+    "madya": "tansah / asring / sering",
+    "krama": "tansah / asring / lumintu"
+  },
+  {
+    "id": "KAMUS-LENGKAP-155",
+    "indonesia": "jarang",
+    "ngoko": "arang / jarang",
+    "madya": "awis / arang",
+    "krama": "awis"
+  },
+  {
+    "id": "KAMUS-LENGKAP-156",
+    "indonesia": "mungkin",
+    "ngoko": "mbok menowo / koyone",
+    "madya": "mbok menawi / kinten-kinten",
+    "krama": "mbok bilih / kintenipun"
+  },
+  {
+    "id": "KAMUS-LENGKAP-157",
+    "indonesia": "pasti",
+    "ngoko": "mesthi / mesti",
+    "madya": "mesthi / tamtu",
+    "krama": "tamtu / saestu"
+  },
+  {
+    "id": "KAMUS-LENGKAP-158",
+    "indonesia": "kiri",
+    "ngoko": "kiwo",
+    "madya": "kiwa / kiwo",
+    "krama": "kiwa"
+  },
+  {
+    "id": "KAMUS-LENGKAP-159",
+    "indonesia": "kanan",
+    "ngoko": "tengen",
+    "madya": "tengen",
+    "krama": "tengen"
+  },
+  {
+    "id": "KAMUS-LENGKAP-160",
+    "indonesia": "atas",
+    "ngoko": "nduwur",
+    "madya": "nginggil",
+    "krama": "nginggil / inggil"
+  },
+  {
+    "id": "KAMUS-LENGKAP-161",
+    "indonesia": "bawah",
+    "ngoko": "ngisor",
+    "madya": "ngandhap",
+    "krama": "ngandhap"
+  },
+  {
+    "id": "KAMUS-LENGKAP-162",
+    "indonesia": "depan",
+    "ngoko": "ngarep",
+    "madya": "ngajeng",
+    "krama": "ngajeng / ngarso"
+  },
+  {
+    "id": "KAMUS-LENGKAP-163",
+    "indonesia": "belakang",
+    "ngoko": "mburi",
+    "madya": "wingking / pungkur",
+    "krama": "wingking / pungkur"
+  },
+  {
+    "id": "KAMUS-LENGKAP-164",
+    "indonesia": "luar",
+    "ngoko": "njobo",
+    "madya": "njawi / njawi",
+    "krama": "njawi"
+  },
+  {
+    "id": "KAMUS-LENGKAP-165",
+    "indonesia": "dalam",
+    "ngoko": "jero",
+    "madya": "lebet",
+    "krama": "lebet"
+  },
+  {
+    "id": "KAMUS-LENGKAP-166",
+    "indonesia": "dengan / sama",
+    "ngoko": "karo",
+    "madya": "kaliyan / sareng",
+    "krama": "kaliyan / sareng"
+  },
+  {
+    "id": "KAMUS-LENGKAP-167",
+    "indonesia": "karena / sebab",
+    "ngoko": "mergo / jalaran",
+    "madya": "amargi / sebab / jalaran",
+    "krama": "amargi / awit / karana"
+  },
+  {
+    "id": "KAMUS-LENGKAP-168",
+    "indonesia": "jika / kalau",
+    "ngoko": "nek / yen",
+    "madya": "menawi / umpami",
+    "krama": "menawi / bilih / umpami"
+  },
+  {
+    "id": "KAMUS-LENGKAP-169",
+    "indonesia": "dan",
+    "ngoko": "lan / karo",
+    "madya": "kaliyan / lan",
+    "krama": "kaliyan / saha"
+  },
+  {
+    "id": "KAMUS-LENGKAP-170",
+    "indonesia": "atau",
+    "ngoko": "utowo",
+    "madya": "utawi / utowo",
+    "krama": "utawi"
+  },
+  {
+    "id": "KAMUS-LENGKAP-171",
+    "indonesia": "tetapi / tapi",
+    "ngoko": "tapi / ning",
+    "madya": "nanging / naming",
+    "krama": "nanging / ananging"
+  },
+  {
+    "id": "KAMUS-LENGKAP-172",
+    "indonesia": "juga",
+    "ngoko": "ugo / pisan",
+    "madya": "ugi / ugo",
+    "krama": "ugi"
+  },
+  {
+    "id": "KAMUS-LENGKAP-173",
+    "indonesia": "lagi (sedang)",
+    "ngoko": "lagi",
+    "madya": "lagi / saweg",
+    "krama": "saweg"
+  },
+  {
+    "id": "KAMUS-LENGKAP-174",
+    "indonesia": "sudah",
+    "ngoko": "wis",
+    "madya": "sampun / mpun",
+    "krama": "sampun"
+  },
+  {
+    "id": "KAMUS-LENGKAP-175",
+    "indonesia": "belum",
+    "ngoko": "durung",
+    "madya": "dereng / durung",
+    "krama": "dereng"
+  },
+  {
+    "id": "KAMUS-LENGKAP-176",
+    "indonesia": "sedang",
+    "ngoko": "lagi",
+    "madya": "lagi / nembe",
+    "krama": "saweg / nembe"
+  },
+  {
+    "id": "KAMUS-LENGKAP-177",
+    "indonesia": "akan",
+    "ngoko": "arep / bakal",
+    "madya": "ajeng / badhe / bakal",
+    "krama": "badhe / arso"
+  },
+  {
+    "id": "KAMUS-LENGKAP-178",
+    "indonesia": "sangat / sekali",
+    "ngoko": "banget",
+    "madya": "sanget / banget",
+    "krama": "sanget / kalangkung"
+  },
+  {
+    "id": "KAMUS-LENGKAP-179",
+    "indonesia": "agak / lumayan",
+    "ngoko": "rodok",
+    "madya": "radi / radi",
+    "krama": "radi"
+  },
+  {
+    "id": "KAMUS-LENGKAP-180",
+    "indonesia": "seperti",
+    "ngoko": "koyo",
+    "madya": "kados / koyo",
+    "krama": "kados / kadosta"
+  },
+  {
+    "id": "KAMUS-LENGKAP-181",
+    "indonesia": "dengan (cara)",
+    "ngoko": "nganggo",
+    "madya": "ngagem / ngangge",
+    "krama": "ngagem"
+  },
+  {
+    "id": "KAMUS-LENGKAP-182",
+    "indonesia": "hanya / saja",
+    "ngoko": "mung / tok",
+    "madya": "namung / mawon",
+    "krama": "namung / kemawon"
+  },
+  {
+    "id": "KAMUS-LENGKAP-183",
+    "indonesia": "sampai",
+    "ngoko": "nganti / tekan",
+    "madya": "ngantos / dumugi",
+    "krama": "ngantos / dumugi"
+  },
+  {
+    "id": "KAMUS-LENGKAP-184",
+    "indonesia": "dari",
+    "ngoko": "seko / soko",
+    "madya": "saking",
+    "krama": "saking"
+  },
+  {
+    "id": "KAMUS-LENGKAP-185",
+    "indonesia": "ke",
+    "ngoko": "nang / menyang",
+    "madya": "dhateng / dateng / teng",
+    "krama": "dhateng"
+  },
+  {
+    "id": "KAMUS-LENGKAP-186",
+    "indonesia": "di",
+    "ngoko": "neng / ing",
+    "madya": "teng / wonten ing",
+    "krama": "wonten ing / ing"
+  },
+  {
+    "id": "KAMUS-LENGKAP-187",
+    "indonesia": "oleh",
+    "ngoko": "dening / karo",
+    "madya": "dening / kaliyan",
+    "krama": "dening / kaliyan"
+  },
+  {
+    "id": "KAMUS-LENGKAP-188",
+    "indonesia": "untuk / buat",
+    "ngoko": "kanggo / nggo",
+    "madya": "kangge / kagem",
+    "krama": "kagem / kangge"
+  },
+  {
+    "id": "KAMUS-LENGKAP-189",
+    "indonesia": "punya",
+    "ngoko": "duwe",
+    "madya": "gadhah / kagungan",
+    "krama": "kagungan / kagungan dalem"
+  },
+  {
+    "id": "KAMUS-LENGKAP-190",
+    "indonesia": "tidak punya",
+    "ngoko": "ora duwe",
+    "madya": "mboten gadhah / mboten kagungan",
+    "krama": "mboten kagungan"
+  },
+  {
+    "id": "KAMUS-LENGKAP-191",
+    "indonesia": "tahu (paham)",
+    "ngoko": "ngerti / mudeng",
+    "madya": "ngertos / mudeng",
+    "krama": "ngertos / prikso"
+  },
+  {
+    "id": "KAMUS-LENGKAP-192",
+    "indonesia": "tidak tahu",
+    "ngoko": "ora ngerti / ora weruh",
+    "madya": "mboten ngertos / mboten pirso",
+    "krama": "mboten ngertos / mboten prikso"
+  },
+  {
+    "id": "KAMUS-LENGKAP-193",
+    "indonesia": "lupa",
+    "ngoko": "lali",
+    "madya": "kesupen / supe",
+    "krama": "kesupen / supe"
+  },
+  {
+    "id": "KAMUS-LENGKAP-194",
+    "indonesia": "ingat",
+    "ngoko": "eling",
+    "madya": "emut / eling",
+    "krama": "emut"
+  },
+  {
+    "id": "KAMUS-LENGKAP-195",
+    "indonesia": "belajar",
+    "ngoko": "sinau",
+    "madya": "sinau",
+    "krama": "ngangsu kawruh / sinau"
+  },
+  {
+    "id": "KAMUS-LENGKAP-196",
+    "indonesia": "mengajar",
+    "ngoko": "mulang / ngajar",
+    "madya": "mucal / ngajar",
+    "krama": "mucal"
+  },
+  {
+    "id": "KAMUS-LENGKAP-197",
+    "indonesia": "kantor",
+    "ngoko": "kantor",
+    "madya": "kantor",
+    "krama": "kantor / dalem kantor"
+  },
+  {
+    "id": "KAMUS-LENGKAP-198",
+    "indonesia": "sekolah",
+    "ngoko": "sekolah",
+    "madya": "sekolah",
+    "krama": "sekolahan"
+  },
+  {
+    "id": "KAMUS-LENGKAP-199",
+    "indonesia": "pasar",
+    "ngoko": "pasar",
+    "madya": "peken",
+    "krama": "peken"
+  },
+  {
+    "id": "KAMUS-LENGKAP-200",
+    "indonesia": "jalan raya",
+    "ngoko": "dalan gedhe",
+    "madya": "mergi ageng / ratan ageng",
+    "krama": "mergi ageng / margi ageng"
+  },
+  {
+    "id": "KAMUS-LENGKAP-201",
+    "indonesia": "desa / kampung",
+    "ngoko": "deso",
+    "madya": "dhusun / dusun",
+    "krama": "dhusun / dusun"
+  },
+  {
+    "id": "KAMUS-LENGKAP-202",
+    "indonesia": "kota",
+    "ngoko": "kutho",
+    "madya": "kutho / kitha",
+    "krama": "kitha"
+  },
+  {
+    "id": "KAMUS-LENGKAP-203",
+    "indonesia": "kabupaten",
+    "ngoko": "kabupaten",
+    "madya": "kabupaten",
+    "krama": "kabupaten"
+  },
+  {
+    "id": "KAMUS-LENGKAP-204",
+    "indonesia": "kecamatan",
+    "ngoko": "kecamatan",
+    "madya": "kecamatan",
+    "krama": "kecamatan / kapanewon"
+  },
+  {
+    "id": "KAMUS-LENGKAP-205",
+    "indonesia": "kelurahan",
+    "ngoko": "kelurahan",
+    "madya": "kelurahan",
+    "krama": "kelurahan / kalurahan"
+  },
+  {
+    "id": "KAMUS-LENGKAP-206",
+    "indonesia": "surat keterangan",
+    "ngoko": "surat keterangan",
+    "madya": "serat keterangan",
+    "krama": "serat keterangan / nawala katrangan"
+  },
+  {
+    "id": "KAMUS-LENGKAP-207",
+    "indonesia": "kartu tanda penduduk",
+    "ngoko": "KTP",
+    "madya": "KTP",
+    "krama": "KTP"
+  },
+  {
+    "id": "KAMUS-LENGKAP-208",
+    "indonesia": "kartu keluarga",
+    "ngoko": "KK / KaKa",
+    "madya": "KK / KaKa",
+    "krama": "KK / KaKa"
+  },
+  {
+    "id": "KAMUS-LENGKAP-209",
+    "indonesia": "akta kelahiran",
+    "ngoko": "akta lair",
+    "madya": "akta lair",
+    "krama": "akta kelairan / serat kelairan"
+  },
+  {
+    "id": "KAMUS-LENGKAP-210",
+    "indonesia": "surat nikah",
+    "ngoko": "surat nikah / buku nikah",
+    "madya": "serat nikah",
+    "krama": "serat krama / serat palakrama"
+  },
+  {
+    "id": "KAMUS-LENGKAP-211",
+    "indonesia": "syarat",
+    "ngoko": "syarat / sarat",
+    "madya": "syarat / sarat",
+    "krama": "syarat / sarat / uborampe"
+  },
+  {
+    "id": "KAMUS-LENGKAP-212",
+    "indonesia": "dokumen",
+    "ngoko": "dokumen / berkas",
+    "madya": "dokumen / berkas",
+    "krama": "dokumen / berkas / serat"
+  },
+  {
+    "id": "KAMUS-LENGKAP-213",
+    "indonesia": "formulir",
+    "ngoko": "formulir",
+    "madya": "formulir",
+    "krama": "formulir"
+  },
+  {
+    "id": "KAMUS-LENGKAP-214",
+    "indonesia": "mengisi",
+    "ngoko": "ngisi",
+    "madya": "ngisi / ngiseni",
+    "krama": "ngiseni / ngisi"
+  },
+  {
+    "id": "KAMUS-LENGKAP-215",
+    "indonesia": "tanda tangan",
+    "ngoko": "tapak asmo / tanda tangan",
+    "madya": "tapak asmo / tandha tangan",
+    "krama": "tapak asmo / tandha asta"
+  },
+  {
+    "id": "KAMUS-LENGKAP-216",
+    "indonesia": "antre",
+    "ngoko": "antri / antre",
+    "madya": "antri / antre",
+    "krama": "antri / antre / ngantri"
+  },
+  {
+    "id": "KAMUS-LENGKAP-217",
+    "indonesia": "nomor",
+    "ngoko": "nomer",
+    "madya": "nomer",
+    "krama": "nomer"
+  },
+  {
+    "id": "KAMUS-LENGKAP-218",
+    "indonesia": "tanggal",
+    "ngoko": "tanggal",
+    "madya": "tanggal / suryo",
+    "krama": "tanggal / suryo"
+  },
+  {
+    "id": "KAMUS-LENGKAP-219",
+    "indonesia": "bulan",
+    "ngoko": "wulan / sasi",
+    "madya": "wulan / sasi",
+    "krama": "wulan / candra"
+  },
+  {
+    "id": "KAMUS-LENGKAP-220",
+    "indonesia": "tahun",
+    "ngoko": "taun",
+    "madya": "taun / warsa",
+    "krama": "taun / warsa"
+  },
+  {
+    "id": "KAMUS-LENGKAP-221",
+    "indonesia": "jam (waktu)",
+    "ngoko": "jam",
+    "madya": "jam / tabuh",
+    "krama": "tabuh"
+  },
+  {
+    "id": "KAMUS-LENGKAP-222",
+    "indonesia": "menit",
+    "ngoko": "menit",
+    "madya": "menit",
+    "krama": "menit"
+  },
+  {
+    "id": "KAMUS-LENGKAP-223",
+    "indonesia": "detik",
+    "ngoko": "detik",
+    "madya": "detik",
+    "krama": "detik"
+  },
+  {
+    "id": "KAMUS-LENGKAP-224",
+    "indonesia": "telepon",
+    "ngoko": "telpon",
+    "madya": "telpon",
+    "krama": "telpon"
+  },
+  {
+    "id": "KAMUS-LENGKAP-225",
+    "indonesia": "alamat",
+    "ngoko": "alamat",
+    "madya": "alamat",
+    "krama": "alamat / dalemipun"
+  }
+]
