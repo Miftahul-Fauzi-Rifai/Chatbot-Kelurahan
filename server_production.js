@@ -6,6 +6,8 @@ import dotenv from 'dotenv';
 import express from 'express';
 import axios from 'axios';
 import fs from 'fs';
+import { localRAG, getRAGStatus } from './rag_handler.js';
+import { makeCacheKey, getCache, setCache, getCacheStats } from './utils/cache.js';
 
 dotenv.config();
 
@@ -262,6 +264,27 @@ app.post('/chat', async (req, res) => {
 
   console.log(`💬 Chat request: "${message.substring(0, 50)}..."`);
   
+  // ============================================
+  // LAYER 0: CACHE CHECK (Hemat kuota Gemini!)
+  // ============================================
+  const cacheKey = makeCacheKey(message);
+  const cached = await getCache(cacheKey);
+  
+  if (cached) {
+    console.log('✅ Returning cached response (no API call)');
+    return res.json({ ...cached, cached: true });
+  }
+  
+  // Helper untuk save to cache dan return response
+  const replyAndCache = async (payload) => {
+    try {
+      await setCache(cacheKey, payload);
+    } catch (err) {
+      console.warn('⚠️  Cache set failed:', err?.message);
+    }
+    return res.json(payload);
+  };
+  
   // Find relevant data (RAG)
   const relevantData = findRelevantData(message, trainingData, 3);
   
@@ -273,7 +296,7 @@ app.post('/chat', async (req, res) => {
       ).join('\n---\n')
     : "";
 
-  // System instruction
+  // System instruction (FINAL VERSION - Bahasa Indonesia WAJIB)
   const systemInstruction = `Anda adalah Asisten Virtual Kelurahan Marga Sari, Balikpapan.
 
 CAKUPAN LAYANAN YANG BISA DIJAWAB:
@@ -286,18 +309,55 @@ CAKUPAN LAYANAN YANG BISA DIJAWAB:
 ✅ Pengaduan: LAPOR!, Call Center 112, Layanan Pengaduan Online
 ✅ Informasi Instansi: Lokasi, alamat, jam kerja, kontak Disdukcapil, Polres, Samsat, BPPDRD, dll
 
-BATASAN KETAT:
-❌ TOLAK pertanyaan di luar topik
-❌ Format penolakan: "Maaf, sebagai Asisten Virtual Kelurahan Marga Sari, saya hanya dapat membantu informasi terkait layanan kelurahan dan administrasi kependudukan di Balikpapan."
+PENANGANAN BAHASA (ATURAN KETAT):
+1. Bahasa Respon Utama: Bahasa Indonesia. Semua jawaban Anda WAJIB ditulis dalam Bahasa Indonesia yang formal, sopan, dan profesional.
+2. Aturan Input: Anda dapat memahami pertanyaan yang diajukan dalam bahasa lain (termasuk Bahasa Jawa).
+3. Aturan Eksekusi Jawaban:
+   - JIKA user bertanya dalam bahasa lain (misal: "Pripun damel KTP?"), Anda TETAP HARUS menjawab dalam Bahasa Indonesia (misal: "Untuk membuat KTP, syaratnya adalah...").
+   - JANGAN PERNAH membalas menggunakan bahasa yang sama dengan input user jika itu bukan Bahasa Indonesia.
 
-CARA MENJAWAB:
+BATASAN KETAT:
+❌ TOLAK pertanyaan di luar topik: resep masakan, tips kecantikan, teknologi gadget, hiburan, olahraga, kesehatan medis, investasi, cryptocurrency, dll
+❌ Format penolakan: "Maaf, sebagai Asisten Virtual Kelurahan Marga Sari, saya hanya dapat membantu informasi terkait layanan kelurahan dan administrasi kependudukan di Balikpapan. Apakah ada yang bisa saya bantu terkait layanan kelurahan?"
+
+PENANGANAN PERTANYAAN TIDAK LENGKAP:
+📋 JIKA user bertanya tidak lengkap (misal: "cara membuat?" tanpa menyebut apa):
+   → GUNAKAN CONTEXT dari chat history untuk melanjutkan percakapan
+   → JIKA tidak ada context → TANYAKAN BALIK: "Untuk membantu Anda, boleh saya tahu dokumen apa yang ingin Anda buat? Misalnya: KTP, KK, Surat Keterangan, NPWP, atau yang lainnya?"
+
+CARA MENJAWAB (PENTING - IKUTI FORMAT INI):
+1. Identifikasi topik dari pertanyaan (misal: NPWP, SKCK, KTP, dll)
+2. Cek data referensi di bawah - GUNAKAN data tersebut sebagai sumber utama jawaban
+3. Struktur jawaban:
+   - Pembukaan singkat (1 kalimat)
+   - Lokasi/Instansi yang menangani (jika relevan)
+   - Persyaratan (numbered list jika ada syarat)
+   - Prosedur/Cara pengajuan (numbered list untuk langkah-langkah)
+   - Informasi tambahan (jika perlu)
+   - Penutup singkat dengan emoji (opsional)
+
+GAYA BAHASA:
 • Formal, sopan, profesional
 • Padat, jelas, to the point
 • Maksimal 3-4 paragraf pendek
-• Gunakan numbered list untuk syarat/langkah
-• Gunakan data referensi di bawah sebagai sumber utama
+• Gunakan numbered list (1. 2. 3.) untuk syarat/langkah
+• Gunakan bullet points (•) untuk pilihan
+• Maksimal 1 emoji di akhir (👍 atau 📄)
 
-${grounding ? '\n📚 DATA REFERENSI:\n' + grounding : ''}`;
+CONTOH JAWABAN YANG BAIK:
+"Sebagai Asisten Virtual Kelurahan Marga Sari, saya akan bantu berikan panduan umum mengenai proses pembuatan SKCK ini, ya.
+
+Proses pembuatan SKCK dilakukan di Polres Balikpapan (bukan di kelurahan).
+
+Syarat-syarat yang umumnya dibutuhkan meliputi:
+1. Kartu Tanda Penduduk (KTP)
+2. Kartu Keluarga (KK)
+3. Pasfoto
+4. Sidik Jari
+
+Untuk memastikan semua persyaratan dan prosedur terbaru, terutama jika Anda ingin mendaftar secara online, disarankan untuk menghubungi langsung Polres Balikpapan atau mengunjungi situs resmi mereka. Terima kasih. 👍"
+
+${grounding ? '\n📚 DATA REFERENSI (WAJIB DIGUNAKAN JIKA RELEVAN):\n' + grounding + '\n\nJawab berdasarkan data referensi di atas. Jangan membuat informasi sendiri.' : ''}`;
 
   // Load API Key
   const apiKey = process.env.GEMINI_API_KEY;
@@ -368,7 +428,7 @@ ${grounding ? '\n📚 DATA REFERENSI:\n' + grounding : ''}`;
         }
 
         console.log(`✅ Success with model: ${model}`);
-        return res.json({ 
+        return replyAndCache({ 
           ok: true, 
           model, 
           output: out 
@@ -388,8 +448,27 @@ ${grounding ? '\n📚 DATA REFERENSI:\n' + grounding : ''}`;
       }
     }
     
-    // All Gemini models failed - use local RAG fallback
-    console.warn('⚠️ All Gemini models failed, using local RAG fallback...');
+    // All Gemini models failed - use RAG semantic fallback
+    console.warn('⚠️ All Gemini models failed, trying RAG semantic fallback...');
+    
+    try {
+      const ragResult = await localRAG(message);
+
+      if (ragResult?.ok && ragResult?.answer) {
+        console.log(`✅ RAG Fallback success (${ragResult.sources.length} sources)`);
+        return replyAndCache({
+          ok: true,
+          model: 'rag-local',
+          output: { candidates: [{ content: { parts: [{ text: ragResult.answer }] } }] }
+        });
+      }
+      console.warn('RAG gagal:', ragResult?.error || ragResult?.message);
+    } catch (ragError) {
+      console.error('RAG exception:', ragError.message);
+    }
+    
+    // RAG failed - use keyword fallback
+    console.warn('⚠️ RAG failed, using keyword fallback...');
     
     const lowerMessage = message.toLowerCase();
     const queryWords = lowerMessage.split(/\s+/).filter(w => w.length > 2);
@@ -422,32 +501,28 @@ ${grounding ? '\n📚 DATA REFERENSI:\n' + grounding : ''}`;
     
     if (matches.length > 0) {
       const bestMatch = matches[0].item;
-      console.log(`✅ Local RAG match found (score: ${matches[0].score})`);
+      console.log(`✅ Keyword match found (score: ${matches[0].score})`);
       
-      return res.json({ 
+      return replyAndCache({ 
         ok: true, 
-        model: 'local-rag',
+        model: 'keyword-fallback',
         output: {
           candidates: [{
-            content: {
-              parts: [{ 
-                text: `${bestMatch.answer}\n\n📌 *Catatan: Informasi dari data lokal.*` 
-              }]
-            }
+            content: { parts: [{ text: bestMatch.answer }] }
           }]
         }
       });
     }
     
-    // No match found - return generic response
-    return res.json({ 
+    // No match found - return professional generic response (manusiawi)
+    return replyAndCache({ 
       ok: true, 
-      model: 'local-fallback',
+      model: 'fallback-generic',
       output: {
         candidates: [{
           content: {
             parts: [{ 
-              text: `Maaf, untuk informasi yang Anda butuhkan, disarankan untuk menghubungi kantor Kelurahan Marga Sari langsung di jam kerja (Senin-Jumat, 08:00-16:00 WITA).` 
+              text: `Maaf, saya belum menemukan jawaban yang tepat untuk pertanyaan Anda. Bisa dijelaskan lebih rinci agar saya bisa bantu lebih baik?\n\nUntuk informasi lebih detail, Anda juga bisa menghubungi kantor Kelurahan Marga Sari langsung (Senin-Jumat, 08:00-16:00 WITA).\n\nTerima kasih.` 
             }]
           }
         }]
@@ -460,10 +535,20 @@ ${grounding ? '\n📚 DATA REFERENSI:\n' + grounding : ''}`;
     
     return res.status(500).json({ 
       ok: false, 
-      error: 'Service temporarily unavailable', 
+      error: 'Maaf, terjadi gangguan sementara. Silakan coba lagi atau hubungi kantor kelurahan langsung.', 
       detail: errorMsg 
     });
   }
+});
+
+// ======== RAG STATUS ENDPOINT (Opsional - untuk monitoring) =========
+app.get('/api/rag/status', (req, res) => {
+  res.json({ ok: true, rag: getRAGStatus() });
+});
+
+// ======== CACHE STATUS ENDPOINT (Monitor cache performance) =========
+app.get('/api/cache/status', (req, res) => {
+  res.json({ ok: true, cache: getCacheStats() });
 });
 
 // ======== ERROR HANDLER =========
@@ -476,15 +561,21 @@ app.use((err, req, res, next) => {
 });
 
 // ======== START SERVER =========
-app.listen(PORT, () => {
-  console.log('\n🚀 Chatbot Kelurahan API Server');
-  console.log(`📡 Server running on port ${PORT}`);
-  console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`📊 Training data: ${trainingData.length} items`);
-  console.log(`🔑 API Key: ${process.env.GEMINI_API_KEY ? 'Configured ✓' : 'Missing ✗'}`);
-  console.log('\nEndpoints:');
-  console.log(`  - GET  /         - API info`);
-  console.log(`  - GET  /health   - Health check`);
-  console.log(`  - GET  /status   - Status & rate limit`);
-  console.log(`  - POST /chat     - Chat endpoint\n`);
-});
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log('\n🚀 Chatbot Kelurahan API Server');
+    console.log(`📡 Server running on port ${PORT}`);
+    console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`📊 Training data: ${trainingData.length} items`);
+    console.log(`🔑 API Key: ${process.env.GEMINI_API_KEY ? 'Configured ✓' : 'Missing ✗'}`);
+    console.log('\nEndpoints:');
+    console.log(`  - GET  /         - API info`);
+    console.log(`  - GET  /health   - Health check`);
+    console.log(`  - GET  /status   - Status & rate limit`);
+    console.log(`  - POST /chat     - Chat endpoint`);
+    console.log(`  - GET  /api/rag/status - RAG status\n`);
+  });
+}
+
+// ======== EXPORT FOR VERCEL COMPATIBILITY =========
+export default app;

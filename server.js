@@ -6,6 +6,7 @@ import express from 'express';
 import axios from 'axios';
 import multer from 'multer';
 import fs from 'fs';
+import { localRAG } from './rag_handler.js';
 
 dotenv.config(); // Load environment variables
 
@@ -251,7 +252,7 @@ app.post('/api/chat', async (req, res) => {
       relevantData.map(d => `Q: ${(d.text||d.question||'').substring(0, 100)}\nA: ${(d.answer||d.response||'').substring(0, 200)}`).join('\n---\n')
     : "";
 
-  // ⚡ OPTIMIZED: System instruction (tanpa pertanyaan spesifik)
+  // ⚡ OPTIMIZED: System instruction (Bahasa Indonesia WAJIB)
   const systemInstruction = `Anda adalah Asisten Virtual Kelurahan Marga Sari, Balikpapan.
 
 CAKUPAN LAYANAN YANG BISA DIJAWAB:
@@ -263,6 +264,13 @@ CAKUPAN LAYANAN YANG BISA DIJAWAB:
 ✅ Administrasi Nikah: Persyaratan nikah di KUA, Surat Pengantar Nikah (N1, N2, N4)
 ✅ Pengaduan: LAPOR!, Call Center 112, Layanan Pengaduan Online
 ✅ Informasi Instansi: Lokasi, alamat, jam kerja, kontak Disdukcapil, Polres, Samsat, BPPDRD, dll
+
+PENANGANAN BAHASA (ATURAN KETAT):
+1. Bahasa Respon Utama: Bahasa Indonesia. Semua jawaban Anda WAJIB ditulis dalam Bahasa Indonesia yang formal, sopan, dan profesional.
+2. Aturan Input: Anda dapat memahami pertanyaan yang diajukan dalam bahasa lain (termasuk Bahasa Jawa).
+3. Aturan Eksekusi Jawaban:
+   - JIKA user bertanya dalam bahasa lain (misal: "Pripun damel KTP?"), Anda TETAP HARUS menjawab dalam Bahasa Indonesia (misal: "Untuk membuat KTP, syaratnya adalah...").
+   - JANGAN PERNAH membalas menggunakan bahasa yang sama dengan input user jika itu bukan Bahasa Indonesia.
 
 BATASAN KETAT:
 ❌ TOLAK pertanyaan di luar topik: resep masakan, tips kecantikan, teknologi gadget, hiburan, olahraga, kesehatan medis, investasi, cryptocurrency, dll
@@ -419,9 +427,30 @@ ${grounding ? '\n📚 DATA REFERENSI (WAJIB DIGUNAKAN JIKA RELEVAN):\n' + ground
     }
     
     // ============================================
-    // LAYER 3: LOCAL FALLBACK (JIKA SEMUA GEMINI GAGAL)
+    // LAYER 4: RAG SEMANTIK FALLBACK (JIKA SEMUA GEMINI GAGAL)
     // ============================================
-    console.warn('⚠️ All Gemini models failed, using local RAG fallback...');
+    console.warn('⚠️ All Gemini models failed, trying RAG semantic fallback...');
+    
+    try {
+      const ragResult = await localRAG(message);
+
+      if (ragResult?.ok && ragResult?.answer) {
+        console.log(`✅ RAG Fallback success (${ragResult.sources.length} sources)`);
+        return res.json({
+          ok: true,
+          model: 'rag-local',
+          output: { candidates: [{ content: { parts: [{ text: ragResult.answer }] } }] }
+        });
+      }
+      console.warn('RAG gagal:', ragResult?.error || ragResult?.message);
+    } catch (ragError) {
+      console.error('RAG exception:', ragError.message);
+    }
+    
+    // ============================================
+    // LAYER 5: KEYWORD FALLBACK (JIKA RAG JUGA GAGAL)
+    // ============================================
+    console.warn('⚠️ RAG failed, using keyword fallback...');
     
     // Search local training data with improved scoring
     const trainData = readTrainData();
@@ -502,17 +531,15 @@ ${grounding ? '\n📚 DATA REFERENSI (WAJIB DIGUNAKAN JIKA RELEVAN):\n' + ground
     if (matches.length > 0) {
       // Return best match
       const bestMatch = matches[0].item;
-      console.log(`✅ Local RAG match found (score: ${matches[0].score}, keywords: [${matches[0].matchedKeywords.join(', ')}]): "${bestMatch.text}"`);
+      console.log(`✅ Keyword match found (score: ${matches[0].score}, keywords: [${matches[0].matchedKeywords.join(', ')}])`);
       
       return res.json({ 
         ok: true, 
-        model: 'local-rag',
+        model: 'keyword-fallback',
         output: {
           candidates: [{
             content: {
-              parts: [{ 
-                text: `${bestMatch.answer}\n\n📌 *Catatan: Informasi ini diambil dari data lokal karena layanan AI sedang sibuk.*` 
-              }]
+              parts: [{ text: bestMatch.answer }]
             }
           }]
         }
@@ -571,15 +598,15 @@ ${grounding ? '\n📚 DATA REFERENSI (WAJIB DIGUNAKAN JIKA RELEVAN):\n' + ground
       });
     }
     
-    // Relevant but no data found - return professional generic response
+    // Relevant but no data found - return professional generic response (manusiawi)
     return res.json({ 
       ok: true, 
-      model: 'local-fallback',
+      model: 'fallback-generic',
       output: {
         candidates: [{
           content: {
             parts: [{ 
-              text: `Maaf, saat ini sistem AI sedang sibuk dan saya tidak menemukan informasi yang tepat.\n\nUntuk mendapatkan informasi yang Anda butuhkan, disarankan untuk:\n\n1. Menghubungi kantor Kelurahan Marga Sari langsung di jam kerja (Senin-Jumat, 08:00-16:00 WITA)\n2. Menghubungi staff kelurahan melalui telepon untuk informasi lebih detail\n3. Mencoba lagi beberapa saat lagi\n\nTerima kasih atas pengertiannya.` 
+              text: `Maaf, saya belum menemukan jawaban yang tepat untuk pertanyaan Anda. Bisa dijelaskan lebih rinci atau sebutkan dokumen/layanan yang dimaksud?\n\nUntuk informasi lebih detail, Anda juga bisa:\n• Menghubungi kantor Kelurahan Marga Sari langsung (Senin-Jumat, 08:00-16:00 WITA)\n• Mencoba mengulang pertanyaan dengan kata kunci yang lebih spesifik\n\nTerima kasih atas pengertiannya.` 
             }]
           }
         }]
@@ -594,7 +621,7 @@ ${grounding ? '\n📚 DATA REFERENSI (WAJIB DIGUNAKAN JIKA RELEVAN):\n' + ground
     const errorDetail = err.response?.data || { message: err.message };
     return res.status(500).json({ 
       ok: false, 
-      error: 'Sistem chatbot sedang mengalami gangguan teknis. Untuk bantuan segera, silakan hubungi kantor kelurahan langsung.', 
+      error: 'Maaf, terjadi gangguan teknis. Untuk bantuan segera, silakan hubungi kantor kelurahan langsung.', 
       detail: errorDetail 
     });
   }
