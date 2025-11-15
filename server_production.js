@@ -340,20 +340,24 @@ app.get('/ui', (req, res) => {
     </div>
   </div>
   <script>
-    const chatMessages = document.getElementById('chatMessages');
-    const messageInput = document.getElementById('messageInput');
-    const sendBtn = document.getElementById('sendBtn');
-    const voiceBtn = document.getElementById('voiceBtn');
-    const errorMessage = document.getElementById('errorMessage');
-    const API_URL = window.location.origin + '/chat';
-    
-    // Conversation history for context (max 10 messages)
-    let conversationHistory = [];
-    
-    // Voice mode state
-    let currentMode = 'text'; // 'text' or 'voice'
-    let recognition = null;
-    let isRecording = false;
+    // Wait for DOM to be fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      const chatMessages = document.getElementById('chatMessages');
+      const messageInput = document.getElementById('messageInput');
+      const sendBtn = document.getElementById('sendBtn');
+      const voiceBtn = document.getElementById('voiceBtn');
+      const textModeBtn = document.getElementById('textModeBtn');
+      const voiceModeBtn = document.getElementById('voiceModeBtn');
+      const errorMessage = document.getElementById('errorMessage');
+      const API_URL = window.location.origin + '/chat';
+      
+      // Conversation history for context (max 10 messages)
+      let conversationHistory = [];
+      
+      // Voice mode state
+      let currentMode = 'text'; // 'text' or 'voice'
+      let recognition = null;
+      let isRecording = false;
     
     // Initialize Speech Recognition (STT)
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
@@ -394,8 +398,8 @@ app.get('/ui', (req, res) => {
       currentMode = mode;
       
       if (mode === 'voice') {
-        document.getElementById('textModeBtn').classList.remove('active');
-        document.getElementById('voiceModeBtn').classList.add('active');
+        textModeBtn.classList.remove('active');
+        voiceModeBtn.classList.add('active');
         voiceBtn.style.display = 'block';
         messageInput.placeholder = 'Klik mikrofon atau ketik...';
         
@@ -403,8 +407,8 @@ app.get('/ui', (req, res) => {
           showError('Browser Anda tidak mendukung pengenalan suara. Gunakan Chrome/Edge.');
         }
       } else {
-        document.getElementById('voiceModeBtn').classList.remove('active');
-        document.getElementById('textModeBtn').classList.add('active');
+        voiceModeBtn.classList.remove('active');
+        textModeBtn.classList.add('active');
         voiceBtn.style.display = 'none';
         messageInput.placeholder = 'Ketik pertanyaan Anda...';
       }
@@ -430,12 +434,11 @@ app.get('/ui', (req, res) => {
       }
     });
     
+    // Event Listeners
     sendBtn.addEventListener('click', sendMessage);
     messageInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
-    
-    // Mode switching event listeners
-    document.getElementById('textModeBtn').addEventListener('click', () => switchMode('text'));
-    document.getElementById('voiceModeBtn').addEventListener('click', () => switchMode('voice'));
+    textModeBtn.addEventListener('click', () => switchMode('text'));
+    voiceModeBtn.addEventListener('click', () => switchMode('voice'));
     
     async function sendMessage() {
       const message = messageInput.value.trim();
@@ -565,6 +568,8 @@ app.get('/ui', (req, res) => {
         window.speechSynthesis.getVoices();
       };
     }
+    
+    }); // End DOMContentLoaded
   </script>
 </body>
 </html>`);
