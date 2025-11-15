@@ -296,6 +296,13 @@ app.get('/ui', (req, res) => {
     .chat-input-wrapper { display: flex; gap: 10px; }
     #messageInput { flex: 1; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 25px; font-size: 14px; outline: none; transition: border-color 0.3s; }
     #messageInput:focus { border-color: #667eea; }
+    .voice-btn { padding: 12px 16px; background: #f0f0f0; color: #333; border: none; border-radius: 25px; font-size: 20px; cursor: pointer; transition: all 0.2s; }
+    .voice-btn:hover { background: #e0e0e0; }
+    .voice-btn.recording { background: #ff4444; color: white; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+    .mode-toggle { display: flex; gap: 10px; margin-bottom: 10px; justify-content: center; }
+    .mode-btn { padding: 8px 16px; background: #f0f0f0; border: 2px solid #e0e0e0; border-radius: 20px; font-size: 13px; cursor: pointer; transition: all 0.2s; }
+    .mode-btn.active { background: #667eea; color: white; border-color: #667eea; }
     #sendBtn { padding: 12px 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 25px; font-size: 14px; font-weight: 600; cursor: pointer; transition: transform 0.2s; }
     #sendBtn:hover { transform: scale(1.05); }
     #sendBtn:disabled { opacity: 0.6; cursor: not-allowed; }
@@ -321,7 +328,12 @@ app.get('/ui', (req, res) => {
     </div>
     <div class="chat-input-container">
       <div class="error-message" id="errorMessage"></div>
+      <div class="mode-toggle">
+        <button class="mode-btn active" id="textModeBtn" onclick="switchMode('text')">💬 Mode Teks</button>
+        <button class="mode-btn" id="voiceModeBtn" onclick="switchMode('voice')">🎤 Mode Suara</button>
+      </div>
       <div class="chat-input-wrapper">
+        <button id="voiceBtn" class="voice-btn" style="display: none;">🎤</button>
         <input type="text" id="messageInput" placeholder="Ketik pertanyaan Anda..." autocomplete="off">
         <button id="sendBtn">Kirim</button>
       </div>
@@ -331,11 +343,92 @@ app.get('/ui', (req, res) => {
     const chatMessages = document.getElementById('chatMessages');
     const messageInput = document.getElementById('messageInput');
     const sendBtn = document.getElementById('sendBtn');
+    const voiceBtn = document.getElementById('voiceBtn');
     const errorMessage = document.getElementById('errorMessage');
     const API_URL = window.location.origin + '/chat';
     
     // Conversation history for context (max 10 messages)
     let conversationHistory = [];
+    
+    // Voice mode state
+    let currentMode = 'text'; // 'text' or 'voice'
+    let recognition = null;
+    let isRecording = false;
+    
+    // Initialize Speech Recognition (STT)
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+      recognition.lang = 'id-ID'; // Bahasa Indonesia
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      
+      recognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        messageInput.value = transcript;
+        isRecording = false;
+        voiceBtn.classList.remove('recording');
+        voiceBtn.textContent = '🎤';
+        
+        // Auto-send after recognition
+        setTimeout(() => sendMessage(), 500);
+      };
+      
+      recognition.onerror = function(event) {
+        console.error('Speech recognition error:', event.error);
+        isRecording = false;
+        voiceBtn.classList.remove('recording');
+        voiceBtn.textContent = '🎤';
+        showError('Gagal mengenali suara. Coba lagi.');
+      };
+      
+      recognition.onend = function() {
+        isRecording = false;
+        voiceBtn.classList.remove('recording');
+        voiceBtn.textContent = '🎤';
+      };
+    }
+    
+    // Switch between text and voice mode
+    function switchMode(mode) {
+      currentMode = mode;
+      
+      if (mode === 'voice') {
+        document.getElementById('textModeBtn').classList.remove('active');
+        document.getElementById('voiceModeBtn').classList.add('active');
+        voiceBtn.style.display = 'block';
+        messageInput.placeholder = 'Klik mikrofon atau ketik...';
+        
+        if (!recognition) {
+          showError('Browser Anda tidak mendukung pengenalan suara. Gunakan Chrome/Edge.');
+        }
+      } else {
+        document.getElementById('voiceModeBtn').classList.remove('active');
+        document.getElementById('textModeBtn').classList.add('active');
+        voiceBtn.style.display = 'none';
+        messageInput.placeholder = 'Ketik pertanyaan Anda...';
+      }
+    }
+    
+    // Voice button click handler
+    voiceBtn.addEventListener('click', function() {
+      if (!recognition) {
+        showError('Pengenalan suara tidak tersedia di browser ini.');
+        return;
+      }
+      
+      if (isRecording) {
+        recognition.stop();
+        isRecording = false;
+        voiceBtn.classList.remove('recording');
+        voiceBtn.textContent = '🎤';
+      } else {
+        recognition.start();
+        isRecording = true;
+        voiceBtn.classList.add('recording');
+        voiceBtn.textContent = '⏹️';
+      }
+    });
     
     sendBtn.addEventListener('click', sendMessage);
     messageInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
@@ -393,6 +486,11 @@ app.get('/ui', (req, res) => {
         }
         
         addMessage(answer, 'bot');
+        
+        // Text-to-Speech for voice mode
+        if (currentMode === 'voice') {
+          speakText(answer);
+        }
       } catch (error) {
         console.error('Error:', error);
         typingIndicator.remove();
@@ -431,6 +529,37 @@ app.get('/ui', (req, res) => {
     
     function hideError() {
       errorMessage.classList.remove('active');
+    }
+    
+    // Text-to-Speech function
+    function speakText(text) {
+      // Stop any ongoing speech
+      window.speechSynthesis.cancel();
+      
+      // Clean text from HTML tags and formatting
+      const cleanText = text.replace(/<[^>]*>/g, '').replace(/\n/g, ' ');
+      
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+      utterance.lang = 'id-ID'; // Bahasa Indonesia
+      utterance.rate = 1.0; // Speed (0.1 to 10)
+      utterance.pitch = 1.0; // Pitch (0 to 2)
+      utterance.volume = 1.0; // Volume (0 to 1)
+      
+      // Get Indonesian voice if available
+      const voices = window.speechSynthesis.getVoices();
+      const indonesianVoice = voices.find(voice => voice.lang.startsWith('id'));
+      if (indonesianVoice) {
+        utterance.voice = indonesianVoice;
+      }
+      
+      window.speechSynthesis.speak(utterance);
+    }
+    
+    // Load voices when available
+    if (window.speechSynthesis) {
+      window.speechSynthesis.onvoiceschanged = function() {
+        window.speechSynthesis.getVoices();
+      };
     }
   </script>
 </body>
