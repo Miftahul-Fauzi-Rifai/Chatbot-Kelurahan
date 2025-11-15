@@ -340,7 +340,6 @@ app.get('/ui', (req, res) => {
     </div>
   </div>
   <script>
-    // Wait for DOM to be fully loaded
     document.addEventListener('DOMContentLoaded', function() {
       const chatMessages = document.getElementById('chatMessages');
       const messageInput = document.getElementById('messageInput');
@@ -358,224 +357,219 @@ app.get('/ui', (req, res) => {
       let currentMode = 'text'; // 'text' or 'voice'
       let recognition = null;
       let isRecording = false;
-    
-    // Initialize Speech Recognition (STT)
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      recognition = new SpeechRecognition();
-      recognition.lang = 'id-ID'; // Bahasa Indonesia
-      recognition.continuous = false;
-      recognition.interimResults = false;
       
-      recognition.onresult = function(event) {
-        const transcript = event.results[0][0].transcript;
-        messageInput.value = transcript;
-        isRecording = false;
-        voiceBtn.classList.remove('recording');
-        voiceBtn.textContent = '🎤';
+      // Initialize Speech Recognition (STT)
+      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.lang = 'id-ID'; // Bahasa Indonesia
+        recognition.continuous = false;
+        recognition.interimResults = false;
         
-        // Auto-send after recognition
-        setTimeout(() => sendMessage(), 500);
-      };
-      
-      recognition.onerror = function(event) {
-        console.error('Speech recognition error:', event.error);
-        isRecording = false;
-        voiceBtn.classList.remove('recording');
-        voiceBtn.textContent = '🎤';
-        showError('Gagal mengenali suara. Coba lagi.');
-      };
-      
-      recognition.onend = function() {
-        isRecording = false;
-        voiceBtn.classList.remove('recording');
-        voiceBtn.textContent = '🎤';
-      };
-    }
-    
-    // Switch between text and voice mode
-    function switchMode(mode) {
-      currentMode = mode;
-      
-      if (mode === 'voice') {
-        textModeBtn.classList.remove('active');
-        voiceModeBtn.classList.add('active');
-        voiceBtn.style.display = 'block';
-        messageInput.placeholder = 'Klik mikrofon atau ketik...';
+        recognition.onresult = function(event) {
+          const transcript = event.results[0][0].transcript;
+          messageInput.value = transcript;
+          isRecording = false;
+          voiceBtn.classList.remove('recording');
+          voiceBtn.textContent = '🎤';
+          
+          // Auto-send after recognition
+          setTimeout(() => sendMessage(), 500);
+        };
         
-        if (!recognition) {
-          showError('Browser Anda tidak mendukung pengenalan suara. Gunakan Chrome/Edge.');
+        recognition.onerror = function(event) {
+          console.error('Speech recognition error:', event.error);
+          isRecording = false;
+          voiceBtn.classList.remove('recording');
+          voiceBtn.textContent = '🎤';
+          showError('Gagal mengenali suara. Coba lagi.');
+        };
+        
+        recognition.onend = function() {
+          isRecording = false;
+          voiceBtn.classList.remove('recording');
+          voiceBtn.textContent = '🎤';
+        };
+      }
+      
+      // Switch between text and voice mode
+      function switchMode(mode) {
+        currentMode = mode;
+        
+        if (mode === 'voice') {
+          textModeBtn.classList.remove('active');
+          voiceModeBtn.classList.add('active');
+          voiceBtn.style.display = 'block';
+          messageInput.placeholder = 'Klik mikrofon atau ketik...';
+          
+          if (!recognition) {
+            showError('Browser Anda tidak mendukung pengenalan suara. Gunakan Chrome/Edge.');
+          }
+        } else {
+          voiceModeBtn.classList.remove('active');
+          textModeBtn.classList.add('active');
+          voiceBtn.style.display = 'none';
+          messageInput.placeholder = 'Ketik pertanyaan Anda...';
         }
-      } else {
-        voiceModeBtn.classList.remove('active');
-        textModeBtn.classList.add('active');
-        voiceBtn.style.display = 'none';
-        messageInput.placeholder = 'Ketik pertanyaan Anda...';
-      }
-    }
-    
-    // Voice button click handler
-    voiceBtn.addEventListener('click', function() {
-      if (!recognition) {
-        showError('Pengenalan suara tidak tersedia di browser ini.');
-        return;
       }
       
-      if (isRecording) {
-        recognition.stop();
-        isRecording = false;
-        voiceBtn.classList.remove('recording');
-        voiceBtn.textContent = '🎤';
-      } else {
-        recognition.start();
-        isRecording = true;
-        voiceBtn.classList.add('recording');
-        voiceBtn.textContent = '⏹️';
+      // Text-to-Speech function (TTS)
+      function speakText(text) {
+        if ('speechSynthesis' in window) {
+          // Cancel any ongoing speech
+          window.speechSynthesis.cancel();
+          
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.lang = 'id-ID'; // Bahasa Indonesia
+          utterance.rate = 1.0;
+          utterance.pitch = 1.0;
+          utterance.volume = 1.0;
+          
+          // Wait for voices to load
+          if (window.speechSynthesis.getVoices().length === 0) {
+            window.speechSynthesis.addEventListener('voiceschanged', function() {
+              window.speechSynthesis.speak(utterance);
+            }, { once: true });
+          } else {
+            window.speechSynthesis.speak(utterance);
+          }
+        }
+      }
+      
+      // Event listeners for mode buttons
+      textModeBtn.addEventListener('click', function() {
+        switchMode('text');
+      });
+      
+      voiceModeBtn.addEventListener('click', function() {
+        switchMode('voice');
+      });
+      
+      // Voice button click handler
+      voiceBtn.addEventListener('click', function() {
+        if (!recognition) {
+          showError('Pengenalan suara tidak tersedia di browser ini.');
+          return;
+        }
+        
+        if (isRecording) {
+          recognition.stop();
+          isRecording = false;
+          voiceBtn.classList.remove('recording');
+          voiceBtn.textContent = '🎤';
+        } else {
+          recognition.start();
+          isRecording = true;
+          voiceBtn.classList.add('recording');
+          voiceBtn.textContent = '⏹️';
+        }
+      });
+      
+      sendBtn.addEventListener('click', sendMessage);
+      messageInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+      
+      async function sendMessage() {
+        const message = messageInput.value.trim();
+        if (!message) return;
+        
+        hideError();
+        const welcomeMsg = chatMessages.querySelector('.welcome-message');
+        if (welcomeMsg) welcomeMsg.remove();
+        
+        addMessage(message, 'user');
+        messageInput.value = '';
+        sendBtn.disabled = true;
+        messageInput.disabled = true;
+        
+        const typingIndicator = addTypingIndicator();
+        
+        try {
+          const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              message,
+              history: conversationHistory.slice(-10) // Last 10 messages only
+            })
+          });
+          
+          if (!response.ok) throw new Error('Gagal menghubungi server. Silakan coba lagi.');
+          
+          const data = await response.json();
+          typingIndicator.remove();
+          
+          let answer = '';
+          if (data.ok && data.output?.candidates?.[0]?.content?.parts?.[0]?.text) {
+            answer = data.output.candidates[0].content.parts[0].text;
+          } else {
+            answer = 'Maaf, saya tidak bisa memproses pertanyaan Anda saat ini.';
+          }
+          
+          // Save to conversation history
+          conversationHistory.push({
+            role: 'user',
+            parts: [{ text: message }]
+          });
+          conversationHistory.push({
+            role: 'model',
+            parts: [{ text: answer }]
+          });
+          
+          // Keep only last 10 messages (5 pairs)
+          if (conversationHistory.length > 10) {
+            conversationHistory = conversationHistory.slice(-10);
+          }
+          
+          addMessage(answer, 'bot');
+          
+          // Text-to-Speech for voice mode
+          if (currentMode === 'voice') {
+            speakText(answer);
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          typingIndicator.remove();
+          showError(error.message || 'Terjadi kesalahan. Silakan coba lagi.');
+        } finally {
+          sendBtn.disabled = false;
+          messageInput.disabled = false;
+          messageInput.focus();
+        }
+      }
+      
+      function addMessage(text, sender) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = \`message \${sender}\`;
+        const now = new Date();
+        const time = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+        messageDiv.innerHTML = \`<div class="message-content">\${text.replace(/\\n/g, '<br>')}<div class="message-time">\${time}</div></div>\`;
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        return messageDiv;
+      }
+      
+      function addTypingIndicator() {
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'message bot';
+        typingDiv.innerHTML = '<div class="typing-indicator active"><span></span><span></span><span></span></div>';
+        chatMessages.appendChild(typingDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        return typingDiv;
+      }
+      
+      function showError(message) {
+        errorMessage.textContent = '❌ ' + message;
+        errorMessage.classList.add('active');
+      }
+      
+      function hideError() {
+        errorMessage.classList.remove('active');
       }
     });
-    
-    // Event Listeners
-    sendBtn.addEventListener('click', sendMessage);
-    messageInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
-    textModeBtn.addEventListener('click', () => switchMode('text'));
-    voiceModeBtn.addEventListener('click', () => switchMode('voice'));
-    
-    async function sendMessage() {
-      const message = messageInput.value.trim();
-      if (!message) return;
-      
-      hideError();
-      const welcomeMsg = chatMessages.querySelector('.welcome-message');
-      if (welcomeMsg) welcomeMsg.remove();
-      
-      addMessage(message, 'user');
-      messageInput.value = '';
-      sendBtn.disabled = true;
-      messageInput.disabled = true;
-      
-      const typingIndicator = addTypingIndicator();
-      
-      try {
-        const response = await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            message,
-            history: conversationHistory.slice(-10) // Last 10 messages only
-          })
-        });
-        
-        if (!response.ok) throw new Error('Gagal menghubungi server. Silakan coba lagi.');
-        
-        const data = await response.json();
-        typingIndicator.remove();
-        
-        let answer = '';
-        if (data.ok && data.output?.candidates?.[0]?.content?.parts?.[0]?.text) {
-          answer = data.output.candidates[0].content.parts[0].text;
-        } else {
-          answer = 'Maaf, saya tidak bisa memproses pertanyaan Anda saat ini.';
-        }
-        
-        // Save to conversation history
-        conversationHistory.push({
-          role: 'user',
-          parts: [{ text: message }]
-        });
-        conversationHistory.push({
-          role: 'model',
-          parts: [{ text: answer }]
-        });
-        
-        // Keep only last 10 messages (5 pairs)
-        if (conversationHistory.length > 10) {
-          conversationHistory = conversationHistory.slice(-10);
-        }
-        
-        addMessage(answer, 'bot');
-        
-        // Text-to-Speech for voice mode
-        if (currentMode === 'voice') {
-          speakText(answer);
-        }
-      } catch (error) {
-        console.error('Error:', error);
-        typingIndicator.remove();
-        showError(error.message || 'Terjadi kesalahan. Silakan coba lagi.');
-      } finally {
-        sendBtn.disabled = false;
-        messageInput.disabled = false;
-        messageInput.focus();
-      }
-    }
-    
-    function addMessage(text, sender) {
-      const messageDiv = document.createElement('div');
-      messageDiv.className = \`message \${sender}\`;
-      const now = new Date();
-      const time = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
-      messageDiv.innerHTML = \`<div class="message-content">\${text.replace(/\\n/g, '<br>')}<div class="message-time">\${time}</div></div>\`;
-      chatMessages.appendChild(messageDiv);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-      return messageDiv;
-    }
-    
-    function addTypingIndicator() {
-      const typingDiv = document.createElement('div');
-      typingDiv.className = 'message bot';
-      typingDiv.innerHTML = '<div class="typing-indicator active"><span></span><span></span><span></span></div>';
-      chatMessages.appendChild(typingDiv);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-      return typingDiv;
-    }
-    
-    function showError(message) {
-      errorMessage.textContent = '❌ ' + message;
-      errorMessage.classList.add('active');
-    }
-    
-    function hideError() {
-      errorMessage.classList.remove('active');
-    }
-    
-    // Text-to-Speech function
-    function speakText(text) {
-      // Stop any ongoing speech
-      window.speechSynthesis.cancel();
-      
-      // Clean text from HTML tags and formatting
-      const cleanText = text.replace(/<[^>]*>/g, '').replace(/\n/g, ' ');
-      
-      const utterance = new SpeechSynthesisUtterance(cleanText);
-      utterance.lang = 'id-ID'; // Bahasa Indonesia
-      utterance.rate = 1.0; // Speed (0.1 to 10)
-      utterance.pitch = 1.0; // Pitch (0 to 2)
-      utterance.volume = 1.0; // Volume (0 to 1)
-      
-      // Get Indonesian voice if available
-      const voices = window.speechSynthesis.getVoices();
-      const indonesianVoice = voices.find(voice => voice.lang.startsWith('id'));
-      if (indonesianVoice) {
-        utterance.voice = indonesianVoice;
-      }
-      
-      window.speechSynthesis.speak(utterance);
-    }
-    
-    // Load voices when available
-    if (window.speechSynthesis) {
-      window.speechSynthesis.onvoiceschanged = function() {
-        window.speechSynthesis.getVoices();
-      };
-    }
-    
-    }); // End DOMContentLoaded
   </script>
 </body>
 </html>`);
-});
-
-// ======== HEALTH CHECK ENDPOINT (untuk Render monitoring) =========
+});// ======== HEALTH CHECK ENDPOINT (untuk Render monitoring) =========
 app.get('/health', (req, res) => {
   const apiKeysConfigured = API_KEYS.length;
   const dataLoaded = trainingData.length > 0;
