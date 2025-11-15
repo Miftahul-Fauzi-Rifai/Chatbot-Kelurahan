@@ -285,6 +285,9 @@ app.get('/ui', (req, res) => {
     const errorMessage = document.getElementById('errorMessage');
     const API_URL = window.location.origin + '/chat';
     
+    // Conversation history for context (max 10 messages)
+    let conversationHistory = [];
+    
     sendBtn.addEventListener('click', sendMessage);
     messageInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
     
@@ -307,7 +310,10 @@ app.get('/ui', (req, res) => {
         const response = await fetch(API_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message })
+          body: JSON.stringify({ 
+            message,
+            history: conversationHistory.slice(-10) // Last 10 messages only
+          })
         });
         
         if (!response.ok) throw new Error('Gagal menghubungi server. Silakan coba lagi.');
@@ -320,6 +326,21 @@ app.get('/ui', (req, res) => {
           answer = data.output.candidates[0].content.parts[0].text;
         } else {
           answer = 'Maaf, saya tidak bisa memproses pertanyaan Anda saat ini.';
+        }
+        
+        // Save to conversation history
+        conversationHistory.push({
+          role: 'user',
+          parts: [{ text: message }]
+        });
+        conversationHistory.push({
+          role: 'model',
+          parts: [{ text: answer }]
+        });
+        
+        // Keep only last 10 messages (5 pairs)
+        if (conversationHistory.length > 10) {
+          conversationHistory = conversationHistory.slice(-10);
         }
         
         addMessage(answer, 'bot');
