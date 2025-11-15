@@ -329,8 +329,8 @@ app.get('/ui', (req, res) => {
     <div class="chat-input-container">
       <div class="error-message" id="errorMessage"></div>
       <div class="mode-toggle">
-        <button class="mode-btn active" id="textModeBtn" onclick="switchMode('text')">💬 Mode Teks</button>
-        <button class="mode-btn" id="voiceModeBtn" onclick="switchMode('voice')">🎤 Mode Suara</button>
+        <button class="mode-btn active" id="textModeBtn">💬 Mode Teks</button>
+        <button class="mode-btn" id="voiceModeBtn">🎤 Mode Suara</button>
       </div>
       <div class="chat-input-wrapper">
         <button id="voiceBtn" class="voice-btn" style="display: none;">🎤</button>
@@ -432,6 +432,10 @@ app.get('/ui', (req, res) => {
     
     sendBtn.addEventListener('click', sendMessage);
     messageInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+    
+    // Mode switching event listeners
+    document.getElementById('textModeBtn').addEventListener('click', () => switchMode('text'));
+    document.getElementById('voiceModeBtn').addEventListener('click', () => switchMode('voice'));
     
     async function sendMessage() {
       const message = messageInput.value.trim();
