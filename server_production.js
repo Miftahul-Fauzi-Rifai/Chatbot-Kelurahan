@@ -162,7 +162,7 @@ async function generateWithRetry(url, payload, modelName, maxRetries = 1) {
       
       const response = await axios.post(url, payload, {
         headers: { 'Content-Type': 'application/json' },
-        timeout: 8000
+        timeout: 3000 // Reduced to 3s - total 9s for 3 models fits Vercel 10s limit
       });
       
       const duration = Date.now() - startTime;
@@ -611,26 +611,26 @@ ${grounding ? '\n📚 DATA REFERENSI (WAJIB DIGUNAKAN JIKA RELEVAN):\n' + ground
     }
     
     // All Gemini models failed - use RAG semantic fallback
-    console.warn('⚠️ All Gemini models failed, trying RAG semantic fallback...');
+    console.log('🔄 Layer 4: All Gemini models failed, trying RAG semantic fallback...');
     
     try {
       const ragResult = await localRAG(message);
 
       if (ragResult?.ok && ragResult?.answer) {
-        console.log(`✅ RAG Fallback success (${ragResult.sources.length} sources)`);
+        console.log(`✅ Layer 4 SUCCESS: RAG Fallback (${ragResult.sources.length} sources)`);
         return replyAndCache({
           ok: true,
           model: 'rag-local',
           output: { candidates: [{ content: { parts: [{ text: ragResult.answer }] } }] }
         });
       }
-      console.warn('RAG gagal:', ragResult?.error || ragResult?.message);
+      console.warn('❌ Layer 4 FAILED: RAG gagal -', ragResult?.error || ragResult?.message);
     } catch (ragError) {
-      console.error('RAG exception:', ragError.message);
+      console.error('❌ Layer 4 EXCEPTION:', ragError.message);
     }
     
     // RAG failed - use keyword fallback
-    console.warn('⚠️ RAG failed, using keyword fallback...');
+    console.log('🔄 Layer 5: RAG failed, using keyword fallback...');
     
     const lowerMessage = message.toLowerCase();
     const queryWords = lowerMessage.split(/\s+/).filter(w => w.length > 2);
@@ -663,7 +663,7 @@ ${grounding ? '\n📚 DATA REFERENSI (WAJIB DIGUNAKAN JIKA RELEVAN):\n' + ground
     
     if (matches.length > 0) {
       const bestMatch = matches[0].item;
-      console.log(`✅ Keyword match found (score: ${matches[0].score})`);
+      console.log(`✅ Layer 5 SUCCESS: Keyword match found (score: ${matches[0].score})`);
       
       return replyAndCache({ 
         ok: true, 
@@ -677,6 +677,7 @@ ${grounding ? '\n📚 DATA REFERENSI (WAJIB DIGUNAKAN JIKA RELEVAN):\n' + ground
     }
     
     // No match found - return professional generic response (manusiawi)
+    console.log('⚠️ Layer 6: No keyword match, using generic response');
     return replyAndCache({ 
       ok: true, 
       model: 'fallback-generic',
