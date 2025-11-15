@@ -200,12 +200,6 @@ async function generateWithRetry(url, payload, modelName, maxRetries = 2) {
 
 // ======== ROOT ENDPOINT =========
 app.get('/', (req, res) => {
-  // Serve chat.html sebagai homepage
-  res.sendFile(path.join(__dirname, 'public', 'chat.html'));
-});
-
-// API info endpoint
-app.get('/api', (req, res) => {
   res.json({
     service: 'Chatbot Kelurahan API',
     version: '2.0.0',
@@ -213,10 +207,166 @@ app.get('/api', (req, res) => {
     endpoints: {
       chat: 'POST /chat',
       health: 'GET /health',
-      status: 'GET /status'
+      status: 'GET /status',
+      ui: 'GET /ui (Chat Interface)'
     },
-    documentation: 'https://github.com/Miftahul-Fauzi-Rifai/Chatbot-Kelurahan'
+    documentation: 'https://github.com/Miftahul-Fauzi-Rifai/Chatbot-Kelurahan',
+    ui_url: '/ui'
   });
+});
+
+// UI Chat Interface
+app.get('/ui', (req, res) => {
+  res.send(`<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chatbot Kelurahan Marga Sari</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+    .chat-container { width: 100%; max-width: 600px; height: 90vh; max-height: 800px; background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); display: flex; flex-direction: column; overflow: hidden; }
+    .chat-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; text-align: center; }
+    .chat-header h1 { font-size: 24px; margin-bottom: 5px; }
+    .chat-header p { font-size: 14px; opacity: 0.9; }
+    .chat-messages { flex: 1; padding: 20px; overflow-y: auto; background: #f8f9fa; }
+    .message { margin-bottom: 15px; display: flex; animation: slideIn 0.3s ease; }
+    @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .message.user { justify-content: flex-end; }
+    .message.bot { justify-content: flex-start; }
+    .message-content { max-width: 70%; padding: 12px 16px; border-radius: 18px; word-wrap: break-word; line-height: 1.5; }
+    .message.user .message-content { background: #667eea; color: white; border-bottom-right-radius: 4px; }
+    .message.bot .message-content { background: white; color: #333; border-bottom-left-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .message-time { font-size: 11px; opacity: 0.7; margin-top: 5px; text-align: right; }
+    .typing-indicator { display: none; padding: 12px 16px; background: white; border-radius: 18px; width: fit-content; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .typing-indicator.active { display: block; }
+    .typing-indicator span { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #667eea; margin: 0 2px; animation: typing 1.4s infinite; }
+    .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typing { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-10px); } }
+    .chat-input-container { padding: 20px; background: white; border-top: 1px solid #e0e0e0; }
+    .chat-input-wrapper { display: flex; gap: 10px; }
+    #messageInput { flex: 1; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 25px; font-size: 14px; outline: none; transition: border-color 0.3s; }
+    #messageInput:focus { border-color: #667eea; }
+    #sendBtn { padding: 12px 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 25px; font-size: 14px; font-weight: 600; cursor: pointer; transition: transform 0.2s; }
+    #sendBtn:hover { transform: scale(1.05); }
+    #sendBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .welcome-message { text-align: center; color: #999; margin-top: 100px; }
+    .welcome-message h2 { font-size: 20px; margin-bottom: 10px; color: #667eea; }
+    .welcome-message p { font-size: 14px; }
+    .error-message { background: #fee; color: #c00; padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 13px; display: none; }
+    .error-message.active { display: block; }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-header">
+      <h1>🏛️ Chatbot Kelurahan</h1>
+      <p>Asisten Virtual Kelurahan Marga Sari, Balikpapan</p>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="welcome-message">
+        <h2>Selamat Datang! 👋</h2>
+        <p>Tanyakan tentang layanan administrasi kelurahan</p>
+        <p style="margin-top: 10px; font-size: 12px; color: #bbb;">Contoh: "Bagaimana cara membuat KTP?"</p>
+      </div>
+    </div>
+    <div class="chat-input-container">
+      <div class="error-message" id="errorMessage"></div>
+      <div class="chat-input-wrapper">
+        <input type="text" id="messageInput" placeholder="Ketik pertanyaan Anda..." autocomplete="off">
+        <button id="sendBtn">Kirim</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    const chatMessages = document.getElementById('chatMessages');
+    const messageInput = document.getElementById('messageInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const errorMessage = document.getElementById('errorMessage');
+    const API_URL = window.location.origin + '/chat';
+    
+    sendBtn.addEventListener('click', sendMessage);
+    messageInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+    
+    async function sendMessage() {
+      const message = messageInput.value.trim();
+      if (!message) return;
+      
+      hideError();
+      const welcomeMsg = chatMessages.querySelector('.welcome-message');
+      if (welcomeMsg) welcomeMsg.remove();
+      
+      addMessage(message, 'user');
+      messageInput.value = '';
+      sendBtn.disabled = true;
+      messageInput.disabled = true;
+      
+      const typingIndicator = addTypingIndicator();
+      
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message })
+        });
+        
+        if (!response.ok) throw new Error('Gagal menghubungi server. Silakan coba lagi.');
+        
+        const data = await response.json();
+        typingIndicator.remove();
+        
+        let answer = '';
+        if (data.ok && data.output?.candidates?.[0]?.content?.parts?.[0]?.text) {
+          answer = data.output.candidates[0].content.parts[0].text;
+        } else {
+          answer = 'Maaf, saya tidak bisa memproses pertanyaan Anda saat ini.';
+        }
+        
+        addMessage(answer, 'bot');
+      } catch (error) {
+        console.error('Error:', error);
+        typingIndicator.remove();
+        showError(error.message || 'Terjadi kesalahan. Silakan coba lagi.');
+      } finally {
+        sendBtn.disabled = false;
+        messageInput.disabled = false;
+        messageInput.focus();
+      }
+    }
+    
+    function addMessage(text, sender) {
+      const messageDiv = document.createElement('div');
+      messageDiv.className = \`message \${sender}\`;
+      const now = new Date();
+      const time = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+      messageDiv.innerHTML = \`<div class="message-content">\${text.replace(/\\n/g, '<br>')}<div class="message-time">\${time}</div></div>\`;
+      chatMessages.appendChild(messageDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      return messageDiv;
+    }
+    
+    function addTypingIndicator() {
+      const typingDiv = document.createElement('div');
+      typingDiv.className = 'message bot';
+      typingDiv.innerHTML = '<div class="typing-indicator active"><span></span><span></span><span></span></div>';
+      chatMessages.appendChild(typingDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      return typingDiv;
+    }
+    
+    function showError(message) {
+      errorMessage.textContent = '❌ ' + message;
+      errorMessage.classList.add('active');
+    }
+    
+    function hideError() {
+      errorMessage.classList.remove('active');
+    }
+  </script>
+</body>
+</html>`);
 });
 
 // ======== HEALTH CHECK ENDPOINT (untuk Render monitoring) =========
