@@ -6,16 +6,24 @@ import dotenv from 'dotenv';
 import express from 'express';
 import axios from 'axios';
 import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { localRAG, getRAGStatus } from './rag_handler.js';
 import { makeCacheKey, getCache, setCache, getCacheStats } from './utils/cache.js';
 
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ======== MIDDLEWARE =========
 app.use(express.json());
+
+// Serve static files dari folder public
+app.use(express.static(path.join(__dirname, 'public')));
 
 // ======== CORS Configuration (Open untuk semua domain) =========
 app.use((req, res, next) => {
@@ -192,6 +200,12 @@ async function generateWithRetry(url, payload, modelName, maxRetries = 2) {
 
 // ======== ROOT ENDPOINT =========
 app.get('/', (req, res) => {
+  // Serve chat.html sebagai homepage
+  res.sendFile(path.join(__dirname, 'public', 'chat.html'));
+});
+
+// API info endpoint
+app.get('/api', (req, res) => {
   res.json({
     service: 'Chatbot Kelurahan API',
     version: '2.0.0',
@@ -201,7 +215,7 @@ app.get('/', (req, res) => {
       health: 'GET /health',
       status: 'GET /status'
     },
-    documentation: 'https://github.com/yourusername/chatbot-kelurahan'
+    documentation: 'https://github.com/Miftahul-Fauzi-Rifai/Chatbot-Kelurahan'
   });
 });
 
