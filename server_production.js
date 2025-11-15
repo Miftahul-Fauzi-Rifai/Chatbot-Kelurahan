@@ -1,5 +1,5 @@
 // server_production.js
-// Backend API chatbot untuk Render deployment
+// Backend API chatbot untuk deployment
 // Fokus: REST API only, CORS-friendly, production-ready
 
 import dotenv from 'dotenv';

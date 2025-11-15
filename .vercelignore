@@ -1,0 +1,32 @@
+# Vercel Ignore File
+# File/folder yang tidak perlu di-upload ke Vercel
+
+# Development files
+quickstart.ps1
+optimize_data.js
+rag_index.js
+
+# Documentation (optional - bisa di-include jika perlu)
+README.md
+VERCEL_DEPLOYMENT.md
+UPSTASH_REDIS_SETUP.md
+
+# Data backup (hanya perlu yang optimized)
+data/train.json
+data/train_backup.json
+data/kosakata_jawa.json
+
+# Uploads folder (tidak diperlukan di serverless)
+uploads/
+
+# Frontend (jika tidak dipakai)
+frontend/
+public/
+
+# Git
+.git/
+.gitignore
+
+# Environment
+.env
+.env.example
