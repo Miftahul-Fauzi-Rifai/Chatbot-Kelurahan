@@ -2062,7 +2062,7 @@
   {
     "id": "SURAT-DOMISILI-001",
     "text": "Bagaimana cara membuat Surat Domisili?",
-    "answer": "Surat Domisili dapat diajukan secara online melalui website Kelurahan Marga Sari. Anda bisa mengisi formulir online terlebih dahulu, kemudian datang ke kelurahan untuk verifikasi. Persyaratan: (1) KTP asli + fotokopi, (2) KK asli + fotokopi, (3) Surat Pengantar RT/RW. Dengan pengajuan online, proses lebih cepat karena data sudah terinput sebelum Anda datang. Kontak: (0542) 123456.",
+    "answer": "Surat Keterangan Domisili (untuk warga ber-KTP setempat) dapat diajukan online melalui website Kelurahan Marga Sari pada menu 'Layanan Online'. Isi formulir online terlebih dahulu, kemudian datang ke kelurahan untuk verifikasi. Persyaratan: (1) Surat Pengantar RT, (2) Fotokopi KTP dan KK pemohon. Dengan pengajuan online, proses lebih cepat karena data sudah terinput sebelum Anda datang. Kontak: (0542) 123456.",
     "kategori_utama": "Surat Kelurahan",
     "tags": [
       "domisili",
@@ -2092,10 +2092,11 @@
   {
     "id": "SURAT-BELUM-NIKAH-001",
     "text": "Bagaimana cara membuat Surat Belum Menikah?",
-    "answer": "Surat Belum Menikah dapat diajukan online melalui website Kelurahan Marga Sari untuk mempercepat proses. Isi formulir online, lalu datang ke kelurahan untuk verifikasi dan pengambilan surat. Persyaratan: (1) KTP asli + fotokopi, (2) KK asli + fotokopi, (3) Surat Pengantar RT/RW. Proses: 1-2 hari kerja setelah verifikasi dokumen. Dengan layanan online, Anda tidak perlu mengisi formulir manual di kelurahan.",
+    "answer": "Surat Keterangan Belum Pernah Menikah dapat diajukan online melalui website Kelurahan Marga Sari pada menu 'Layanan Online'. Isi formulir online, lalu datang ke kelurahan untuk verifikasi. Persyaratan: (1) Surat Pengantar RT, (2) Fotokopi KTP dan KK pemohon, (3) Surat Pernyataan Belum Pernah Menikah yang dibubuhi materai Rp10.000, (4) Fotokopi KTP 2 (dua) orang saksi yang tercantum dalam Surat Pernyataan. Proses: 1-2 hari kerja setelah verifikasi.",
     "kategori_utama": "Surat Kelurahan",
     "tags": [
       "belum menikah",
+      "belum pernah menikah",
       "surat",
       "keterangan",
       "status",
@@ -2107,7 +2108,7 @@
   {
     "id": "SURAT-JANDA-DUDA-001",
     "text": "Bagaimana cara membuat Surat Keterangan Janda/Duda?",
-    "answer": "Surat Keterangan Janda/Duda dapat diajukan online melalui website Kelurahan Marga Sari. Isi formulir online terlebih dahulu untuk mempermudah proses, kemudian datang ke kelurahan untuk verifikasi dokumen dan pengambilan surat. Persyaratan: (1) KTP asli + fotokopi, (2) KK asli + fotokopi, (3) Akta Kematian pasangan (jika cerai mati) atau Akta Cerai (jika cerai hidup) asli + fotokopi, (4) Surat Pengantar RT/RW. Proses: 1-3 hari kerja setelah verifikasi. Layanan online menghemat waktu Anda.",
+    "answer": "Surat Keterangan Janda/Duda dapat diajukan online melalui website Kelurahan Marga Sari pada menu 'Layanan Online'. Isi formulir online, lalu datang ke kelurahan untuk verifikasi. Persyaratan: (1) Surat Pengantar RT, (2) Fotokopi KTP dan KK pemohon, (3) Fotokopi Akta Cerai atau Akta Kematian, (4) Surat Pernyataan Janda/Duda yang dibuat oleh Pemohon dengan dibubuhi materai Rp10.000, (5) Fotokopi KTP 2 (dua) orang saksi yang dicantumkan dalam Surat Pernyataan. Proses: 1-3 hari kerja setelah verifikasi.",
     "kategori_utama": "Surat Kelurahan",
     "tags": [
       "janda",
@@ -2123,7 +2124,7 @@
   {
     "id": "SURAT-PENGHASILAN-001",
     "text": "Bagaimana cara membuat Surat Keterangan Penghasilan Tidak Tetap?",
-    "answer": "Surat Keterangan Penghasilan Tidak Tetap dapat diajukan online melalui website Kelurahan Marga Sari. Isi formulir online dengan mencantumkan estimasi penghasilan dan jenis pekerjaan, lalu datang ke kelurahan untuk verifikasi dan pengambilan surat. Persyaratan: (1) KTP asli + fotokopi, (2) KK asli + fotokopi, (3) Surat Pengantar RT/RW, (4) Keterangan pekerjaan/usaha. Pengajuan online memudahkan proses karena data sudah tercatat sebelum verifikasi.",
+    "answer": "Surat Keterangan Berpenghasilan Tidak Tetap dapat diajukan online melalui website Kelurahan Marga Sari pada menu 'Layanan Online'. Isi formulir online, lalu datang ke kelurahan untuk verifikasi. Persyaratan: (1) Surat Pengantar RT, (2) Fotokopi KTP dan KK pemohon, (3) Surat Pernyataan Berpenghasilan Tidak Tetap yang dibubuhi materai Rp10.000, (4) Fotokopi KTP 2 (dua) orang saksi yang dicantumkan dalam Surat Pernyataan. Pengajuan online mempercepat proses administrasi.",
     "kategori_utama": "Surat Kelurahan",
     "tags": [
       "penghasilan",
@@ -2133,6 +2134,34 @@
       "surat",
       "keterangan",
       "gaji"
+    ]
+  },
+  {
+    "id": "SURAT-BERTEMPAT-TINGGAL-001",
+    "text": "Bagaimana cara membuat Surat Keterangan Bertempat Tinggal?",
+    "answer": "Surat Keterangan Bertempat Tinggal (untuk warga ber-KTP luar daerah) dapat diajukan online melalui website Kelurahan Marga Sari pada menu 'Layanan Online'. Isi formulir online terlebih dahulu, kemudian datang ke kelurahan untuk verifikasi. Persyaratan: (1) Fotokopi KTP dan KK pemohon, (2) Surat Pengantar RT, (3) Surat keterangan kuliah/kerja atau KK penjamin, (4) Pas foto pemohon ukuran 3x4 sebanyak 2 lembar dengan latar belakang merah. Layanan online memudahkan proses pengajuan.",
+    "kategori_utama": "Surat Kelurahan",
+    "tags": [
+      "bertempat tinggal",
+      "domisili",
+      "surat",
+      "keterangan",
+      "KTP luar daerah",
+      "online",
+      "website"
+    ]
+  },
+  {
+    "id": "SURAT-BERTEMPAT-TINGGAL-002",
+    "text": "Apa bedanya Surat Keterangan Bertempat Tinggal dan Surat Domisili?",
+    "answer": "Surat Keterangan Bertempat Tinggal untuk warga ber-KTP luar daerah yang tinggal sementara (mahasiswa, pekerja), memerlukan surat keterangan kuliah/kerja dan pas foto. Surat Domisili untuk warga ber-KTP setempat, hanya perlu KTP, KK, dan Surat Pengantar RT. Keduanya dapat diajukan online melalui website Kelurahan Marga Sari di menu 'Layanan Online'.",
+    "kategori_utama": "Surat Kelurahan",
+    "tags": [
+      "beda",
+      "perbedaan",
+      "bertempat tinggal",
+      "domisili",
+      "KTP"
     ]
   },
   {
