@@ -47,6 +47,32 @@ app.use((req, res, next) => {
   next();
 });
 
+// ======== MULTI API KEY CONFIGURATION =========
+const API_KEYS = [
+  process.env.GEMINI_API_KEY,
+  process.env.GEMINI_API_KEY_2,
+  process.env.GEMINI_API_KEY_3
+].filter(Boolean); // Remove undefined/null keys
+
+let currentKeyIndex = 0;
+
+function getNextApiKey() {
+  if (API_KEYS.length === 0) {
+    throw new Error('No API keys configured');
+  }
+  
+  const key = API_KEYS[currentKeyIndex];
+  currentKeyIndex = (currentKeyIndex + 1) % API_KEYS.length;
+  return key;
+}
+
+function getCurrentKeyInfo() {
+  return {
+    total: API_KEYS.length,
+    current: currentKeyIndex + 1
+  };
+}
+
 // ======== RATE LIMITER (Protection dari API quota) =========
 const rateLimit = {
   requests: [],
@@ -152,34 +178,57 @@ function findRelevantData(message, allData, maxResults = 3) {
 }
 
 // ======== RETRY LOGIC =========
-async function generateWithRetry(url, payload, modelName, maxRetries = 1) {
+async function generateWithRetry(url, payload, modelName, maxRetries = 2) {
+  const totalKeys = API_KEYS.length;
+  const attemptsPerKey = Math.max(1, Math.floor(maxRetries / Math.max(1, totalKeys)));
+  
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       await rateLimit.waitIfNeeded();
       
-      console.log(`🔄 Attempt ${attempt}/${maxRetries} - ${modelName}`);
+      // Get next API key (automatic rotation)
+      const apiKey = getNextApiKey();
+      const keyInfo = getCurrentKeyInfo();
+      const urlWithKey = url.replace(/key=[^&]*/, `key=${apiKey}`);
+      
+      console.log(`🔄 Attempt ${attempt}/${maxRetries} - ${modelName} [Key ${keyInfo.current}/${keyInfo.total}]`);
       const startTime = Date.now();
       
-      const response = await axios.post(url, payload, {
+      const response = await axios.post(urlWithKey, payload, {
         headers: { 'Content-Type': 'application/json' },
-        timeout: 3000 // Reduced to 3s - total 9s for 3 models fits Vercel 10s limit
+        timeout: 3000
       });
       
       const duration = Date.now() - startTime;
-      console.log(`✅ Success with ${modelName} in ${duration}ms`);
+      console.log(`✅ Success with ${modelName} [Key ${keyInfo.current}] in ${duration}ms`);
       return response.data;
       
     } catch (error) {
       const statusCode = error.response?.status;
       const errorMessage = error.response?.data?.error?.message || error.message;
+      const keyInfo = getCurrentKeyInfo();
       
       if (statusCode === 429) {
-        console.log(`⚠️ Rate limit (429) - Skip to next layer immediately`);
+        // If multiple keys available and not last attempt, rotate and retry
+        if (totalKeys > 1 && attempt < maxRetries) {
+          console.log(`⚠️ Rate limit (429) [Key ${keyInfo.current}] - Rotating to next key...`);
+          await new Promise(resolve => setTimeout(resolve, 500)); // Brief wait
+          continue;
+        }
+        console.log(`⚠️ Rate limit (429) - All keys exhausted, skip to next layer`);
         throw new Error('QUOTA_EXCEEDED');
       }
       
       if (errorMessage.includes('quota') || errorMessage.includes('RESOURCE_EXHAUSTED')) {
-        console.log(`📊 Quota exceeded for ${modelName}`);
+        console.log(`📊 Quota exceeded [Key ${keyInfo.current}]`);
+        
+        // Rotate to next key if available
+        if (totalKeys > 1 && attempt < maxRetries) {
+          console.log(`🔄 Trying with next API key...`);
+          await new Promise(resolve => setTimeout(resolve, 500));
+          continue;
+        }
+        
         throw new Error('QUOTA_EXCEEDED');
       }
       
@@ -390,17 +439,18 @@ app.get('/ui', (req, res) => {
 
 // ======== HEALTH CHECK ENDPOINT (untuk Render monitoring) =========
 app.get('/health', (req, res) => {
-  const apiKeyConfigured = !!process.env.GEMINI_API_KEY;
+  const apiKeysConfigured = API_KEYS.length;
   const dataLoaded = trainingData.length > 0;
   
   const health = {
-    status: (apiKeyConfigured && dataLoaded) ? 'healthy' : 'degraded',
+    status: (apiKeysConfigured > 0 && dataLoaded) ? 'healthy' : 'degraded',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     checks: {
-      api_key: apiKeyConfigured ? 'OK' : 'MISSING',
+      gemini_api_keys: `${apiKeysConfigured} key${apiKeysConfigured !== 1 ? 's' : ''} configured`,
       training_data: dataLoaded ? `OK (${trainingData.length} items)` : 'EMPTY',
-      memory: `${Math.round(process.memoryUsage().heapUsed / 1024 / 1024)}MB`
+      memory: `${Math.round(process.memoryUsage().heapUsed / 1024 / 1024)}MB`,
+      quota_capacity: `${apiKeysConfigured * 15} requests/minute (estimated)`
     }
   };
   
@@ -446,6 +496,16 @@ app.post('/chat', async (req, res) => {
   }
 
   console.log(`💬 Chat request: "${message.substring(0, 50)}..."`);
+  
+  // Validate API Keys
+  if (API_KEYS.length === 0) {
+    return res.status(500).json({ 
+      ok: false, 
+      error: 'GEMINI_API_KEY not configured. Please add at least one API key.' 
+    });
+  }
+  
+  console.log(`🔑 Available API Keys: ${API_KEYS.length}`);
   
   // ============================================
   // LAYER 0: CACHE CHECK (Hemat kuota Gemini!)
@@ -567,7 +627,8 @@ ${grounding ? '\n📚 DATA REFERENSI (WAJIB DIGUNAKAN JIKA RELEVAN):\n' + ground
         console.log(`🤖 Trying model: ${model}`);
         
         const apiVersion = model.includes('2.0') ? 'v1beta' : 'v1';
-        const url = `https://generativelanguage.googleapis.com/${apiVersion}/models/${model}:generateContent?key=${apiKey}`;
+        // Placeholder URL - actual API key will be injected in generateWithRetry()
+        const url = `https://generativelanguage.googleapis.com/${apiVersion}/models/${model}:generateContent?key=PLACEHOLDER`;
 
         // Build conversation
         const contents = [];
@@ -604,7 +665,7 @@ ${grounding ? '\n📚 DATA REFERENSI (WAJIB DIGUNAKAN JIKA RELEVAN):\n' + ground
           }
         };
 
-        const out = await generateWithRetry(url, payload, model);
+        const out = await generateWithRetry(url, payload, model, 2); // maxRetries=2 for multi-key rotation
 
         if (!out.candidates || !out.candidates[0].content) {
           throw new Error("Invalid API response");
@@ -751,7 +812,7 @@ if (!process.env.VERCEL) {
     console.log(`📡 Server running on port ${PORT}`);
     console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
     console.log(`📊 Training data: ${trainingData.length} items`);
-    console.log(`🔑 API Key: ${process.env.GEMINI_API_KEY ? 'Configured ✓' : 'Missing ✗'}`);
+    console.log(`🔑 API Keys: ${API_KEYS.length} configured (${API_KEYS.length * 15} req/min capacity)`);
     console.log('\nEndpoints:');
     console.log(`  - GET  /         - API info`);
     console.log(`  - GET  /health   - Health check`);
