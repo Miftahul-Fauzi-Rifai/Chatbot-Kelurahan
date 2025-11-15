@@ -152,7 +152,7 @@ function findRelevantData(message, allData, maxResults = 3) {
 }
 
 // ======== RETRY LOGIC =========
-async function generateWithRetry(url, payload, modelName, maxRetries = 2) {
+async function generateWithRetry(url, payload, modelName, maxRetries = 1) {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       await rateLimit.waitIfNeeded();
@@ -162,7 +162,7 @@ async function generateWithRetry(url, payload, modelName, maxRetries = 2) {
       
       const response = await axios.post(url, payload, {
         headers: { 'Content-Type': 'application/json' },
-        timeout: 10000
+        timeout: 8000
       });
       
       const duration = Date.now() - startTime;
@@ -173,11 +173,9 @@ async function generateWithRetry(url, payload, modelName, maxRetries = 2) {
       const statusCode = error.response?.status;
       const errorMessage = error.response?.data?.error?.message || error.message;
       
-      if (statusCode === 429 && attempt < maxRetries) {
-        const waitTime = 3000;
-        console.log(`⚠️ Rate limit (429) - Retry in ${waitTime/1000}s...`);
-        await new Promise(resolve => setTimeout(resolve, waitTime));
-        continue;
+      if (statusCode === 429) {
+        console.log(`⚠️ Rate limit (429) - Skip to next layer immediately`);
+        throw new Error('QUOTA_EXCEEDED');
       }
       
       if (errorMessage.includes('quota') || errorMessage.includes('RESOURCE_EXHAUSTED')) {
