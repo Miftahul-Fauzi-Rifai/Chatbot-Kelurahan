@@ -43,6 +43,9 @@ app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('Referrer-Policy', 'no-referrer-when-downgrade');
   
+  // CRITICAL: Permissions Policy untuk touch events di mobile iframe
+  res.setHeader('Permissions-Policy', 'microphone=*, camera=*, geolocation=*, accelerometer=*, gyroscope=*, magnetometer=*');
+  
   // Handle preflight requests
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
