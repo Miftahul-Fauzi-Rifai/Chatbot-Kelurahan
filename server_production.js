@@ -32,6 +32,17 @@ app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   
+  // ======== IFRAME EMBEDDING SUPPORT (untuk mobile widget) =========
+  // Hapus header yang memblokir iframe
+  res.removeHeader('X-Frame-Options');
+  
+  // Izinkan embedding dari semua domain
+  res.setHeader('Content-Security-Policy', "frame-ancestors *");
+  
+  // Security headers tambahan untuk mobile compatibility
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Referrer-Policy', 'no-referrer-when-downgrade');
+  
   // Handle preflight requests
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
