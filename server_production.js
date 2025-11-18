@@ -126,7 +126,7 @@ const rateLimit = {
 };
 
 // ======== DATA LOADING =========
-const TRAIN_FILE = process.env.TRAIN_DATA_FILE || './data/train_optimized.json';
+const TRAIN_FILE = process.env.TRAIN_DATA_FILE || './data/train_backup.json';
 
 function readTrainData() {
   try {
