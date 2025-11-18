@@ -8,7 +8,8 @@ import axios from 'axios';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { localRAG, getRAGStatus } from './rag_handler.js';
+// UPDATE IMPORT: Menambahkan semanticSearch
+import { localRAG, getRAGStatus, semanticSearch } from './rag_handler.js';
 import { makeCacheKey, getCache, setCache, getCacheStats } from './utils/cache.js';
 
 dotenv.config();
@@ -125,7 +126,7 @@ const rateLimit = {
   }
 };
 
-// ======== DATA LOADING =========
+// ======== DATA LOADING (BACKUP KEYWORD SEARCH) =========
 const TRAIN_FILE = process.env.TRAIN_DATA_FILE || './data/train_optimized.json';
 
 function readTrainData() {
@@ -146,7 +147,7 @@ function readTrainData() {
 // Load data saat startup
 const trainingData = readTrainData();
 
-// ======== FUNGSI PENCARIAN SEMANTIK (RAG) =========
+// ======== FUNGSI PENCARIAN KEYWORD (OLD METHOD - FALLBACK) =========
 function findRelevantData(message, allData, maxResults = 3) {
   const lowerMessage = message.toLowerCase();
   const queryWords = lowerMessage.split(/\s+/);
@@ -263,7 +264,7 @@ async function generateWithRetry(url, payload, modelName, maxRetries = 2) {
 app.get('/', (req, res) => {
   res.json({
     service: 'Chatbot Kelurahan API',
-    version: '2.0.0',
+    version: '2.1.0',
     status: 'online',
     endpoints: {
       chat: 'POST /chat',
@@ -286,12 +287,18 @@ app.get('/ui', (req, res) => {
   <title>Chatbot Kelurahan Marga Sari</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
-    .chat-container { width: 100%; max-width: 600px; height: 90vh; max-height: 800px; background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); display: flex; flex-direction: column; overflow: hidden; }
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+    }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    .chat-container { width: 100%; height: 100%; max-width: 600px; max-height: 100%; background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); display: flex; flex-direction: column; overflow: hidden; margin: auto; }
     .chat-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; text-align: center; }
     .chat-header h1 { font-size: 24px; margin-bottom: 5px; }
     .chat-header p { font-size: 14px; opacity: 0.9; }
-    .chat-messages { flex: 1; padding: 20px; overflow-y: auto; background: #f8f9fa; }
+    .chat-messages { flex: 1; padding: 20px; overflow-y: auto; background: #f8f9fa; -webkit-overflow-scrolling: touch; }
     .message { margin-bottom: 15px; display: flex; animation: slideIn 0.3s ease; }
     @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     .message.user { justify-content: flex-end; }
@@ -307,8 +314,8 @@ app.get('/ui', (req, res) => {
     .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
     @keyframes typing { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-10px); } }
     .chat-input-container { padding: 20px; background: white; border-top: 1px solid #e0e0e0; }
-    .chat-input-wrapper { display: flex; gap: 10px; }
-    #messageInput { flex: 1; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 25px; font-size: 14px; outline: none; transition: border-color 0.3s; }
+    .chat-input-wrapper { display: flex; gap: 10px; align-items: center; }
+    #messageInput { flex: 1; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 25px; font-size: 14px; outline: none; transition: border-color 0.3s; -webkit-appearance: none; touch-action: manipulation; }
     #messageInput:focus { border-color: #667eea; }
     .voice-btn { padding: 12px 16px; background: #f0f0f0; color: #333; border: none; border-radius: 25px; font-size: 20px; cursor: pointer; transition: all 0.2s; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
     .voice-btn:hover { background: #e0e0e0; }
@@ -325,6 +332,17 @@ app.get('/ui', (req, res) => {
     .welcome-message p { font-size: 14px; }
     .error-message { background: #fee; color: #c00; padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 13px; display: none; }
     .error-message.active { display: block; }
+
+    /* Mobile optimizations */
+    @media (max-width: 768px) {
+      body { padding: 0; }
+      .chat-container { width: 100%; height: 100%; max-width: 100%; max-height: 100%; border-radius: 0; margin: 0; }
+      .chat-header h1 { font-size: 20px; }
+      .chat-header p { font-size: 12px; }
+      #messageInput { font-size: 16px; } /* Prevent zoom on iOS */
+      .mode-btn { padding: 10px 14px; font-size: 14px; }
+      #sendBtn { padding: 12px 20px; }
+    }
   </style>
 </head>
 <body>
@@ -364,19 +382,15 @@ app.get('/ui', (req, res) => {
       const errorMessage = document.getElementById('errorMessage');
       const API_URL = window.location.origin + '/chat';
       
-      // Conversation history for context (max 10 messages)
       let conversationHistory = [];
-      
-      // Voice mode state
-      let currentMode = 'text'; // 'text' or 'voice'
+      let currentMode = 'text';
       let recognition = null;
       let isRecording = false;
       
-      // Initialize Speech Recognition (STT)
       if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         recognition = new SpeechRecognition();
-        recognition.lang = 'id-ID'; // Bahasa Indonesia
+        recognition.lang = 'id-ID';
         recognition.continuous = false;
         recognition.interimResults = false;
         
@@ -386,8 +400,6 @@ app.get('/ui', (req, res) => {
           isRecording = false;
           voiceBtn.classList.remove('recording');
           voiceBtn.textContent = '🎤';
-          
-          // Auto-send after recognition
           setTimeout(() => sendMessage(), 500);
         };
         
@@ -406,16 +418,13 @@ app.get('/ui', (req, res) => {
         };
       }
       
-      // Switch between text and voice mode
       function switchMode(mode) {
         currentMode = mode;
-        
         if (mode === 'voice') {
           textModeBtn.classList.remove('active');
           voiceModeBtn.classList.add('active');
           voiceBtn.style.display = 'block';
           messageInput.placeholder = 'Klik mikrofon atau ketik...';
-          
           if (!recognition) {
             showError('Browser Anda tidak mendukung pengenalan suara. Gunakan Chrome/Edge.');
           }
@@ -427,19 +436,15 @@ app.get('/ui', (req, res) => {
         }
       }
       
-      // Text-to-Speech function (TTS)
       function speakText(text) {
         if ('speechSynthesis' in window) {
-          // Cancel any ongoing speech
           window.speechSynthesis.cancel();
-          
           const utterance = new SpeechSynthesisUtterance(text);
-          utterance.lang = 'id-ID'; // Bahasa Indonesia
+          utterance.lang = 'id-ID';
           utterance.rate = 1.0;
           utterance.pitch = 1.0;
           utterance.volume = 1.0;
           
-          // Wait for voices to load
           if (window.speechSynthesis.getVoices().length === 0) {
             window.speechSynthesis.addEventListener('voiceschanged', function() {
               window.speechSynthesis.speak(utterance);
@@ -450,22 +455,14 @@ app.get('/ui', (req, res) => {
         }
       }
       
-      // Event listeners for mode buttons
-      textModeBtn.addEventListener('click', function() {
-        switchMode('text');
-      });
+      textModeBtn.addEventListener('click', function() { switchMode('text'); });
+      voiceModeBtn.addEventListener('click', function() { switchMode('voice'); });
       
-      voiceModeBtn.addEventListener('click', function() {
-        switchMode('voice');
-      });
-      
-      // Voice button click handler
       voiceBtn.addEventListener('click', function() {
         if (!recognition) {
           showError('Pengenalan suara tidak tersedia di browser ini.');
           return;
         }
-        
         if (isRecording) {
           recognition.stop();
           isRecording = false;
@@ -503,7 +500,7 @@ app.get('/ui', (req, res) => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
               message,
-              history: conversationHistory.slice(-10) // Last 10 messages only
+              history: conversationHistory.slice(-10)
             })
           });
           
@@ -519,24 +516,15 @@ app.get('/ui', (req, res) => {
             answer = 'Maaf, saya tidak bisa memproses pertanyaan Anda saat ini.';
           }
           
-          // Save to conversation history
-          conversationHistory.push({
-            role: 'user',
-            parts: [{ text: message }]
-          });
-          conversationHistory.push({
-            role: 'model',
-            parts: [{ text: answer }]
-          });
+          conversationHistory.push({ role: 'user', parts: [{ text: message }] });
+          conversationHistory.push({ role: 'model', parts: [{ text: answer }] });
           
-          // Keep only last 10 messages (5 pairs)
           if (conversationHistory.length > 10) {
             conversationHistory = conversationHistory.slice(-10);
           }
           
           addMessage(answer, 'bot');
           
-          // Text-to-Speech for voice mode
           if (currentMode === 'voice') {
             speakText(answer);
           }
@@ -583,7 +571,9 @@ app.get('/ui', (req, res) => {
   </script>
 </body>
 </html>`);
-});// ======== HEALTH CHECK ENDPOINT (untuk Render monitoring) =========
+});
+
+// ======== HEALTH CHECK ENDPOINT (untuk Render monitoring) =========
 app.get('/health', (req, res) => {
   const apiKeysConfigured = API_KEYS.length;
   const dataLoaded = trainingData.length > 0;
@@ -630,7 +620,7 @@ app.get('/status', (req, res) => {
   });
 });
 
-// ======== MAIN CHAT ENDPOINT =========
+// ======== MAIN CHAT ENDPOINT (UPDATED WITH SMART SEARCH) =========
 app.post('/chat', async (req, res) => {
   const { message, history } = req.body || {};
   
@@ -674,14 +664,39 @@ app.post('/chat', async (req, res) => {
     return res.json(payload);
   };
   
-  // Find relevant data (RAG)
-  const relevantData = findRelevantData(message, trainingData, 3);
+  // ============================================
+  // SMART CONTEXT: Menggunakan Semantic Search (RAG)
+  // ============================================
+  let relevantData = [];
+  let ragSource = 'none';
+
+  try {
+    // 1. Coba cari pakai "Otak Cerdas" (Vector/Embedding)
+    // Perlu memastikan semanticSearch diimpor di atas
+    const ragResults = await semanticSearch(message);
+    
+    if (ragResults.length > 0) {
+      console.log(`🔍 Smart Search: Found ${ragResults.length} relevant docs`);
+      relevantData = ragResults.map(res => res.doc);
+      ragSource = 'semantic';
+    } else {
+      // 2. Jika tidak ketemu, fallback ke "Otak Lama" (Keyword)
+      console.log('⚠️ Smart Search miss, falling back to keyword search');
+      relevantData = findRelevantData(message, trainingData, 3);
+      ragSource = 'keyword';
+    }
+  } catch (e) {
+    console.error('❌ Smart Search Error:', e.message);
+    // Fallback aman jika RAG error
+    relevantData = findRelevantData(message, trainingData, 3);
+    ragSource = 'fallback-keyword';
+  }
   
   // Build grounding context
   const grounding = relevantData.length > 0
-    ? "Data referensi:\n" + 
+    ? "Data referensi (Gunakan ini sebagai sumber kebenaran):\n" + 
       relevantData.map(d => 
-        `Q: ${(d.text||d.question||'').substring(0, 100)}\nA: ${(d.answer||d.response||'').substring(0, 200)}`
+        `[Kategori: ${d.kategori_utama || d.kategori}]\nTanya: ${d.text || d.question}\nJawab: ${d.answer || d.response}`
       ).join('\n---\n')
     : "";
 
@@ -821,7 +836,8 @@ ${grounding ? '\n📚 DATA REFERENSI (WAJIB DIGUNAKAN JIKA RELEVAN):\n' + ground
         return replyAndCache({ 
           ok: true, 
           model, 
-          output: out 
+          output: out,
+          ragSource // Debug info
         });
         
       } catch (modelError) {
@@ -838,7 +854,7 @@ ${grounding ? '\n📚 DATA REFERENSI (WAJIB DIGUNAKAN JIKA RELEVAN):\n' + ground
       }
     }
     
-    // All Gemini models failed - use RAG semantic fallback
+    // All Gemini models failed - use RAG semantic fallback (Layer 4)
     console.log('🔄 Layer 4: All Gemini models failed, trying RAG semantic fallback...');
     
     try {
@@ -857,7 +873,7 @@ ${grounding ? '\n📚 DATA REFERENSI (WAJIB DIGUNAKAN JIKA RELEVAN):\n' + ground
       console.error('❌ Layer 4 EXCEPTION:', ragError.message);
     }
     
-    // RAG failed - use keyword fallback
+    // RAG failed - use keyword fallback (Layer 5)
     console.log('🔄 Layer 5: RAG failed, using keyword fallback...');
     
     const lowerMessage = message.toLowerCase();
@@ -931,42 +947,6 @@ ${grounding ? '\n📚 DATA REFERENSI (WAJIB DIGUNAKAN JIKA RELEVAN):\n' + ground
     });
   }
 });
-
-// ======== RAG STATUS ENDPOINT (Opsional - untuk monitoring) =========
-app.get('/api/rag/status', (req, res) => {
-  res.json({ ok: true, rag: getRAGStatus() });
-});
-
-// ======== CACHE STATUS ENDPOINT (Monitor cache performance) =========
-app.get('/api/cache/status', (req, res) => {
-  res.json({ ok: true, cache: getCacheStats() });
-});
-
-// ======== ERROR HANDLER =========
-app.use((err, req, res, next) => {
-  console.error('❌ Unhandled error:', err);
-  res.status(500).json({
-    ok: false,
-    error: 'Internal server error'
-  });
-});
-
-// ======== START SERVER =========
-if (!process.env.VERCEL) {
-  app.listen(PORT, () => {
-    console.log('\n🚀 Chatbot Kelurahan API Server');
-    console.log(`📡 Server running on port ${PORT}`);
-    console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`📊 Training data: ${trainingData.length} items`);
-    console.log(`🔑 API Keys: ${API_KEYS.length} configured (${API_KEYS.length * 15} req/min capacity)`);
-    console.log('\nEndpoints:');
-    console.log(`  - GET  /         - API info`);
-    console.log(`  - GET  /health   - Health check`);
-    console.log(`  - GET  /status   - Status & rate limit`);
-    console.log(`  - POST /chat     - Chat endpoint`);
-    console.log(`  - GET  /api/rag/status - RAG status\n`);
-  });
-}
 
 // ======== EXPORT FOR VERCEL COMPATIBILITY =========
 export default app;

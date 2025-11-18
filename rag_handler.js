@@ -53,12 +53,6 @@ function loadEmbeddedDocs() {
 }
 
 // ======== FUNGSI HELPER: COSINE SIMILARITY =========
-/**
- * Menghitung cosine similarity antara dua vektor
- * @param {number[]} vecA - Vector A
- * @param {number[]} vecB - Vector B
- * @returns {number} Similarity score (0-1, semakin tinggi semakin mirip)
- */
 function cosineSimilarity(vecA, vecB) {
   if (!vecA || !vecB || vecA.length !== vecB.length) {
     return 0;
@@ -85,11 +79,6 @@ function cosineSimilarity(vecA, vecB) {
 }
 
 // ======== FUNGSI HELPER: RETRIEVAL (Pencarian Semantik) =========
-/**
- * Mencari dokumen yang paling relevan dengan query
- * @param {string} query - Pertanyaan user
- * @returns {Promise<Array>} Array of top K relevant documents dengan score
- */
 async function retrieveRelevantDocs(query) {
   const docs = loadEmbeddedDocs();
   
@@ -132,12 +121,6 @@ async function retrieveRelevantDocs(query) {
 }
 
 // ======== FUNGSI HELPER: GENERATION (Generate Jawaban) =========
-/**
- * Generate jawaban berdasarkan context dari dokumen relevan
- * @param {string} query - Pertanyaan user
- * @param {Array} relevantDocs - Array of {doc, score}
- * @returns {Promise<string>} Generated answer
- */
 async function generateAnswer(query, relevantDocs) {
   if (relevantDocs.length === 0) {
     return null; // No context available
@@ -192,11 +175,6 @@ JAWABAN (berdasarkan konteks di atas):`;
 }
 
 // ======== FUNGSI UTAMA: LOCAL RAG (EXPORT) =========
-/**
- * Fungsi utama RAG: Retrieve + Generate
- * @param {string} query - Pertanyaan user
- * @returns {Promise<Object>} { ok, answer, sources, error }
- */
 export async function localRAG(query) {
   console.log(`\n🤖 RAG: Processing query: "${query.substring(0, 80)}..."`);
   
@@ -252,10 +230,6 @@ export async function localRAG(query) {
 }
 
 // ======== FUNGSI HELPER: GET RAG STATUS =========
-/**
- * Mendapatkan status sistem RAG
- * @returns {Object} Status information
- */
 export function getRAGStatus() {
   const docs = loadEmbeddedDocs();
   
@@ -270,8 +244,14 @@ export function getRAGStatus() {
   };
 }
 
-// ======== EXPORT DEFAULT =========
+// ======== EXPORT DEFAULT (UPDATED) =========
+// INI BAGIAN PENTING: Mengekspor 'retrieveRelevantDocs' sebagai 'semanticSearch'
+export {
+  retrieveRelevantDocs as semanticSearch
+};
+
 export default {
   localRAG,
-  getRAGStatus
+  getRAGStatus,
+  semanticSearch: retrieveRelevantDocs
 };
