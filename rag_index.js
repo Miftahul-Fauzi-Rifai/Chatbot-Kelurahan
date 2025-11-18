@@ -14,7 +14,7 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const EMBEDDING_MODEL = 'text-embedding-004'; // Model embedding Google terbaru
 const DATA_FILES = [
   './data/kosakata_jawa.json',
-  './data/train.json'
+  './data/train_optimized.json'
 ];
 const OUTPUT_FILE = './data/embedded_docs.json';
 
