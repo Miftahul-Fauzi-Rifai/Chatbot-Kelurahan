@@ -1,10 +1,11 @@
 // server_production.js
-// Backend API Chatbot Kelurahan (Vercel Fix: No Uploads)
-// ------------------------------------------------------
+// Backend API Chatbot Kelurahan (Final Vercel Fix - No Uploads)
+// -------------------------------------------------------------
 // Perbaikan:
-// 1. MENGHAPUS fitur upload file (penyebab crash di Vercel).
-// 2. Mempertahankan "Otak Cerdas" untuk chat teks.
-// 3. UI tidak berubah.
+// 1. HAPUS Multer & Upload (Penyebab Crash di Vercel).
+// 2. Logic Chat Teks Cerdas (Sama seperti server.js).
+// 3. UI Asli (Tanpa tombol kamera).
+// 4. Production Ready (Rate Limit, Key Rotation).
 
 import dotenv from 'dotenv';
 import express from 'express';
@@ -12,10 +13,8 @@ import axios from 'axios';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-// Google GenAI hanya dipakai untuk chat text sekarang
-import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Coba import RAG (Optional)
+// Import RAG jika ada (Optional)
 let localRAG;
 try {
   const ragModule = await import('./rag_handler.js');
@@ -32,7 +31,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ======== API KEYS =========
+// ======== API KEYS ROTATION =========
 const API_KEYS = [
   process.env.GEMINI_API_KEY,
   process.env.GEMINI_API_KEY_2,
@@ -41,14 +40,13 @@ const API_KEYS = [
 
 let currentKeyIndex = 0;
 function getNextApiKey() {
-  if (API_KEYS.length === 0) return null; // Handle gracefully if no key
+  if (API_KEYS.length === 0) throw new Error('No API keys configured');
   const key = API_KEYS[currentKeyIndex];
   currentKeyIndex = (currentKeyIndex + 1) % API_KEYS.length;
   return key;
 }
 
 // ======== MIDDLEWARE =========
-// Hapus multer/upload middleware agar tidak crash di Vercel
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -64,7 +62,24 @@ app.use((req, res, next) => {
   next();
 });
 
-// ======== DATA LOADING (PATH ABSOLUT AMAN) =========
+// ======== RATE LIMITER =========
+const rateLimit = {
+  requests: [],
+  maxPerMinute: 15,
+  canMakeRequest() {
+    const now = Date.now();
+    this.requests = this.requests.filter(time => now - time < 60000);
+    if (this.requests.length >= this.maxPerMinute) return false;
+    this.requests.push(now);
+    return true;
+  },
+  async waitIfNeeded() {
+    if (!this.canMakeRequest()) await new Promise(r => setTimeout(r, 2000));
+  }
+};
+
+// ======== DATA LOADING (READ ONLY - SAFE FOR VERCEL) =========
+// Gunakan path.join untuk kompatibilitas lintas OS & Serverless
 const TRAIN_FILE = path.join(__dirname, 'data', 'train.json');
 const KLARIFIKASI_FILE = path.join(__dirname, 'data', 'kosakata_jawa.json');
 
@@ -82,8 +97,7 @@ function readTrainData() {
 }
 let trainingData = readTrainData();
 
-// ======== LOGIKA PENCARIAN (SMART MATCHING) =========
-// Ini "otak" cerdas dari server.js
+// ======== LOGIKA PENCARIAN (SMART KEYWORD - SERVER.JS LOGIC) =========
 function findRelevantData(message, allData, maxResults = 5) {
   if (!message) return [];
   const lowerMessage = message.toLowerCase();
@@ -95,7 +109,6 @@ function findRelevantData(message, allData, maxResults = 5) {
     const text = (item.text || item.question || '').toLowerCase();
     const answer = (item.answer || item.response || '').toLowerCase();
     const tags = (item.tags || []).join(' ').toLowerCase();
-    const kategori = (item.kategori_utama || '').toLowerCase();
     
     if (isDefinition && message.match(/(?:apa|apakah)\s+(?:itu|kepanjangan|arti)\s+(.+?)(?:\?|$)/i)) {
        const term = message.match(/(?:apa|apakah)\s+(?:itu|kepanjangan|arti)\s+(.+?)(?:\?|$)/i)[1].toLowerCase().trim();
@@ -108,7 +121,6 @@ function findRelevantData(message, allData, maxResults = 5) {
       if (tags.includes(word)) score += 3;
       if (answer.includes(word)) score += 1;
     });
-    // Exact phrase boost
     if (text.includes(lowerMessage)) score += 10;
     return { item, score };
   });
@@ -117,33 +129,25 @@ function findRelevantData(message, allData, maxResults = 5) {
 }
 
 // ======== RETRY LOGIC =========
-// Rate limiter sederhana
-const rateLimit = {
-  requests: [],
-  canMakeRequest() {
-    const now = Date.now();
-    this.requests = this.requests.filter(t => now - t < 60000);
-    if (this.requests.length >= 15) return false;
-    this.requests.push(now);
-    return true;
-  },
-  async wait() { if (!this.canMakeRequest()) await new Promise(r => setTimeout(r, 2000)); }
-};
-
-async function generateWithRetry(url, payload, maxRetries = 2) {
+async function generateWithRetry(url, payload, modelName, maxRetries = 2) {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      await rateLimit.wait();
+      await rateLimit.waitIfNeeded();
       const apiKey = getNextApiKey();
-      if (!apiKey) throw new Error("API Key missing");
-      
       const urlWithKey = url.replace('KEY_PLACEHOLDER', apiKey);
-      const response = await axios.post(urlWithKey, payload, { timeout: 10000 });
+      
+      const response = await axios.post(urlWithKey, payload, {
+        headers: { 'Content-Type': 'application/json' },
+        timeout: 10000
+      });
       return response.data;
     } catch (error) {
-      if (attempt === maxRetries) throw error;
+      const msg = error.response?.data?.error?.message || error.message;
+      if (msg.includes('QUOTA') || msg.includes('429')) continue; 
+      throw error;
     }
   }
+  throw new Error('All API keys exhausted');
 }
 
 // ======== ENDPOINT CHAT (SMART LOGIC) =========
@@ -151,45 +155,41 @@ const chatHandler = async (req, res) => {
   const { message, history } = req.body || {};
   if (!message) return res.status(400).json({ ok: false, error: 'Pesan kosong' });
 
-  // Reload Data (Safe)
-  trainingData = readTrainData();
+  trainingData = readTrainData(); // Refresh Data
   
   // 1. Cari Data Lokal
-  const relevantData = findRelevantData(message, trainingData, 4);
+  const relevantData = findRelevantData(message, trainingData, 3);
   const grounding = relevantData.length > 0
     ? "DATA REFERENSI:\n" + relevantData.map(d => `Q: ${d.text||d.question}\nA: ${d.answer||d.response}`).join('\n---\n')
     : "";
 
-  // 2. System Prompt (Cerdas & Luwes)
+  // 2. System Prompt (Smart & Luwes)
   const systemInstruction = `Anda adalah Asisten Virtual Kelurahan Marga Sari, Balikpapan.
-
-CAKUPAN LAYANAN: Kependudukan, Surat, Perizinan.
-
-ATURAN PENTING:
-1. Gunakan DATA REFERENSI di bawah sebagai sumber utama.
-2. Jika data referensi menyebutkan layanan online tersedia, JAWAB BISA.
-3. Jawab WAJIB dalam BAHASA INDONESIA yang sopan.
-4. Jawab singkat, padat, dan jelas.
-
-${grounding ? '\n📚 DATA REFERENSI (WAJIB DIGUNAKAN):\n' + grounding : ''}`;
+  
+  ATURAN:
+  1. Gunakan DATA REFERENSI di bawah sebagai sumber utama.
+  2. Jika data mengatakan bisa online, jawab BISA.
+  3. Jawab Bahasa Indonesia sopan.
+  
+  ${grounding ? '\n📚 DATA REFERENSI:\n' + grounding : ''}`;
 
   try {
-    const modelName = 'gemini-1.5-flash'; // Stabil
+    const modelName = 'gemini-1.5-flash'; // Stabil & Cepat
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=KEY_PLACEHOLDER`;
 
-    const out = await generateWithRetry(url, {
+    const response = await generateWithRetry(url, {
       contents: [
         { role: "user", parts: [{ text: systemInstruction }] },
         ...(history || []).slice(-4),
         { role: "user", parts: [{ text: message }] }
       ],
-      generationConfig: { maxOutputTokens: 500, temperature: 0.7 } // 0.7 agar luwes
-    });
+      generationConfig: { maxOutputTokens: 500, temperature: 0.7 } // Luwes (Sama seperti server.js)
+    }, modelName);
 
-    res.json({ ok: true, output: out });
+    res.json({ ok: true, model: modelName, output: response });
 
   } catch (error) {
-    // Fallback
+    // Fallback Local
     if (relevantData.length > 0) {
       return res.json({
         ok: true,
@@ -197,32 +197,28 @@ ${grounding ? '\n📚 DATA REFERENSI (WAJIB DIGUNAKAN):\n' + grounding : ''}`;
         output: { candidates: [{ content: { parts: [{ text: relevantData[0].answer }] } }] }
       });
     }
+    // Fallback RAG
+    if (localRAG) {
+        const ragResult = await localRAG(message);
+        if (ragResult.ok) return res.json({ ok: true, output: { candidates: [{ content: { parts: [{ text: ragResult.answer }] } }] } });
+    }
     res.status(500).json({ ok: false, error: "Sistem sibuk." });
   }
 };
 
-// ======== ROUTING CHAT =========
+// ======== ROUTES =========
 app.post('/chat', chatHandler);
 app.post('/api/chat', chatHandler);
 
-// ======== ENDPOINT VISION (DUMMY / NON-AKTIF) =========
-// Kita ganti endpoint scan agar tidak memproses file tapi mengembalikan info
-// Ini mencegah crash di Vercel karena tidak ada multer/fs write
+// Dummy Endpoint Scan (Agar tidak 404, tapi aman untuk Vercel)
 app.post('/api/scan-surat', (req, res) => {
-  res.json({ 
-    ok: true, 
-    result: { 
-      jenis_dokumen: "Fitur Non-Aktif", 
-      analisis: "-", 
-      saran: "Mohon maaf, fitur pemindaian dokumen sedang dalam perbaikan sistem. Silakan ketik pertanyaan Anda secara manual." 
-    } 
-  });
+    res.json({ ok: false, error: "Fitur scan dinonaktifkan sementara." });
 });
 
-app.get('/', (req, res) => res.json({ status: 'online', mode: 'production-lite' }));
+app.get('/', (req, res) => res.json({ status: 'online' }));
 app.get('/health', (req, res) => res.json({ status: 'online', data: trainingData.length }));
 
-// ======== UI CHAT (ASLI - TIDAK DIUBAH) =========
+// ======== UI CHAT (ORIGINAL - NO VISION) =========
 app.get('/ui', (req, res) => {
   res.send(`<!DOCTYPE html>
 <html lang="id">
@@ -272,10 +268,6 @@ app.get('/ui', (req, res) => {
     .welcome-message p { font-size: 14px; }
     .error-message { background: #fee; color: #c00; padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 13px; display: none; }
     .error-message.active { display: block; }
-    .file-input { display: none; }
-    .preview-container { position: absolute; bottom: 80px; left: 20px; background: white; padding: 5px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); display: none; z-index: 100; }
-    .preview-img { width: 80px; height: 80px; object-fit: cover; border-radius: 5px; }
-    .close-preview { position: absolute; top: -8px; right: -8px; background: red; color: white; border-radius: 50%; width: 20px; height: 20px; text-align: center; line-height: 18px; cursor: pointer; font-size: 12px; font-weight: bold; border: 2px solid white; }
     @media (max-width: 768px) {
       body { padding: 0; }
       .chat-container { width: 100%; height: 100%; max-width: 100%; max-height: 100%; border-radius: 0; margin: 0; }
@@ -300,12 +292,6 @@ app.get('/ui', (req, res) => {
         <p style="margin-top: 10px; font-size: 12px; color: #bbb;">Contoh: "Bagaimana cara membuat KTP?"</p>
       </div>
     </div>
-    
-    <div class="preview-container" id="previewBox">
-      <div class="close-preview" onclick="clearImage()">×</div>
-      <img src="" id="previewImg" class="preview-img">
-    </div>
-
     <div class="chat-input-container">
       <div class="error-message" id="errorMessage"></div>
       <div class="mode-toggle">
@@ -313,9 +299,6 @@ app.get('/ui', (req, res) => {
         <button class="mode-btn" id="voiceModeBtn">🎤 Mode Suara</button>
       </div>
       <div class="chat-input-wrapper">
-        <input type="file" id="imageInput" accept="image/*" class="file-input" onchange="handleImageSelect()">
-        <button class="voice-btn" style="font-size: 18px;" onclick="document.getElementById('imageInput').click()">📷</button>
-        
         <button id="voiceBtn" class="voice-btn" style="display: none;">🎤</button>
         <input type="text" id="messageInput" placeholder="Ketik pertanyaan Anda..." autocomplete="off">
         <button id="sendBtn">Kirim</button>
@@ -331,39 +314,12 @@ app.get('/ui', (req, res) => {
       const textModeBtn = document.getElementById('textModeBtn');
       const voiceModeBtn = document.getElementById('voiceModeBtn');
       const errorMessage = document.getElementById('errorMessage');
-      const previewBox = document.getElementById('previewBox');
-      const previewImg = document.getElementById('previewImg');
-      const imageInput = document.getElementById('imageInput');
-      
       const API_URL = window.location.origin + '/chat';
-      const SCAN_URL = window.location.origin + '/api/scan-surat';
       
       let conversationHistory = [];
       let currentMode = 'text';
       let recognition = null;
       let isRecording = false;
-      let currentFile = null;
-
-      window.handleImageSelect = function() {
-        const file = imageInput.files[0];
-        if (file) {
-          currentFile = file;
-          const reader = new FileReader();
-          reader.onload = function(e) {
-            previewImg.src = e.target.result;
-            previewBox.style.display = 'block';
-            messageInput.placeholder = 'Tekan Kirim untuk scan gambar...';
-          }
-          reader.readAsDataURL(file);
-        }
-      }
-
-      window.clearImage = function() {
-        currentFile = null;
-        imageInput.value = '';
-        previewBox.style.display = 'none';
-        messageInput.placeholder = 'Ketik pertanyaan Anda...';
-      }
       
       if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -459,29 +415,6 @@ app.get('/ui', (req, res) => {
       
       async function sendMessage() {
         const message = messageInput.value.trim();
-        
-        // Handle Image Upload (Dummy Response to avoid crash)
-        if (currentFile) {
-          hideError();
-          const welcomeMsg = chatMessages.querySelector('.welcome-message');
-          if (welcomeMsg) welcomeMsg.remove();
-
-          addMessage("📷 [Mengirim Dokumen...]", 'user');
-          const typingIndicator = addTypingIndicator();
-          
-          // Fake delay to simulate processing
-          setTimeout(() => {
-             typingIndicator.remove();
-             clearImage();
-             // Respond with unavailable message
-             const reply = "Mohon maaf, fitur pemindaian dokumen saat ini sedang dinonaktifkan untuk pemeliharaan sistem. Silakan ketik pertanyaan Anda secara manual.";
-             addMessage(reply, 'bot');
-             speakText(reply);
-          }, 1500);
-          
-          return; 
-        }
-
         if (!message) return;
         
         hideError();
@@ -514,6 +447,8 @@ app.get('/ui', (req, res) => {
           if (data.ok && data.output?.candidates?.[0]?.content?.parts?.[0]?.text) {
             answer = data.output.candidates[0].content.parts[0].text;
           } else if (data.model === 'keyword-fallback' || data.model === 'local-rag-fallback') {
+             answer = data.output.candidates[0].content.parts[0].text;
+          } else if (data.model === 'fallback') {
              answer = data.output.candidates[0].content.parts[0].text;
           } else {
             answer = 'Maaf, saya tidak bisa memproses pertanyaan Anda saat ini.';
