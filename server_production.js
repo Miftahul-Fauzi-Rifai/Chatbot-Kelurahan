@@ -1,6 +1,6 @@
 // server_production.js
-// Backend API Chatbot Kelurahan (Hybrid: Localhost + Vercel Ready)
-// Fitur: Text/Voice Chat, UI Original, Smart Context (Jawa Support)
+// Backend API Chatbot Kelurahan (Versi Paling Stabil)
+// Fitur: UI Original, Otak Cerdas (JSON), Hybrid (Local + Vercel), Anti-Crash
 
 import dotenv from 'dotenv';
 import express from 'express';
@@ -21,146 +21,94 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ======== CORS (Aman untuk Widget/Web) =========
+// ======== CORS (Agar UI tidak error network) =========
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.removeHeader('X-Frame-Options'); // Izinkan Iframe
-  res.setHeader('Content-Security-Policy', "frame-ancestors *");
+  res.removeHeader('X-Frame-Options'); 
   if (req.method === 'OPTIONS') return res.status(200).end();
   next();
 });
 
-// ======== API KEY MANAGEMENT =========
+// ======== API KEY CHECK =========
 const API_KEYS = [
   process.env.GEMINI_API_KEY,
   process.env.GEMINI_API_KEY_2,
   process.env.GEMINI_API_KEY_3
 ].filter(Boolean);
 
-let currentKeyIndex = 0;
-function getNextApiKey() {
-  if (API_KEYS.length === 0) throw new Error('No API keys configured. Cek file .env Anda.');
-  const key = API_KEYS[currentKeyIndex];
-  currentKeyIndex = (currentKeyIndex + 1) % API_KEYS.length;
-  return key;
+function getApiKey() {
+  // Ambil key acak agar beban terbagi
+  if (API_KEYS.length === 0) return null;
+  return API_KEYS[Math.floor(Math.random() * API_KEYS.length)];
 }
 
-// ======== RATE LIMITER =========
-const rateLimit = {
-  requests: [],
-  maxPerMinute: 15,
-  async waitIfNeeded() {
-    const now = Date.now();
-    this.requests = this.requests.filter(time => now - time < 60000);
-    if (this.requests.length >= this.maxPerMinute) {
-      console.log('⏳ Rate limit active, waiting...');
-      await new Promise(resolve => setTimeout(resolve, 2000));
-    }
-    this.requests.push(Date.now());
-  }
-};
-
-// ======== OTAK CERDAS (DATA LOADING) =========
-// Memuat train.json DAN kosakata_jawa.json agar pintar
+// ======== DATA LOADING (OTAK) =========
+// Membaca train.json dan kosakata_jawa.json
 const TRAIN_FILE = process.env.TRAIN_DATA_FILE || './data/train.json';
-const FALLBACK_TRAIN_FILE = './data/train_optimized.json';
 const KLARIFIKASI_FILE = './data/kosakata_jawa.json';
 
 function readTrainData() {
   try {
     let data = [];
-    // 1. Load Data Utama
+    
+    // 1. Coba Load Data Utama
     if (fs.existsSync(TRAIN_FILE)) {
       data = data.concat(JSON.parse(fs.readFileSync(TRAIN_FILE, 'utf8')));
-    } else if (fs.existsSync(FALLBACK_TRAIN_FILE)) {
-      data = data.concat(JSON.parse(fs.readFileSync(FALLBACK_TRAIN_FILE, 'utf8')));
+    } else if (fs.existsSync('./data/train_optimized.json')) {
+      data = data.concat(JSON.parse(fs.readFileSync('./data/train_optimized.json', 'utf8')));
     }
 
-    // 2. Load Kosakata Jawa (Penting!)
+    // 2. Coba Load Kosakata Jawa (Jika ada)
     if (fs.existsSync(KLARIFIKASI_FILE)) {
       data = data.concat(JSON.parse(fs.readFileSync(KLARIFIKASI_FILE, 'utf8')));
-      console.log('✅ Loaded: Kosakata Jawa');
     }
     
-    console.log(`✅ Database Loaded: ${data.length} items`);
+    console.log(`✅ Database Siap: ${data.length} baris data`);
     return data;
   } catch (e) {
-    console.error(`❌ Error loading data:`, e.message);
+    console.error(`⚠️ Gagal memuat data (Chatbot akan berjalan tanpa data lokal):`, e.message);
     return [];
   }
 }
 
 const trainingData = readTrainData();
 
-// ======== LOGIC PENCARIAN (KEYWORD MATCH) =========
-function findRelevantData(message, allData, maxResults = 4) {
+// ======== LOGIC PENCARIAN KEYWORD =========
+function findRelevantData(message, allData) {
+  if (!allData || allData.length === 0) return [];
+  
   const lowerMessage = message.toLowerCase();
   const queryWords = lowerMessage.split(/\s+/).filter(w => w.length > 2);
-  const isDefinition = /^(apa|apakah)\s+(itu|kepanjangan|arti)\s+/i.test(message);
   
+  // Filter cari yang cocok
   const scores = allData.map(item => {
     let score = 0;
     const text = (item.text || item.question || '').toLowerCase();
     const answer = (item.answer || item.response || '').toLowerCase();
     const tags = (item.tags || []).join(' ').toLowerCase();
-    const kategori = (item.kategori_utama || '').toLowerCase();
     
-    // Prioritas Definisi
-    if (isDefinition) {
-      const termMatch = message.match(/(?:apa|apakah)\s+(?:itu|kepanjangan|arti)\s+(.+?)(?:\?|$)/i);
-      if (termMatch) {
-        const term = termMatch[1].toLowerCase().trim();
-        if (text.includes(term)) score += 15;
-        if (kategori.includes('istilah') && text.includes(term)) score += 20;
-      }
-    }
-    
-    // Pencarian Kata Kunci
     queryWords.forEach(word => {
       if (text.includes(word)) score += 3;
       if (tags.includes(word)) score += 3;
       if (answer.includes(word)) score += 1;
     });
     
-    // Bonus kecocokan frasa
     if (text.includes(lowerMessage)) score += 10;
     
     return { item, score };
   });
 
+  // Ambil 3 teratas
   return scores
     .filter(s => s.score > 0)
     .sort((a, b) => b.score - a.score)
-    .slice(0, maxResults)
+    .slice(0, 3)
     .map(s => s.item);
 }
 
-// ======== RETRY LOGIC UNTUK GEMINI =========
-async function generateWithRetry(url, payload, modelName, maxRetries = 2) {
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      await rateLimit.waitIfNeeded();
-      const apiKey = getNextApiKey();
-      const urlWithKey = url.replace('KEY_PLACEHOLDER', apiKey);
-      
-      const response = await axios.post(urlWithKey, payload, {
-        headers: { 'Content-Type': 'application/json' },
-        timeout: 10000 // 10 detik timeout
-      });
-      return response.data;
-    } catch (error) {
-      const msg = error.response?.data?.error?.message || error.message;
-      console.warn(`⚠️ Attempt ${attempt} failed: ${msg}`);
-      if (msg.includes('quota') || msg.includes('429')) continue; // Coba key lain
-      throw error;
-    }
-  }
-  throw new Error('Semua API Key habis/limit.');
-}
-
-// ======== ROUTE: UI CHAT (ORIGINAL UI) =========
+// ======== UI ENDPOINT (TETAP SAMA) =========
 app.get('/ui', (req, res) => {
   res.send(`<!DOCTYPE html>
 <html lang="id">
@@ -404,78 +352,78 @@ app.get('/ui', (req, res) => {
 </html>`);
 });
 
-// ======== ROUTE: UTAMA /CHAT (LOGIC UTAMA) =========
+// ======== CHAT ENDPOINT (LOGIC UTAMA) =========
 app.post('/chat', async (req, res) => {
-  const { message, history } = req.body || {};
-  
-  if (!message) return res.status(400).json({ ok: false, error: 'message required' });
-
-  // 1. Cari Context (Data Pendukung)
-  const relevantData = findRelevantData(message, trainingData, 4);
-  
-  const grounding = relevantData.length > 0
-    ? "DATA REFERENSI KELURAHAN (WAJIB DIGUNAKAN SEBAGAI DATA UTAMA):\n" + 
-      relevantData.map(d => `Q: ${d.text||d.question}\nA: ${d.answer||d.response}`).join('\n---\n')
-    : "";
-
-  // 2. System Prompt (STRICT RULES)
-  const systemInstruction = `Anda adalah Asisten Virtual Kelurahan Marga Sari, Balikpapan.
-
-ATURAN PENTING (STRICT RULES):
-1. Gunakan "DATA REFERENSI KELURAHAN" di bawah untuk menjawab. Jika data bilang BISA ONLINE, maka jawab BISA.
-2. Jawab WAJIB dalam BAHASA INDONESIA formal.
-3. Jika user bertanya bahasa daerah (Jawa/Banjar), TETAP jawab Bahasa Indonesia.
-4. Jawab singkat, padat, jelas (max 3 paragraf). Gunakan poin-poin jika perlu.
-
-${grounding ? '\n' + grounding + '\n\nJawab pertanyaan user berdasarkan data di atas.' : ''}`;
-
-  // 3. Panggil AI
   try {
+    const { message, history } = req.body || {};
+    if (!message) return res.status(400).json({ ok: false, error: 'Message empty' });
+
+    // 1. Cek API Key (Anti-Crash)
+    const apiKey = getApiKey();
+    if (!apiKey) {
+      console.error("❌ API KEY TIDAK DITEMUKAN DI .ENV");
+      return res.json({ 
+        ok: true, 
+        output: { candidates: [{ content: { parts: [{ text: "⚠️ Maaf, Server Error: API Key belum dikonfigurasi. Mohon hubungi admin." }] } }] } 
+      });
+    }
+
+    // 2. Cari Data Referensi
+    const relevantData = findRelevantData(message, trainingData);
+    const grounding = relevantData.length > 0
+      ? "DATA REFERENSI (Gunakan sebagai KUNCI JAWABAN):\n" + relevantData.map(d => `Q: ${d.text}\nA: ${d.answer}`).join('\n---\n')
+      : "";
+
+    // 3. Instruksi Sistem
+    const systemInstruction = `Anda adalah Asisten Virtual Kelurahan Marga Sari, Balikpapan.
+    
+    ATURAN PENTING:
+    1. Jika data referensi bilang "BISA ONLINE", jawab BISA.
+    2. Jawab dalam BAHASA INDONESIA SOPAN.
+    3. Jangan jawab di luar topik layanan kelurahan.
+    4. Format: Singkat, gunakan poin-poin.
+
+    ${grounding}`;
+
+    // 4. Panggil Gemini API
     const modelName = process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp';
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=KEY_PLACEHOLDER`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
 
     const contents = [
       { role: "user", parts: [{ text: systemInstruction }] },
-      { role: "model", parts: [{ text: "Mengerti. Saya siap." }] },
       ...(history || []).slice(-4),
       { role: "user", parts: [{ text: message }] }
     ];
 
-    const out = await generateWithRetry(url, {
+    const response = await axios.post(url, {
       contents,
       generationConfig: { maxOutputTokens: 500, temperature: 0.3 }
-    }, modelName);
+    }, { timeout: 8000 });
 
-    // Sukses
-    return res.json({ ok: true, output: out });
+    res.json({ ok: true, output: response.data });
 
   } catch (error) {
-    console.error(`⚠️ Chat Error: ${error.message}`);
+    console.error("❌ Error:", error.message);
     
-    // Fallback jika AI Error: Cek Keyword Match
-    if (relevantData.length > 0) {
-        return res.json({
-            ok: true,
-            model: 'keyword-fallback',
-            output: { candidates: [{ content: { parts: [{ text: relevantData[0].answer || relevantData[0].response }] } }] }
-        });
+    // Fallback Keyword Match (Anti-Blank Response)
+    const fallbackData = findRelevantData(req.body.message, trainingData);
+    if (fallbackData.length > 0) {
+      return res.json({ 
+        ok: true, 
+        output: { candidates: [{ content: { parts: [{ text: fallbackData[0].answer }] } }] } 
+      });
     }
 
-    res.status(500).json({ ok: false, error: 'Maaf, sistem sedang sibuk.' });
+    res.status(500).json({ ok: false, error: "Internal Server Error" });
   }
 });
 
-app.get('/', (req, res) => res.json({ status: 'online', version: '3.1-Fixed' }));
-app.get('/health', (req, res) => res.json({ status: 'ok', data: trainingData.length }));
+app.get('/', (req, res) => res.json({ status: 'online' }));
 
-// ======== HYBRID STARTUP (PENTING!) =========
-// Ini yang membuat kode ini bisa jalan di Localhost (node server.js) DAN Vercel
-if (process.env.VERCEL) {
-  // Mode Vercel: Export app
-  console.log('🚀 Running in Vercel Mode');
-} else {
-  // Mode Localhost: Listen port
-  app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
+// ======== STARTUP LOGIC (HYBRID: LOCAL + VERCEL) =========
+// Ini yang membuat kode bisa jalan di Localhost TANPA error, dan tetap export untuk Vercel
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => console.log(`🚀 Server LOCAL berjalan di http://localhost:${PORT}`));
 }
 
 export default app;
