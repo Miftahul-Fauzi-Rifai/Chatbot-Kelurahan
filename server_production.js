@@ -1,23 +1,22 @@
 // server_production.js
-// Backend API Chatbot Kelurahan (Updated Fix)
-// Perbaikan: Akurasi Data (Surat Domisili), Vision AI, & Integrasi UI Tetap
+// Backend API Chatbot Kelurahan (Vercel Safe - No Vision)
+// Fitur: Text Chat Cerdas + Production Ready (No File Write)
 
 import dotenv from 'dotenv';
 import express from 'express';
 import axios from 'axios';
 import fs from 'fs';
 import path from 'path';
-import multer from 'multer'; // Tambahan untuk upload gambar
 import { fileURLToPath } from 'url';
-import { GoogleGenerativeAI } from '@google/generative-ai'; // Tambahan untuk Vision
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Coba import RAG handler, jika tidak ada gunakan fallback
+// Import RAG jika ada (Optional)
 let localRAG;
 try {
   const ragModule = await import('./rag_handler.js');
   localRAG = ragModule.localRAG;
 } catch (e) {
-  console.log('ℹ️ RAG Handler tidak ditemukan, menggunakan mode keyword search.');
+  // Silent fallback
 }
 
 dotenv.config();
@@ -25,41 +24,10 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Pastikan folder uploads ada untuk fitur scan
-if (!fs.existsSync('./uploads')) fs.mkdirSync('./uploads');
-const upload = multer({ dest: process.env.UPLOAD_DIR || 'uploads/' });
-
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ======== MIDDLEWARE =========
-app.use(express.json({ limit: '10mb' })); // Limit diperbesar untuk gambar
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
-
-// ======== CORS Configuration =========
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  
-  // Iframe & Mobile Support
-  res.removeHeader('X-Frame-Options');
-  res.setHeader('Content-Security-Policy', "frame-ancestors *");
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('Permissions-Policy', 'microphone=*, camera=*, geolocation=*');
-  
-  if (req.method === 'OPTIONS') return res.status(200).end();
-  next();
-});
-
-// ======== REQUEST LOGGING =========
-app.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
-  next();
-});
-
-// ======== MULTI API KEY CONFIGURATION =========
+// ======== CONFIG: API KEYS =========
 const API_KEYS = [
   process.env.GEMINI_API_KEY,
   process.env.GEMINI_API_KEY_2,
@@ -67,7 +35,6 @@ const API_KEYS = [
 ].filter(Boolean);
 
 let currentKeyIndex = 0;
-
 function getNextApiKey() {
   if (API_KEYS.length === 0) throw new Error('No API keys configured');
   const key = API_KEYS[currentKeyIndex];
@@ -75,13 +42,27 @@ function getNextApiKey() {
   return key;
 }
 
-// Inisialisasi Vision (Gunakan key pertama)
-const genAI = new GoogleGenerativeAI(API_KEYS[0]);
+// ======== MIDDLEWARE =========
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+// Gunakan path.join untuk Vercel
+app.use(express.static(path.join(__dirname, 'public')));
+
+// ======== CORS Configuration (Open) =========
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.removeHeader('X-Frame-Options');
+  res.setHeader('Content-Security-Policy', "frame-ancestors *");
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  next();
+});
 
 // ======== RATE LIMITER =========
 const rateLimit = {
   requests: [],
-  maxPerMinute: 15, // Sedikit lebih longgar
+  maxPerMinute: 15,
   canMakeRequest() {
     const now = Date.now();
     this.requests = this.requests.filter(time => now - time < 60000);
@@ -91,52 +72,32 @@ const rateLimit = {
   },
   async waitIfNeeded() {
     if (!this.canMakeRequest()) {
-      console.log(`⏳ Rate limit active...`);
       await new Promise(resolve => setTimeout(resolve, 2000));
     }
-  },
-  getStatus() {
-    return { used: this.requests.length, limit: this.maxPerMinute };
   }
 };
 
-// ======== DATA LOADING (DIPERBAIKI: MENGGUNAKAN DATA LENGKAP) =========
-// Mengganti train_optimized.json dengan train.json + kosakata_jawa.json
-// Ini kunci agar jawaban "Surat Domisili" kembali akurat.
-const TRAIN_FILE = process.env.TRAIN_DATA_FILE || './data/train.json';
-const KLARIFIKASI_FILE = './data/kosakata_jawa.json';
+// ======== DATA LOADING (Safe Read Only) =========
+const TRAIN_FILE = path.join(__dirname, 'data', 'train.json');
+const KLARIFIKASI_FILE = path.join(__dirname, 'data', 'kosakata_jawa.json');
 
 function readTrainData() {
   try {
     let data = [];
-    // 1. Load Data Training Utama
     if (fs.existsSync(TRAIN_FILE)) {
-      const trainContent = fs.readFileSync(TRAIN_FILE, 'utf8');
-      data = data.concat(JSON.parse(trainContent));
-    } else if (fs.existsSync('./data/train_optimized.json')) {
-      // Fallback jika train.json tidak ada
-      data = data.concat(JSON.parse(fs.readFileSync('./data/train_optimized.json', 'utf8')));
+      data = data.concat(JSON.parse(fs.readFileSync(TRAIN_FILE, 'utf8')));
     }
-
-    // 2. Load Kosakata Jawa (Penting untuk istilah lokal & akurasi)
     if (fs.existsSync(KLARIFIKASI_FILE)) {
-      const jawaContent = fs.readFileSync(KLARIFIKASI_FILE, 'utf8');
-      data = data.concat(JSON.parse(jawaContent));
+      data = data.concat(JSON.parse(fs.readFileSync(KLARIFIKASI_FILE, 'utf8')));
     }
-    
-    console.log(`✅ Database dimuat: ${data.length} item (Mode Akurasi Tinggi)`);
     return data;
-  } catch (e) {
-    console.error(`❌ Error loading data:`, e.message);
-    return [];
-  }
+  } catch (e) { return []; }
 }
+let trainingData = readTrainData();
 
-const trainingData = readTrainData();
-
-// ======== FUNGSI PENCARIAN (RESTORED DARI SERVER.JS) =========
-// Algoritma ini terbukti lebih akurat untuk pertanyaan spesifik
-function findRelevantData(message, allData, maxResults = 4) {
+// ======== LOGIKA PENCARIAN (SMART KEYWORD) =========
+function findRelevantData(message, allData, maxResults = 5) {
+  if (!message) return [];
   const lowerMessage = message.toLowerCase();
   const queryWords = lowerMessage.split(/\s+/);
   const isDefinition = /^(apa|apakah)\s+(itu|kepanjangan|arti)\s+/i.test(message);
@@ -146,126 +107,111 @@ function findRelevantData(message, allData, maxResults = 4) {
     const text = (item.text || item.question || '').toLowerCase();
     const answer = (item.answer || item.response || '').toLowerCase();
     const tags = (item.tags || []).join(' ').toLowerCase();
-    const kategori = (item.kategori_utama || '').toLowerCase();
     
-    if (isDefinition) {
-      const termMatch = message.match(/(?:apa|apakah)\s+(?:itu|kepanjangan|arti)\s+(.+?)(?:\?|$)/i);
-      if (termMatch) {
-        const term = termMatch[1].toLowerCase().trim();
-        if (text.includes(term)) score += 15;
-        if (kategori.includes('istilah') && text.includes(term)) score += 20;
-      }
+    if (isDefinition && message.match(/(?:apa|apakah)\s+(?:itu|kepanjangan|arti)\s+(.+?)(?:\?|$)/i)) {
+       const term = message.match(/(?:apa|apakah)\s+(?:itu|kepanjangan|arti)\s+(.+?)(?:\?|$)/i)[1].toLowerCase().trim();
+       if (text.includes(term)) score += 15;
     }
     
     queryWords.forEach(word => {
       if (word.length < 3) return;
-      if (text.includes(word)) score += 3; // Bobot diperbesar agar lebih sensitif
+      if (text.includes(word)) score += 2;
       if (tags.includes(word)) score += 3;
       if (answer.includes(word)) score += 1;
     });
-    
-    // Bonus untuk frase yang cocok persis (misal: "surat domisili")
     if (text.includes(lowerMessage)) score += 10;
-    
     return { item, score };
   });
 
-  return scores
-    .filter(s => s.score > 0)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, maxResults)
-    .map(s => s.item);
+  return scores.filter(s => s.score > 0).sort((a, b) => b.score - a.score).slice(0, maxResults).map(s => s.item);
 }
 
-// ======== HELPER: Vision Utils =========
-function fileToGenerativePart(path, mimeType) {
-  return {
-    inlineData: {
-      data: fs.readFileSync(path).toString("base64"),
-      mimeType
-    },
-  };
-}
-
-// ======== HELPER: Retry Logic =========
+// ======== HELPER RETRY =========
 async function generateWithRetry(url, payload, modelName, maxRetries = 2) {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       await rateLimit.waitIfNeeded();
-      
       const apiKey = getNextApiKey();
-      const urlWithKey = url.replace('KEY_PLACEHOLDER', apiKey); // Inject key here
+      const urlWithKey = url.replace('KEY_PLACEHOLDER', apiKey);
       
       const response = await axios.post(urlWithKey, payload, {
         headers: { 'Content-Type': 'application/json' },
         timeout: 10000
       });
-      
       return response.data;
     } catch (error) {
       const msg = error.response?.data?.error?.message || error.message;
-      console.warn(`⚠️ API Error (${modelName}): ${msg}`);
-      if (msg.includes('QUOTA') || msg.includes('429')) continue; // Coba key lain
+      if (msg.includes('QUOTA') || msg.includes('429')) continue; 
       throw error;
     }
   }
   throw new Error('All API keys exhausted');
 }
 
-// ======== FITUR BARU: SCAN SURAT (VISION) =========
-app.post('/api/scan-surat', upload.single('image'), async (req, res) => {
+// ======== ENDPOINT CHAT (SMART LOGIC) =========
+const chatHandler = async (req, res) => {
+  const { message, history } = req.body || {};
+  if (!message) return res.status(400).json({ ok: false, error: 'Pesan kosong' });
+
+  // Reload data (Safe read)
+  trainingData = readTrainData();
+  
+  // 1. Cari Data Lokal
+  const relevantData = findRelevantData(message, trainingData, 3);
+  const grounding = relevantData.length > 0
+    ? "DATA REFERENSI:\n" + relevantData.map(d => `Q: ${d.text||d.question}\nA: ${d.answer||d.response}`).join('\n---\n')
+    : "";
+
+  // 2. System Prompt (Smart)
+  const systemInstruction = `Anda adalah Asisten Virtual Kelurahan Marga Sari, Balikpapan.
+  
+  ATURAN:
+  1. Gunakan DATA REFERENSI di bawah sebagai sumber utama.
+  2. Jika data mengatakan bisa online, jawab BISA.
+  3. Jawab Bahasa Indonesia sopan.
+  
+  ${grounding ? '\n📚 DATA REFERENSI:\n' + grounding : ''}`;
+
   try {
-    if (!req.file) return res.status(400).json({ ok: false, error: 'No image uploaded' });
+    const modelName = 'gemini-1.5-flash'; // Stabil & Cepat
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=KEY_PLACEHOLDER`;
 
-    console.log(`📸 Scanning Document: ${req.file.originalname}`);
-    const imagePart = fileToGenerativePart(req.file.path, req.file.mimetype);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const response = await generateWithRetry(url, {
+      contents: [
+        { role: "user", parts: [{ text: systemInstruction }] },
+        ...(history || []).slice(-4),
+        { role: "user", parts: [{ text: message }] }
+      ],
+      generationConfig: { maxOutputTokens: 500, temperature: 0.7 } // Luwes
+    }, modelName);
 
-    const prompt = `
-      Kamu adalah AI Staf Kelurahan. Analisis gambar dokumen ini.
-      Output WAJIB JSON murni:
-      {
-        "jenis_dokumen": "KTP/KK/Akta/Surat Pengantar/Lainnya/Bukan Dokumen",
-        "kualitas": "Jelas/Buram/Terpotong",
-        "data_terbaca": "Ringkasan data utama jika ada (Nama/NIK), kosongkan jika tidak aman/tidak jelas",
-        "saran": "Saran singkat untuk warga terkait dokumen ini (misal: 'Foto sudah jelas', 'Mohon foto ulang')"
-      }
-    `;
+    res.json({ ok: true, model: modelName, output: response });
 
-    const result = await model.generateContent([prompt, imagePart]);
-    const response = await result.response;
-    const text = response.text();
-
-    if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path); // Bersihkan file
-
-    try {
-      const cleanJson = text.replace(/```json|```/g, '').trim();
-      res.json({ ok: true, result: JSON.parse(cleanJson) });
-    } catch (e) {
-      res.json({ ok: true, result: { jenis_dokumen: "Terdeteksi Teks", saran: text, raw: true } });
-    }
   } catch (error) {
-    console.error("Vision Error:", error);
-    if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-    res.status(500).json({ ok: false, error: "Gagal memindai dokumen" });
-  }
-});
-
-// ======== ROOT ENDPOINT =========
-app.get('/', (req, res) => {
-  res.json({
-    service: 'Chatbot Kelurahan API',
-    version: '2.1.0',
-    status: 'online',
-    endpoints: {
-      chat: 'POST /chat',
-      scan: 'POST /api/scan-surat',
-      ui: 'GET /ui'
+    // Fallback Local
+    if (relevantData.length > 0) {
+      return res.json({
+        ok: true,
+        model: 'fallback',
+        output: { candidates: [{ content: { parts: [{ text: relevantData[0].answer }] } }] }
+      });
     }
-  });
-});
+    // Fallback RAG
+    if (localRAG) {
+        const ragResult = await localRAG(message);
+        if (ragResult.ok) return res.json({ ok: true, output: { candidates: [{ content: { parts: [{ text: ragResult.answer }] } }] } });
+    }
+    res.status(500).json({ ok: false, error: "Sistem sibuk." });
+  }
+};
 
-// ======== UI ENDPOINT (TETAP SAMA SESUAI PERMINTAAN) =========
+// ======== ROUTES =========
+app.post('/chat', chatHandler);
+app.post('/api/chat', chatHandler);
+app.get('/', (req, res) => res.json({ status: 'online' }));
+app.get('/health', (req, res) => res.json({ status: 'online', data: trainingData.length }));
+
+// ======== UI CHAT (ORIGINAL - NO VISION) =========
 app.get('/ui', (req, res) => {
   res.send(`<!DOCTYPE html>
 <html lang="id">
@@ -275,12 +221,7 @@ app.get('/ui', (req, res) => {
   <title>Chatbot Kelurahan Marga Sari</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body {
-      height: 100%;
-      overflow: hidden;
-      margin: 0;
-      padding: 0;
-    }
+    html, body { height: 100%; overflow: hidden; margin: 0; padding: 0; }
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
     .chat-container { width: 100%; height: 100%; max-width: 600px; max-height: 100%; background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); display: flex; flex-direction: column; overflow: hidden; margin: auto; }
     .chat-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; text-align: center; }
@@ -320,14 +261,12 @@ app.get('/ui', (req, res) => {
     .welcome-message p { font-size: 14px; }
     .error-message { background: #fee; color: #c00; padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 13px; display: none; }
     .error-message.active { display: block; }
-
-    /* Mobile optimizations */
     @media (max-width: 768px) {
       body { padding: 0; }
       .chat-container { width: 100%; height: 100%; max-width: 100%; max-height: 100%; border-radius: 0; margin: 0; }
       .chat-header h1 { font-size: 20px; }
       .chat-header p { font-size: 12px; }
-      #messageInput { font-size: 16px; } /* Prevent zoom on iOS */
+      #messageInput { font-size: 16px; }
       .mode-btn { padding: 10px 14px; font-size: 14px; }
       #sendBtn { padding: 12px 20px; }
     }
@@ -500,6 +439,10 @@ app.get('/ui', (req, res) => {
           let answer = '';
           if (data.ok && data.output?.candidates?.[0]?.content?.parts?.[0]?.text) {
             answer = data.output.candidates[0].content.parts[0].text;
+          } else if (data.model === 'keyword-fallback' || data.model === 'local-rag-fallback') {
+             answer = data.output.candidates[0].content.parts[0].text;
+          } else if (data.model === 'fallback') {
+             answer = data.output.candidates[0].content.parts[0].text;
           } else {
             answer = 'Maaf, saya tidak bisa memproses pertanyaan Anda saat ini.';
           }
@@ -511,7 +454,8 @@ app.get('/ui', (req, res) => {
             conversationHistory = conversationHistory.slice(-10);
           }
           
-          addMessage(answer, 'bot');
+          const formattedAnswer = answer.replace(/\\*\\*(.*?)\\*\\*/g, '<b>$1</b>').replace(/\\n/g, '<br>');
+          addMessage(formattedAnswer, 'bot');
           
           if (currentMode === 'voice') {
             speakText(answer);
@@ -532,7 +476,9 @@ app.get('/ui', (req, res) => {
         messageDiv.className = \`message \${sender}\`;
         const now = new Date();
         const time = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
-        messageDiv.innerHTML = \`<div class="message-content">\${text.replace(/\\n/g, '<br>')}<div class="message-time">\${time}</div></div>\`;
+        const content = sender === 'bot' ? text : text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        
+        messageDiv.innerHTML = \`<div class="message-content">\${content}<div class="message-time">\${time}</div></div>\`;
         chatMessages.appendChild(messageDiv);
         chatMessages.scrollTop = chatMessages.scrollHeight;
         return messageDiv;
@@ -561,97 +507,10 @@ app.get('/ui', (req, res) => {
 </html>`);
 });
 
-// ======== HEALTH CHECK =========
-app.get('/health', (req, res) => {
-  res.json({ 
-    status: 'online', 
-    data_loaded: trainingData.length,
-    features: { chat: true, vision: true, rag: !!localRAG }
-  });
-});
+// ======== EXPORT FOR VERCEL =========
+// Di Production (Vercel), jangan jalankan app.listen() langsung
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => console.log(`🚀 Local Server running on port ${PORT}`));
+}
 
-// ======== MAIN CHAT ENDPOINT (UPDATED LOGIC) =========
-app.post('/chat', async (req, res) => {
-  const { message, history } = req.body || {};
-  
-  if (!message) {
-    return res.status(400).json({ ok: false, error: 'message field is required' });
-  }
-
-  // 1. Cari Data Lokal (Gunakan Keyword Search - Terbukti Lebih Akurat untuk Kasus ini)
-  const relevantData = findRelevantData(message, trainingData, 4);
-  
-  const grounding = relevantData.length > 0
-    ? "DATA REFERENSI KELURAHAN (WAJIB DIGUNAKAN):\n" + 
-      relevantData.map(d => `Q: ${d.text||d.question}\nA: ${d.answer||d.response}`).join('\n---\n')
-    : "";
-
-  // 2. Instruksi Sistem (Diperbarui untuk memaksa Bahasa Indonesia)
-  const systemInstruction = `Anda adalah Asisten Virtual Kelurahan Marga Sari, Balikpapan.
-
-  ATURAN PENTING:
-  1. Prioritaskan "DATA REFERENSI KELURAHAN" di bawah ini. Jika data mengatakan bisa online, maka jawab BISA.
-  2. Jawab WAJIB dalam BAHASA INDONESIA yang sopan dan formal.
-  3. Jika user bertanya dengan bahasa Jawa, tetap jawab dengan Bahasa Indonesia.
-  4. Jawab singkat dan jelas (maksimal 3 paragraf).
-
-  ${grounding}`;
-
-  try {
-    await rateLimit.waitIfNeeded();
-    const apiKey = getNextApiKey();
-    
-    const modelName = process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp';
-    // Gunakan placeholder key yang akan diganti di helper generateWithRetry
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=KEY_PLACEHOLDER`;
-
-    const contents = [
-      { role: "user", parts: [{ text: systemInstruction }] },
-      ...(history || []).slice(-4),
-      { role: "user", parts: [{ text: message }] }
-    ];
-
-    const out = await generateWithRetry(url, {
-      contents: contents,
-      generationConfig: { maxOutputTokens: 500, temperature: 0.3 }
-    }, modelName);
-
-    res.json({ ok: true, model: modelName, output: out });
-
-  } catch (error) {
-    console.warn(`⚠️ Chat Error: ${error.message}`);
-    
-    // Fallback ke RAG Lokal jika API Gagal
-    if (localRAG) {
-      const ragResult = await localRAG(message);
-      if (ragResult.ok) {
-        return res.json({
-          ok: true,
-          model: 'local-rag-fallback',
-          output: { candidates: [{ content: { parts: [{ text: ragResult.answer }] } }] }
-        });
-      }
-    }
-    
-    // Fallback Terakhir: Keyword Match Langsung (Tanpa AI)
-    if (relevantData.length > 0) {
-        return res.json({
-            ok: true,
-            model: 'keyword-fallback',
-            output: { candidates: [{ content: { parts: [{ text: relevantData[0].answer || relevantData[0].response }] } }] }
-        });
-    }
-
-    res.status(500).json({ ok: false, error: "Maaf, sistem sedang sibuk." });
-  }
-});
-
-// ======== STATUS ENDPOINT =========
-app.get('/status', (req, res) => {
-  res.json({ ok: true, server: 'online', data_items: trainingData.length });
-});
-
-app.listen(PORT, () => console.log(`🚀 Server Production running on port ${PORT}`));
-
-// ======== EXPORT FOR VERCEL COMPATIBILITY =========
 export default app;
