@@ -1,6 +1,6 @@
 // rag_handler.js
 // Modul RAG untuk pencarian semantik dan generation
-// Digunakan sebagai Layer 4 Fallback di server.js
+// Digunakan sebagai Layer 4 Fallback & Hybrid Search
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import fs from 'fs';
@@ -13,17 +13,16 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const EMBEDDING_MODEL = 'text-embedding-004';
 const GENERATION_MODEL = 'gemini-2.0-flash-exp'; // Model untuk generate jawaban
 const EMBEDDED_DOCS_FILE = './data/embedded_docs.json';
-const SIMILARITY_THRESHOLD = 0.5; // Minimum similarity score (0-1)
-const TOP_K = 3; // Ambil top 3 dokumen paling relevan
+const SIMILARITY_THRESHOLD = 0.4; // Minimum similarity score (0-1)
+const TOP_K = 5; // Ambil top 5 dokumen paling relevan
 
 // ======== VALIDASI =========
 if (!GEMINI_API_KEY) {
   console.error('❌ Error: GEMINI_API_KEY tidak ditemukan di .env file!');
-  process.exit(1);
 }
 
 // ======== INISIALISASI GEMINI AI =========
-const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+const genAI = new GoogleGenerativeAI(GEMINI_API_KEY || 'dummy');
 const embeddingModel = genAI.getGenerativeModel({ model: EMBEDDING_MODEL });
 const generationModel = genAI.getGenerativeModel({ model: GENERATION_MODEL });
 
@@ -36,8 +35,7 @@ function loadEmbeddedDocs() {
   }
   
   if (!fs.existsSync(EMBEDDED_DOCS_FILE)) {
-    console.error(`❌ File embedding tidak ditemukan: ${EMBEDDED_DOCS_FILE}`);
-    console.error('💡 Jalankan: node rag_index.js terlebih dahulu!');
+    console.warn(`⚠️ File embedding tidak ditemukan: ${EMBEDDED_DOCS_FILE}`);
     return [];
   }
   
@@ -78,12 +76,16 @@ function cosineSimilarity(vecA, vecB) {
   return dotProduct / (normA * normB);
 }
 
-// ======== FUNGSI HELPER: RETRIEVAL (Pencarian Semantik) =========
-async function retrieveRelevantDocs(query) {
+// ======== FUNGSI UTAMA: SEMANTIC SEARCH (DI-EXPORT) =========
+/**
+ * Mencari dokumen yang paling relevan dengan query menggunakan embedding
+ * @param {string} query - Pertanyaan user
+ * @returns {Promise<Array>} Array of top relevant documents dengan score
+ */
+export async function semanticSearch(query) {
   const docs = loadEmbeddedDocs();
   
   if (docs.length === 0) {
-    console.warn('⚠️  RAG: No embedded documents available');
     return [];
   }
   
@@ -107,15 +109,10 @@ async function retrieveRelevantDocs(query) {
       .sort((a, b) => b.score - a.score)
       .slice(0, TOP_K);
     
-    console.log(`🔍 RAG: Found ${topDocs.length} relevant docs (threshold: ${SIMILARITY_THRESHOLD})`);
-    topDocs.forEach((item, i) => {
-      console.log(`   ${i + 1}. [Score: ${item.score.toFixed(3)}] "${item.doc.text.substring(0, 60)}..."`);
-    });
-    
     return topDocs;
     
   } catch (error) {
-    console.error('❌ RAG Retrieval Error:', error.message);
+    console.error('❌ Semantic Search Error:', error.message);
     return [];
   }
 }
@@ -140,9 +137,7 @@ async function generateAnswer(query, relevantDocs) {
 INSTRUKSI PENTING:
 1. Gunakan HANYA informasi dari KONTEKS REFERENSI di bawah untuk menjawab pertanyaan
 2. Jika konteks tidak cukup untuk menjawab, katakan dengan jujur
-3. Jawab dengan bahasa formal, sopan, dan profesional
-4. Berikan jawaban yang padat, jelas, maksimal 3-4 paragraf
-5. Gunakan numbered list untuk syarat/langkah, bullet points untuk pilihan
+3. Jawab dengan bahasa formal, sopan, dan profesional dalam BAHASA INDONESIA.
 
 KONTEKS REFERENSI:
 ${context}
@@ -157,15 +152,11 @@ JAWABAN (berdasarkan konteks di atas):`;
       contents: [{ role: 'user', parts: [{ text: ragPrompt }] }],
       generationConfig: {
         maxOutputTokens: 500,
-        temperature: 0.7,
-        topP: 0.95,
-        topK: 40
+        temperature: 0.5,
       }
     });
     
     const answer = result.response.text();
-    console.log(`✅ RAG: Generated answer (${answer.length} chars)`);
-    
     return answer;
     
   } catch (error) {
@@ -176,14 +167,14 @@ JAWABAN (berdasarkan konteks di atas):`;
 
 // ======== FUNGSI UTAMA: LOCAL RAG (EXPORT) =========
 export async function localRAG(query) {
-  console.log(`\n🤖 RAG: Processing query: "${query.substring(0, 80)}..."`);
+  console.log(`\n🤖 RAG: Processing query: "${query.substring(0, 50)}..."`);
   
   try {
     // STEP 1: RETRIEVAL - Cari dokumen relevan
-    const relevantDocs = await retrieveRelevantDocs(query);
+    // Kita gunakan semanticSearch yang sudah kita buat di atas
+    const relevantDocs = await semanticSearch(query);
     
     if (relevantDocs.length === 0) {
-      console.warn('⚠️  RAG: No relevant documents found');
       return {
         ok: false,
         error: 'NO_RELEVANT_DOCS',
@@ -238,20 +229,14 @@ export function getRAGStatus() {
     totalDocs: docs.length,
     embeddingModel: EMBEDDING_MODEL,
     generationModel: GENERATION_MODEL,
-    similarityThreshold: SIMILARITY_THRESHOLD,
-    topK: TOP_K,
     dataFile: EMBEDDED_DOCS_FILE
   };
 }
 
-// ======== EXPORT DEFAULT (UPDATED) =========
-// INI BAGIAN PENTING: Mengekspor 'retrieveRelevantDocs' sebagai 'semanticSearch'
-export {
-  retrieveRelevantDocs as semanticSearch
-};
-
+// ======== EXPORT DEFAULT =========
+// Pastikan semua fungsi di-export juga sebagai default object
 export default {
   localRAG,
   getRAGStatus,
-  semanticSearch: retrieveRelevantDocs
+  semanticSearch
 };
