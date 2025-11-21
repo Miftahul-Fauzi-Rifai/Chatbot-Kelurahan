@@ -512,8 +512,5 @@ app.get('/ui', (req, res) => {
 });
 
 // ======== EXPORT FOR VERCEL =========
-if (process.env.NODE_ENV !== 'production') {
-  app.listen(PORT, () => console.log(`🚀 Local Server running on port ${PORT}`));
-}
 
 export default app;
