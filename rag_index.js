@@ -5,7 +5,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import fs from 'fs';
 import dotenv from 'dotenv';
-import crypto from 'crypto';
 
 dotenv.config();
 
@@ -14,7 +13,7 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const EMBEDDING_MODEL = 'text-embedding-004'; // Model embedding Google terbaru
 const DATA_FILES = [
   './data/kosakata_jawa.json',
-  './data/train_optimized.json'
+  './data/train.json'
 ];
 const OUTPUT_FILE = './data/embedded_docs.json';
 
@@ -28,40 +27,7 @@ if (!GEMINI_API_KEY) {
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 const embeddingModel = genAI.getGenerativeModel({ model: EMBEDDING_MODEL });
 
-// ======== FUNGSI HELPER: OPTIMASI DATA =========
-// Stopwords untuk filter (Indonesia + Jawa)
-const STOPWORDS = new Set(['dan','atau','yang','dengan','untuk','pada','di','ke','dari','ini','itu','adalah','sebagai','opo','kuwi','niki','ing','sak','karo']);
-
-function normalizeText(text) {
-  return (text || '').toString().replace(/\s+/g, ' ').trim().toLowerCase();
-}
-
-function removeStopwords(words) {
-  return words.filter(w => w && w.length > 2 && !STOPWORDS.has(w));
-}
-
-function hashText(text) {
-  return crypto.createHash('sha1').update(text).digest('hex');
-}
-
-function chunkMerge(lines, maxLen = 500) {
-  const chunks = [];
-  let buf = '';
-  for (const line of lines) {
-    const cleaned = (line || '').toString().trim();
-    if (!cleaned || cleaned.length < 20) continue; // Skip very short lines
-    if ((buf + ' ' + cleaned).length > maxLen) {
-      if (buf) chunks.push(buf.trim());
-      buf = cleaned;
-    } else {
-      buf = buf ? `${buf} ${cleaned}` : cleaned;
-    }
-  }
-  if (buf) chunks.push(buf.trim());
-  return chunks;
-}
-
-// ======== FUNGSI HELPER: TRANSFORM KOSAKATA JAWA (OPTIMIZED) =========
+// ======== FUNGSI HELPER: TRANSFORM KOSAKATA JAWA =========
 function transformKosakata(item) {
   // Jika item memiliki format kosakata Jawa (indonesia, ngoko, madya, krama)
   if (item.indonesia && (item.ngoko || item.madya || item.krama)) {
@@ -83,10 +49,9 @@ function transformKosakata(item) {
   return item;
 }
 
-// ======== FUNGSI HELPER: LOAD DATA (WITH DEDUPLICATION) =========
+// ======== FUNGSI HELPER: LOAD DATA =========
 function loadTrainingData() {
   let allData = [];
-  const seen = new Set(); // For deduplication
   
   for (const file of DATA_FILES) {
     if (!fs.existsSync(file)) {
@@ -99,19 +64,10 @@ function loadTrainingData() {
       const jsonData = JSON.parse(rawData);
       
       if (Array.isArray(jsonData)) {
-        // Transform dan deduplikasi
-        jsonData.forEach(item => {
-          const transformed = transformKosakata(item);
-          const textToCheck = (transformed.text || transformed.question || '') + (transformed.answer || transformed.response || '');
-          const hash = hashText(normalizeText(textToCheck));
-          
-          // Skip jika duplikat atau terlalu pendek
-          if (!seen.has(hash) && textToCheck.length >= 40) {
-            seen.add(hash);
-            allData.push(transformed);
-          }
-        });
-        console.log(`✅ Loaded ${jsonData.length} items from ${file} (${allData.length} unique after dedup)`);
+        // Transform kosakata jawa format jika diperlukan
+        const transformedData = jsonData.map(item => transformKosakata(item));
+        allData = allData.concat(transformedData);
+        console.log(`✅ Loaded ${jsonData.length} items from ${file}`);
       } else {
         console.warn(`⚠️  ${file} bukan array, dilewati.`);
       }
@@ -120,41 +76,32 @@ function loadTrainingData() {
     }
   }
   
-  // IMPORTANT: Batasi jumlah total dokumen (maksimal 300-400)
-  if (allData.length > 400) {
-    console.log(`⚠️  Terlalu banyak data (${allData.length}), mengambil 400 teratas berdasarkan panjang jawaban...`);
-    allData = allData
-      .sort((a, b) => {
-        const lenA = (a.answer || a.response || '').length;
-        const lenB = (b.answer || b.response || '').length;
-        return lenB - lenA; // Sort by answer length descending
-      })
-      .slice(0, 400);
-  }
-  
   return allData;
 }
 
-// ======== FUNGSI HELPER: BUAT TEXT UNTUK EMBEDDING (OPTIMIZED) =========
+// ======== FUNGSI HELPER: BUAT TEXT UNTUK EMBEDDING =========
 function prepareTextForEmbedding(item) {
-  // Hanya gabungkan field penting (hemat token)
+  // Gabungkan semua informasi penting dari item
   const parts = [];
   
-  // Question/Text
+  // Prioritas 1: Question/Text (pertanyaan/topik utama)
   if (item.text || item.question) {
     parts.push(item.text || item.question);
   }
   
-  // Answer/Response (batasi panjang maksimal 300 karakter)
+  // Prioritas 2: Answer/Response (jawaban/informasi)
   if (item.answer || item.response) {
-    const answer = (item.answer || item.response).substring(0, 300);
-    parts.push(answer);
+    parts.push(item.answer || item.response);
   }
   
-  // Tags (hanya 3 pertama)
-  if (item.tags && Array.isArray(item.tags) && item.tags.length > 0) {
-    const topTags = item.tags.slice(0, 3).join(', ');
-    parts.push('Tag: ' + topTags);
+  // Prioritas 3: Tags (kata kunci)
+  if (item.tags && Array.isArray(item.tags)) {
+    parts.push('Tag: ' + item.tags.join(', '));
+  }
+  
+  // Prioritas 4: Kategori
+  if (item.kategori_utama) {
+    parts.push('Kategori: ' + item.kategori_utama);
   }
   
   return parts.join('\n');
@@ -176,7 +123,7 @@ async function generateEmbeddings() {
   
   // 2. Generate embeddings untuk setiap item
   const embeddedDocs = [];
-  const batchSize = 10; // ⚡ INCREASED: Process 10 items at a time (was 5)
+  const batchSize = 5; // Process 5 items at a time to avoid rate limits
   
   for (let i = 0; i < trainingData.length; i += batchSize) {
     const batch = trainingData.slice(i, i + batchSize);
@@ -198,14 +145,15 @@ async function generateEmbeddings() {
         
         console.log(`✅ [${globalIndex + 1}/${trainingData.length}] Embedded: ${item.id || 'no-id'} - "${(item.text || item.question || '').substring(0, 50)}..."`);
         
-        // Return embedded document (ONLY essential fields)
+        // Return embedded document
         return {
           id: item.id,
           text: item.text || item.question || '',
           answer: item.answer || item.response || '',
           kategori: item.kategori_utama || '',
-          tags: (item.tags || []).slice(0, 3), // Only top 3 tags
-          embedding: embedding
+          tags: item.tags || [],
+          embedding: embedding,
+          embeddingText: textToEmbed // Simpan untuk debugging
         };
         
       } catch (error) {
@@ -227,7 +175,7 @@ async function generateEmbeddings() {
     
     // Small delay between batches to avoid rate limits
     if (i + batchSize < trainingData.length) {
-      await new Promise(resolve => setTimeout(resolve, 500)); // ⚡ REDUCED: 0.5s delay (was 1s)
+      await new Promise(resolve => setTimeout(resolve, 1000)); // 1 second delay
     }
   }
   
@@ -244,13 +192,8 @@ async function generateEmbeddings() {
   
   console.log(`\n✅ SELESAI! Embedding berhasil disimpan.`);
   console.log(`📄 File: ${OUTPUT_FILE}`);
-  console.log(`📊 Total documents: ${embeddedDocs.length} (dari ${trainingData.length} data awal)`);
+  console.log(`📊 Total documents: ${embeddedDocs.length}`);
   console.log(`📏 Embedding dimension: ${embeddedDocs[0]?.embedding?.length || 'N/A'}`);
-  
-  // Hitung ukuran file
-  const stats = fs.statSync(OUTPUT_FILE);
-  const fileSizeMB = (stats.size / (1024 * 1024)).toFixed(2);
-  console.log(`💾 File size: ${fileSizeMB} MB`);
   console.log('\n🎉 RAG Index siap digunakan!\n');
 }
 
@@ -258,4 +201,4 @@ async function generateEmbeddings() {
 generateEmbeddings().catch(error => {
   console.error('\n❌ Fatal Error:', error);
   process.exit(1);
-});
+});  
