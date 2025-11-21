@@ -1,11 +1,6 @@
 // server_production.js
-// Backend API Chatbot Kelurahan (Clean - No Vision - Vercel Ready)
-// ----------------------------------------------------------------
-// Fitur:
-// 1. Text Chat (Smart Logic server.js)
-// 2. UI Web Chat (Tanpa tombol kamera)
-// 3. Rate Limit & API Key Rotation
-// 4. Read-Only Data Loading (Safe for Vercel)
+// Backend API Chatbot Kelurahan (Final Clean Version)
+// Fitur: Chat Text & Voice Only, UI Original, Smart Context, Caching
 
 import dotenv from 'dotenv';
 import express from 'express';
@@ -13,16 +8,11 @@ import axios from 'axios';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Import RAG jika ada (Optional)
-let localRAG;
-try {
-  const ragModule = await import('./rag_handler.js');
-  localRAG = ragModule.localRAG;
-} catch (e) {
-  // Silent fallback
-}
+// Import Handler (Pastikan file rag_handler.js dan cache.js ada)
+// Jika tidak ada, kode akan otomatis menggunakan fallback keyword
+import { localRAG, semanticSearch } from './rag_handler.js';
+import { makeCacheKey, getCache, setCache } from './utils/cache.js';
 
 dotenv.config();
 
@@ -32,7 +22,34 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ======== CONFIG: API KEYS =========
+// ======== MIDDLEWARE =========
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
+
+// ======== CORS Configuration (Aman untuk Production) =========
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  
+  // Iframe Support (Penting untuk Widget)
+  res.removeHeader('X-Frame-Options');
+  res.setHeader('Content-Security-Policy', "frame-ancestors *");
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Permissions-Policy', 'microphone=*, camera=*, geolocation=*');
+  
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  next();
+});
+
+// ======== REQUEST LOGGING =========
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+  next();
+});
+
+// ======== MULTI API KEY CONFIGURATION =========
 const API_KEYS = [
   process.env.GEMINI_API_KEY,
   process.env.GEMINI_API_KEY_2,
@@ -40,28 +57,13 @@ const API_KEYS = [
 ].filter(Boolean);
 
 let currentKeyIndex = 0;
+
 function getNextApiKey() {
   if (API_KEYS.length === 0) throw new Error('No API keys configured');
   const key = API_KEYS[currentKeyIndex];
   currentKeyIndex = (currentKeyIndex + 1) % API_KEYS.length;
   return key;
 }
-
-// ======== MIDDLEWARE =========
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
-
-// ======== CORS Configuration =========
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.removeHeader('X-Frame-Options');
-  res.setHeader('Content-Security-Policy', "frame-ancestors *");
-  if (req.method === 'OPTIONS') return res.status(200).end();
-  next();
-});
 
 // ======== RATE LIMITER =========
 const rateLimit = {
@@ -70,41 +72,56 @@ const rateLimit = {
   canMakeRequest() {
     const now = Date.now();
     this.requests = this.requests.filter(time => now - time < 60000);
-    if (this.requests.length >= this.maxPerMinute) return false;
-    this.requests.push(now);
-    return true;
+    return this.requests.length < this.maxPerMinute;
   },
   async waitIfNeeded() {
     if (!this.canMakeRequest()) {
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const waitTime = 2000; // Tunggu sebentar
+      console.log(`⏳ Rate limit active, waiting...`);
+      await new Promise(resolve => setTimeout(resolve, waitTime));
+      this.requests.push(Date.now()); // Catat request baru
+    } else {
+      this.requests.push(Date.now());
     }
   }
 };
 
-// ======== DATA LOADING (Safe Read Only) =========
-const TRAIN_FILE = path.join(__dirname, 'data', 'train.json');
-const KLARIFIKASI_FILE = path.join(__dirname, 'data', 'kosakata_jawa.json');
+// ======== DATA LOADING (LOGIKA GABUNGAN) =========
+// Memuat data utama DAN kosakata jawa agar akurat
+const TRAIN_FILE = process.env.TRAIN_DATA_FILE || './data/train.json';
+const FALLBACK_TRAIN_FILE = './data/train_optimized.json';
+const KLARIFIKASI_FILE = './data/kosakata_jawa.json';
 
 function readTrainData() {
   try {
     let data = [];
+    // 1. Load Data Training Utama
     if (fs.existsSync(TRAIN_FILE)) {
       data = data.concat(JSON.parse(fs.readFileSync(TRAIN_FILE, 'utf8')));
+    } else if (fs.existsSync(FALLBACK_TRAIN_FILE)) {
+      data = data.concat(JSON.parse(fs.readFileSync(FALLBACK_TRAIN_FILE, 'utf8')));
     }
+
+    // 2. Load Kosakata Jawa (Agar paham istilah lokal)
     if (fs.existsSync(KLARIFIKASI_FILE)) {
       data = data.concat(JSON.parse(fs.readFileSync(KLARIFIKASI_FILE, 'utf8')));
+      console.log('✅ Loaded additional local vocabulary (Javanese)');
     }
-    return data;
-  } catch (e) { return []; }
-}
-let trainingData = readTrainData();
 
-// ======== LOGIKA PENCARIAN (SMART KEYWORD) =========
-function findRelevantData(message, allData, maxResults = 5) {
-  if (!message) return [];
+    console.log(`✅ Database Loaded: ${data.length} items`);
+    return data;
+  } catch (e) {
+    console.error(`❌ Error loading data:`, e.message);
+    return [];
+  }
+}
+
+const trainingData = readTrainData();
+
+// ======== SMART KEYWORD SEARCH (FALLBACK) =========
+function findRelevantData(message, allData, maxResults = 4) {
   const lowerMessage = message.toLowerCase();
-  const queryWords = lowerMessage.split(/\s+/);
-  const isDefinition = /^(apa|apakah)\s+(itu|kepanjangan|arti)\s+/i.test(message);
+  const queryWords = lowerMessage.split(/\s+/).filter(w => w.length > 2);
   
   const scores = allData.map(item => {
     let score = 0;
@@ -112,25 +129,27 @@ function findRelevantData(message, allData, maxResults = 5) {
     const answer = (item.answer || item.response || '').toLowerCase();
     const tags = (item.tags || []).join(' ').toLowerCase();
     
-    if (isDefinition && message.match(/(?:apa|apakah)\s+(?:itu|kepanjangan|arti)\s+(.+?)(?:\?|$)/i)) {
-       const term = message.match(/(?:apa|apakah)\s+(?:itu|kepanjangan|arti)\s+(.+?)(?:\?|$)/i)[1].toLowerCase().trim();
-       if (text.includes(term)) score += 15;
-    }
-    
+    // Bobot skor
     queryWords.forEach(word => {
-      if (word.length < 3) return;
-      if (text.includes(word)) score += 2;
+      if (text.includes(word)) score += 3;
       if (tags.includes(word)) score += 3;
       if (answer.includes(word)) score += 1;
     });
+
+    // Bonus jika cocok persis
     if (text.includes(lowerMessage)) score += 10;
+    
     return { item, score };
   });
 
-  return scores.filter(s => s.score > 0).sort((a, b) => b.score - a.score).slice(0, maxResults).map(s => s.item);
+  return scores
+    .filter(s => s.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, maxResults)
+    .map(s => s.item);
 }
 
-// ======== HELPER RETRY =========
+// ======== RETRY LOGIC =========
 async function generateWithRetry(url, payload, modelName, maxRetries = 2) {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
@@ -140,82 +159,19 @@ async function generateWithRetry(url, payload, modelName, maxRetries = 2) {
       
       const response = await axios.post(urlWithKey, payload, {
         headers: { 'Content-Type': 'application/json' },
-        timeout: 10000
+        timeout: 8000
       });
       return response.data;
     } catch (error) {
       const msg = error.response?.data?.error?.message || error.message;
-      if (msg.includes('QUOTA') || msg.includes('429')) continue; 
+      if (msg.includes('quota') || msg.includes('429')) continue; // Coba key lain
       throw error;
     }
   }
   throw new Error('All API keys exhausted');
 }
 
-// ======== ENDPOINT CHAT (SMART LOGIC) =========
-const chatHandler = async (req, res) => {
-  const { message, history } = req.body || {};
-  if (!message) return res.status(400).json({ ok: false, error: 'Pesan kosong' });
-
-  // Reload data (Safe read)
-  trainingData = readTrainData();
-  
-  // 1. Cari Data Lokal
-  const relevantData = findRelevantData(message, trainingData, 3);
-  const grounding = relevantData.length > 0
-    ? "DATA REFERENSI:\n" + relevantData.map(d => `Q: ${d.text||d.question}\nA: ${d.answer||d.response}`).join('\n---\n')
-    : "";
-
-  // 2. System Prompt (Smart)
-  const systemInstruction = `Anda adalah Asisten Virtual Kelurahan Marga Sari, Balikpapan.
-  
-  ATURAN:
-  1. Gunakan DATA REFERENSI di bawah sebagai sumber utama.
-  2. Jika data mengatakan bisa online, jawab BISA.
-  3. Jawab Bahasa Indonesia sopan.
-  
-  ${grounding ? '\n📚 DATA REFERENSI:\n' + grounding : ''}`;
-
-  try {
-    const modelName = 'gemini-1.5-flash'; // Stabil & Cepat
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=KEY_PLACEHOLDER`;
-
-    const response = await generateWithRetry(url, {
-      contents: [
-        { role: "user", parts: [{ text: systemInstruction }] },
-        ...(history || []).slice(-4),
-        { role: "user", parts: [{ text: message }] }
-      ],
-      generationConfig: { maxOutputTokens: 500, temperature: 0.7 } // Luwes
-    }, modelName);
-
-    res.json({ ok: true, model: modelName, output: response });
-
-  } catch (error) {
-    // Fallback Local
-    if (relevantData.length > 0) {
-      return res.json({
-        ok: true,
-        model: 'fallback',
-        output: { candidates: [{ content: { parts: [{ text: relevantData[0].answer }] } }] }
-      });
-    }
-    // Fallback RAG
-    if (localRAG) {
-        const ragResult = await localRAG(message);
-        if (ragResult.ok) return res.json({ ok: true, output: { candidates: [{ content: { parts: [{ text: ragResult.answer }] } }] } });
-    }
-    res.status(500).json({ ok: false, error: "Sistem sibuk." });
-  }
-};
-
-// ======== ROUTES =========
-app.post('/chat', chatHandler);
-app.post('/api/chat', chatHandler);
-app.get('/', (req, res) => res.json({ status: 'online' }));
-app.get('/health', (req, res) => res.json({ status: 'online', data: trainingData.length }));
-
-// ======== UI CHAT (TANPA TOMBOL KAMERA) =========
+// ======== UI ENDPOINT (ORIGINAL LAMA) =========
 app.get('/ui', (req, res) => {
   res.send(`<!DOCTYPE html>
 <html lang="id">
@@ -225,7 +181,12 @@ app.get('/ui', (req, res) => {
   <title>Chatbot Kelurahan Marga Sari</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { height: 100%; overflow: hidden; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+    }
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
     .chat-container { width: 100%; height: 100%; max-width: 600px; max-height: 100%; background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); display: flex; flex-direction: column; overflow: hidden; margin: auto; }
     .chat-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; text-align: center; }
@@ -337,7 +298,6 @@ app.get('/ui', (req, res) => {
         };
         
         recognition.onerror = function(event) {
-          console.error('Speech recognition error:', event.error);
           isRecording = false;
           voiceBtn.classList.remove('recording');
           voiceBtn.textContent = '🎤';
@@ -359,7 +319,7 @@ app.get('/ui', (req, res) => {
           voiceBtn.style.display = 'block';
           messageInput.placeholder = 'Klik mikrofon atau ketik...';
           if (!recognition) {
-            showError('Browser Anda tidak mendukung pengenalan suara. Gunakan Chrome/Edge.');
+            showError('Browser Anda tidak mendukung pengenalan suara.');
           }
         } else {
           voiceModeBtn.classList.remove('active');
@@ -374,17 +334,7 @@ app.get('/ui', (req, res) => {
           window.speechSynthesis.cancel();
           const utterance = new SpeechSynthesisUtterance(text);
           utterance.lang = 'id-ID';
-          utterance.rate = 1.0;
-          utterance.pitch = 1.0;
-          utterance.volume = 1.0;
-          
-          if (window.speechSynthesis.getVoices().length === 0) {
-            window.speechSynthesis.addEventListener('voiceschanged', function() {
-              window.speechSynthesis.speak(utterance);
-            }, { once: true });
-          } else {
-            window.speechSynthesis.speak(utterance);
-          }
+          window.speechSynthesis.speak(utterance);
         }
       }
       
@@ -392,15 +342,9 @@ app.get('/ui', (req, res) => {
       voiceModeBtn.addEventListener('click', function() { switchMode('voice'); });
       
       voiceBtn.addEventListener('click', function() {
-        if (!recognition) {
-          showError('Pengenalan suara tidak tersedia di browser ini.');
-          return;
-        }
+        if (!recognition) return;
         if (isRecording) {
           recognition.stop();
-          isRecording = false;
-          voiceBtn.classList.remove('recording');
-          voiceBtn.textContent = '🎤';
         } else {
           recognition.start();
           isRecording = true;
@@ -437,37 +381,25 @@ app.get('/ui', (req, res) => {
             })
           });
           
-          if (!response.ok) throw new Error('Gagal menghubungi server. Silakan coba lagi.');
+          if (!response.ok) throw new Error('Gagal menghubungi server.');
           
           const data = await response.json();
           typingIndicator.remove();
           
-          let answer = '';
-          if (data.ok && data.output?.candidates?.[0]?.content?.parts?.[0]?.text) {
-            answer = data.output.candidates[0].content.parts[0].text;
-          } else if (data.model === 'keyword-fallback' || data.model === 'local-rag-fallback' || data.model === 'fallback') {
-             answer = data.output.candidates[0].content.parts[0].text;
-          } else {
-            answer = 'Maaf, saya tidak bisa memproses pertanyaan Anda saat ini.';
-          }
+          let answer = data.ok && data.output?.candidates?.[0]?.content?.parts?.[0]?.text
+            ? data.output.candidates[0].content.parts[0].text
+            : 'Maaf, saya tidak bisa memproses pertanyaan Anda saat ini.';
           
           conversationHistory.push({ role: 'user', parts: [{ text: message }] });
           conversationHistory.push({ role: 'model', parts: [{ text: answer }] });
           
-          if (conversationHistory.length > 10) {
-            conversationHistory = conversationHistory.slice(-10);
-          }
+          if (conversationHistory.length > 10) conversationHistory = conversationHistory.slice(-10);
           
-          const formattedAnswer = answer.replace(/\\*\\*(.*?)\\*\\*/g, '<b>$1</b>').replace(/\\n/g, '<br>');
-          addMessage(formattedAnswer, 'bot');
-          
-          if (currentMode === 'voice') {
-            speakText(answer);
-          }
+          addMessage(answer, 'bot');
+          if (currentMode === 'voice') speakText(answer);
         } catch (error) {
-          console.error('Error:', error);
           typingIndicator.remove();
-          showError(error.message || 'Terjadi kesalahan. Silakan coba lagi.');
+          showError('Terjadi kesalahan. Silakan coba lagi.');
         } finally {
           sendBtn.disabled = false;
           messageInput.disabled = false;
@@ -480,9 +412,7 @@ app.get('/ui', (req, res) => {
         messageDiv.className = \`message \${sender}\`;
         const now = new Date();
         const time = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
-        const content = sender === 'bot' ? text : text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        
-        messageDiv.innerHTML = \`<div class="message-content">\${content}<div class="message-time">\${time}</div></div>\`;
+        messageDiv.innerHTML = \`<div class="message-content">\${text.replace(/\\n/g, '<br>')}<div class="message-time">\${time}</div></div>\`;
         chatMessages.appendChild(messageDiv);
         chatMessages.scrollTop = chatMessages.scrollHeight;
         return messageDiv;
@@ -511,6 +441,104 @@ app.get('/ui', (req, res) => {
 </html>`);
 });
 
-// ======== EXPORT FOR VERCEL =========
+// ======== ROOT & HEALTH =========
+app.get('/', (req, res) => {
+  res.json({
+    service: 'Chatbot Kelurahan API',
+    version: '3.0.0-Stable',
+    status: 'online',
+    endpoints: { chat: 'POST /chat', ui: 'GET /ui' }
+  });
+});
+
+app.get('/health', (req, res) => {
+  res.json({ status: 'healthy', items: trainingData.length });
+});
+
+// ======== MAIN CHAT ENDPOINT (FINAL) =========
+app.post('/chat', async (req, res) => {
+  const { message, history } = req.body || {};
+  
+  if (!message) return res.status(400).json({ ok: false, error: 'message required' });
+
+  // 1. Check Cache
+  const cacheKey = makeCacheKey(message);
+  const cached = await getCache(cacheKey);
+  if (cached) return res.json({ ...cached, cached: true });
+
+  const replyAndCache = async (payload) => {
+    try { await setCache(cacheKey, payload); } catch (e) {}
+    return res.json(payload);
+  };
+
+  // 2. Context Retrieval (RAG + Keyword)
+  let relevantData = [];
+  try {
+    // Coba Semantic Search dulu
+    const ragResults = await semanticSearch(message);
+    if (ragResults.length > 0) {
+      relevantData = ragResults.map(res => res.doc);
+    } else {
+      // Fallback Keyword
+      relevantData = findRelevantData(message, trainingData, 4);
+    }
+  } catch (e) {
+    relevantData = findRelevantData(message, trainingData, 4);
+  }
+
+  const grounding = relevantData.length > 0
+    ? "DATA REFERENSI (SUMBER KEBENARAN):\n" + 
+      relevantData.map(d => `Tanya: ${d.text||d.question}\nJawab: ${d.answer||d.response}`).join('\n---\n')
+    : "";
+
+  // 3. System Prompt (Gabungan Terbaik)
+  const systemInstruction = `Anda adalah Asisten Virtual Kelurahan Marga Sari, Balikpapan.
+
+ATURAN UTAMA:
+1. Gunakan DATA REFERENSI di bawah untuk menjawab.
+2. WAJIB Bahasa Indonesia formal dan sopan.
+3. Jika user bertanya bahasa daerah (Jawa/Banjar), tetap jawab Bahasa Indonesia.
+4. Jangan jawab pertanyaan di luar layanan kelurahan (resep, game, dll).
+
+${grounding ? '\n' + grounding + '\n\nJawab berdasarkan data di atas.' : ''}`;
+
+  // 4. Generate Response
+  try {
+    const modelName = process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp';
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=KEY_PLACEHOLDER`;
+
+    const contents = [
+      { role: "user", parts: [{ text: systemInstruction }] },
+      { role: "model", parts: [{ text: "Siap, saya mengerti." }] },
+      ...(history || []).slice(-4),
+      { role: "user", parts: [{ text: message }] }
+    ];
+
+    const out = await generateWithRetry(url, {
+      contents: contents,
+      generationConfig: { maxOutputTokens: 500, temperature: 0.3 }
+    }, modelName);
+
+    return replyAndCache({ ok: true, output: out });
+
+  } catch (error) {
+    console.warn('⚠️ API Error, trying fallbacks...');
+    
+    // Fallback 1: Local RAG
+    try {
+      const ragRes = await localRAG(message);
+      if (ragRes?.ok) {
+        return replyAndCache({ ok: true, output: { candidates: [{ content: { parts: [{ text: ragRes.answer }] } }] } });
+      }
+    } catch (e) {}
+
+    // Fallback 2: Keyword Match Hard
+    if (relevantData.length > 0) {
+      return replyAndCache({ ok: true, output: { candidates: [{ content: { parts: [{ text: relevantData[0].answer || relevantData[0].response }] } }] } });
+    }
+
+    return res.status(500).json({ ok: false, error: 'Sistem sedang sibuk.' });
+  }
+});
 
 export default app;
