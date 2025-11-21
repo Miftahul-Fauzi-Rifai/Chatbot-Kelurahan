@@ -652,3 +652,6 @@ app.get('/status', (req, res) => {
 });
 
 app.listen(PORT, () => console.log(`🚀 Server Production running on port ${PORT}`));
+
+// ======== EXPORT FOR VERCEL COMPATIBILITY =========
+export default app;
