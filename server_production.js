@@ -712,10 +712,11 @@ app.post('/chat', async (req, res) => {
   const cacheKey = makeCacheKey(message);
   const cached = await getCache(cacheKey);
   
-  if (cached) {
-    console.log('✅ Returning cached response (no API call)');
+  const respondFromCache = () => {
+    if (!cached) return null;
+    console.log('♻️ Returning cached response (no API call)');
     return res.json({ ...cached, cached: true });
-  }
+  };
   
   // Helper untuk save to cache dan return response
   const replyAndCache = async (payload) => {
@@ -798,6 +799,9 @@ app.post('/chat', async (req, res) => {
     directResponse = await tryDirectAnswer(mergedExpanded, 'direct-data-expanded');
     if (directResponse) return directResponse;
   }
+
+  const cachedHandled = respondFromCache();
+  if (cachedHandled) return cachedHandled;
   
   // Build grounding context
   const grounding = relevantData.length > 0
