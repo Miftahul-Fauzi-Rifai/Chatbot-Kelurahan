@@ -152,7 +152,7 @@ const STOP_WORDS = new Set([
   'bisakah','bisa','saya','saya','untuk','yang','dan','atau','dengan','minta','ingin',
   'butuh','halo','hai','hello','mohon','please','tolonglah','ap','ayo','dong','nih',
   'nih','kami','kita','anda','kamu','sih','kah','ya','deh','dong','serta','agar','supaya','dapat','para',
-  'cara'
+  'cara','secara','online'
 ]);
 
 function tokenizeText(text = '') {
@@ -238,7 +238,22 @@ function findRelevantData(message, allData, maxResults = 3) {
     .map(s => s.item);
 }
 
-const DIRECT_ANSWER_THRESHOLD = parseFloat(process.env.DIRECT_ANSWER_THRESHOLD || '0.55');
+function mergeDocLists(primary = [], secondary = []) {
+  const seen = new Set();
+  const result = [];
+  const pushDoc = (doc) => {
+    if (!doc) return;
+    const key = doc.id || doc.text || doc.question || JSON.stringify(doc).slice(0, 50);
+    if (seen.has(key)) return;
+    seen.add(key);
+    result.push(doc);
+  };
+  primary.forEach(pushDoc);
+  secondary.forEach(pushDoc);
+  return result;
+}
+
+const DIRECT_ANSWER_THRESHOLD = parseFloat(process.env.DIRECT_ANSWER_THRESHOLD || '0.45');
 
 // ======== RETRY LOGIC =========
 async function generateWithRetry(url, payload, modelName, maxRetries = 2) {
@@ -740,7 +755,13 @@ app.post('/chat', async (req, res) => {
     ragSource = 'fallback-keyword';
   }
 
-  const directMatch = getBestDirectMatch(message, relevantData);
+  let directDocs = relevantData;
+  if (directDocs.length < 5) {
+    const keywordBoost = findRelevantData(message, trainingData, 8);
+    directDocs = mergeDocLists(directDocs, keywordBoost);
+  }
+
+  const directMatch = getBestDirectMatch(message, directDocs);
   if (directMatch && directMatch.item && directMatch.score >= DIRECT_ANSWER_THRESHOLD) {
     const directAnswer = directMatch.item.answer || directMatch.item.response;
     if (directAnswer) {
