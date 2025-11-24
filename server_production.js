@@ -152,7 +152,7 @@ const STOP_WORDS = new Set([
   'bisakah','bisa','saya','saya','untuk','yang','dan','atau','dengan','minta','ingin',
   'butuh','halo','hai','hello','mohon','please','tolonglah','ap','ayo','dong','nih',
   'nih','kami','kita','anda','kamu','sih','kah','ya','deh','dong','serta','agar','supaya','dapat','para',
-  'cara','secara','online'
+  'cara','secara','di'
 ]);
 
 function tokenizeText(text = '') {
