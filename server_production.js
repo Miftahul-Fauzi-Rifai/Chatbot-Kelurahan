@@ -253,7 +253,7 @@ function mergeDocLists(primary = [], secondary = []) {
   return result;
 }
 
-const DIRECT_ANSWER_THRESHOLD = parseFloat(process.env.DIRECT_ANSWER_THRESHOLD || '0.45');
+const DIRECT_ANSWER_THRESHOLD = parseFloat(process.env.DIRECT_ANSWER_THRESHOLD || '0.35');
 
 // ======== RETRY LOGIC =========
 async function generateWithRetry(url, payload, modelName, maxRetries = 2) {
@@ -799,6 +799,9 @@ app.post('/chat', async (req, res) => {
     directResponse = await tryDirectAnswer(mergedExpanded, 'direct-data-expanded');
     if (directResponse) return directResponse;
   }
+
+  const fullDirectResponse = await tryDirectAnswer(trainingData, 'direct-data-full');
+  if (fullDirectResponse) return fullDirectResponse;
 
   const cachedHandled = respondFromCache();
   if (cachedHandled) return cachedHandled;
