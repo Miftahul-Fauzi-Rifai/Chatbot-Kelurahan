@@ -726,6 +726,34 @@ app.post('/chat', async (req, res) => {
     }
     return res.json(payload);
   };
+
+  const respondWithDirectDoc = async (doc, score, label = 'direct-data') => {
+    if (!doc) return null;
+    const directAnswer = doc.answer || doc.response;
+    if (!directAnswer) return null;
+    return replyAndCache({
+      ok: true,
+      model: label,
+      ragSource,
+      directMatchScore: score,
+      directMatchId: doc.id || null,
+      output: {
+        candidates: [{
+          content: { parts: [{ text: directAnswer }] }
+        }]
+      }
+    });
+  };
+
+  const tryDirectAnswer = async (docs, label = 'direct-data') => {
+    if (!docs || docs.length === 0) return null;
+    const directMatch = getBestDirectMatch(message, docs);
+    if (directMatch && directMatch.item && directMatch.score >= DIRECT_ANSWER_THRESHOLD) {
+      console.log(`🎯 Direct data hit (${label}) score ${(directMatch.score * 100).toFixed(1)}% -> ${directMatch.item.text || directMatch.item.question}`);
+      return respondWithDirectDoc(directMatch.item, directMatch.score, label);
+    }
+    return null;
+  };
   
   // ============================================
   // SMART CONTEXT: Menggunakan Semantic Search (RAG)
@@ -757,29 +785,18 @@ app.post('/chat', async (req, res) => {
 
   let directDocs = relevantData;
   if (directDocs.length < 5) {
-    const keywordBoost = findRelevantData(message, trainingData, 8);
+    const keywordBoost = findRelevantData(message, trainingData, 12);
     directDocs = mergeDocLists(directDocs, keywordBoost);
   }
 
-  const directMatch = getBestDirectMatch(message, directDocs);
-  if (directMatch && directMatch.item && directMatch.score >= DIRECT_ANSWER_THRESHOLD) {
-    const directAnswer = directMatch.item.answer || directMatch.item.response;
-    if (directAnswer) {
-      console.log(`🎯 Direct data hit (score: ${(directMatch.score * 100).toFixed(1)}%) -> ${directMatch.item.text || directMatch.item.question}`);
-      return replyAndCache({
-        ok: true,
-        model: 'direct-data',
-        ragSource,
-        directMatchScore: directMatch.score,
-        output: {
-          candidates: [{
-            content: {
-              parts: [{ text: directAnswer }]
-            }
-          }]
-        }
-      });
-    }
+  let directResponse = await tryDirectAnswer(directDocs, 'direct-data-initial');
+  if (directResponse) return directResponse;
+
+  if (process.env.DIRECT_SEARCH_EXPANDED !== 'off') {
+    const expandedDocs = findRelevantData(message, trainingData, 50);
+    const mergedExpanded = mergeDocLists(directDocs, expandedDocs);
+    directResponse = await tryDirectAnswer(mergedExpanded, 'direct-data-expanded');
+    if (directResponse) return directResponse;
   }
   
   // Build grounding context
