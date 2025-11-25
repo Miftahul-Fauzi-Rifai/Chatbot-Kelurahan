@@ -1,51 +1,918 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="id">
 <head>
-  <meta charset="utf-8">
-  <title>Chatbot Kelurahan (Gemini)</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chatbot Kelurahan Marga Sari</title>
   <style>
-    body{font-family:system-ui,Arial;margin:0 auto;padding:20px;max-width:900px}
-    #chat{border:1px solid #ddd;padding:10px;height:400px;overflow:auto;background:#fafafa; border-radius: 8px;}
-    .msg{margin:8px 0; padding: 8px 12px; border-radius: 8px;}
-    .msg .meta{font-size:12px;color:#666; font-weight: 600;}
-    /* [PENYEMPURNAAN] Style berbeda untuk User dan Bot */
-    .msg div:first-child + div { margin-top: 4px; }
-    .msg:has(.meta:contains(Anda)) { background-color: #e1f5fe; }
-    .msg:has(.meta:contains(Bot)) { background-color: #f1f1f1; }
-    .msg:has(i) { color: #555; } /* Style untuk 'sedang berpikir' */
-    #f { display: flex; margin-top: 10px; }
-    #m { flex-grow: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
-    #f button { padding: 8px 12px; margin-left: 8px; border: none; background-color: #007bff; color: white; border-radius: 4px; cursor: pointer; }
-    #f button:hover { background-color: #0056b3; }
-    .controls { margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; }
-    /* [PENYEMPURNAAN] Tombol Clear */
-    #clear { padding: 6px 10px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer; }
-    #clear:hover { background: #d32f2f; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top, #8b5cf6 0, #4338ca 30%, #1f2937 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      color: #111827;
+    }
+
+    .chat-shell {
+      width: 100%;
+      max-width: 960px;
+      height: 100%;
+      max-height: 100vh;
+      border-radius: 24px;
+      background: white;
+      box-shadow:
+        0 22px 45px rgba(15, 23, 42, 0.45),
+        0 0 0 1px rgba(255, 255, 255, 0.16);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .chat-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: #f3f4f6;
+      overflow: hidden; /* tambahkan ini */
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto !important; /* wajib */
+      padding: 16px 20px 12px;
+      scroll-behavior: smooth;
+    }
+
+
+    .chat-header {
+      padding: 16px 20px 14px;
+      background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+      color: white;
+      text-align: center;
+      position: relative;
+    }
+
+    .chat-header-title {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .chat-header-sub {
+      font-size: 12px;
+      opacity: 0.9;
+    }
+
+    .chat-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: #f3f4f6;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 20px 12px;
+      scroll-behavior: smooth;
+    }
+
+    .welcome {
+      margin-top: 80px;
+      text-align: center;
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    .welcome h2 {
+      font-size: 18px;
+      margin-bottom: 4px;
+      color: #4f46e5;
+    }
+
+    .message {
+      display: flex;
+      margin-bottom: 10px;
+      animation: fadeUp 0.22s ease-out;
+    }
+
+    .message.user { justify-content: flex-end; }
+    .message.bot { justify-content: flex-start; }
+
+    .message-content {
+      max-width: min(70%, 520px);
+      padding: 10px 12px;
+      border-radius: 18px;
+      font-size: 14px;
+      line-height: 1.45;
+      position: relative;
+      word-wrap: break-word;
+      background: white;
+      color: #1f2933;
+      box-shadow: 0 2px 5px rgba(15, 23, 42, 0.08);
+    }
+
+    .message.user .message-content {
+      background: #4f46e5;
+      color: #eef2ff;
+      border-bottom-right-radius: 4px;
+    }
+
+    .message.bot .message-content {
+      border-bottom-left-radius: 4px;
+    }
+
+    .message-time {
+      margin-top: 4px;
+      font-size: 11px;
+      opacity: 0.7;
+      text-align: right;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .typing-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #4f46e5;
+      animation: bounce 1.2s infinite;
+    }
+
+    .dot:nth-child(2) { animation-delay: 0.15s; }
+    .dot:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: translateY(0); opacity: 0.5; }
+      40% { transform: translateY(-6px); opacity: 1; }
+    }
+
+    .chat-footer {
+      padding: 10px 16px 14px;
+      border-top: 1px solid #e5e7eb;
+      background: #f9fafb;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .mode-toggle-row {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .pill-toggle-btn {
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
+      background: white;
+      font-size: 13px;
+      padding: 6px 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #374151;
+      transition: all 0.16s ease;
+    }
+
+    .pill-toggle-btn span {
+      font-size: 16px;
+    }
+
+    .pill-toggle-btn.active {
+      background: #4f46e5;
+      border-color: #4f46e5;
+      color: #eef2ff;
+      box-shadow: 0 0 0 1px rgba(129, 140, 248, 0.5);
+    }
+
+    .input-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
+      background: white;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 18px;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .icon-btn:hover {
+      border-color: #9ca3af;
+      background: #f3f4f6;
+    }
+
+    .icon-btn.recording {
+      border-color: #ef4444;
+      background: #fee2e2;
+      color: #b91c1c;
+      animation: pulse 1.2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.7); }
+      50% { box-shadow: 0 0 0 8px rgba(248, 113, 113, 0); }
+    }
+
+    .input-wrapper {
+      flex: 1;
+      background: white;
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
+      display: flex;
+      align-items: center;
+      padding: 0 4px 0 14px;
+      gap: 8px;
+    }
+
+    #messageInput {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 14px;
+      padding: 8px 0;
+      background: transparent;
+    }
+
+    #messageInput::placeholder { color: #9ca3af; }
+
+    #sendBtn {
+      border-radius: 999px;
+      border: none;
+      padding: 7px 14px;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #4f46e5;
+      color: #eef2ff;
+      font-weight: 500;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.15s ease;
+    }
+
+    #sendBtn span {
+      font-size: 15px;
+    }
+
+    #sendBtn:hover:not(:disabled) {
+      background: #4338ca;
+      transform: translateY(-0.5px);
+      box-shadow: 0 4px 10px rgba(79, 70, 229, 0.35);
+    }
+
+    #sendBtn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .error-message {
+      font-size: 12px;
+      color: #b91c1c;
+      background: #fee2e2;
+      border-radius: 10px;
+      padding: 6px 10px;
+      display: none;
+    }
+
+    .error-message.active { display: block; }
+
+    .image-preview-bubble .message-content {
+      padding: 8px;
+      background: #e0ecff;
+      color: #111827;
+      box-shadow: none;
+    }
+
+    .image-preview-inner {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .image-preview-thumb {
+      width: 80px;
+      height: 80px;
+      border-radius: 10px;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: #d1d5db;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .image-preview-thumb img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: cover;
+    }
+
+    .image-preview-meta {
+      flex: 1;
+      font-size: 12px;
+      color: #374151;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .image-preview-buttons {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .btn-chip {
+      border-radius: 999px;
+      padding: 3px 10px;
+      font-size: 11px;
+      border: 1px solid #c4d4ff;
+      background: #e5edff;
+      color: #1d4ed8;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-chip.danger {
+      border-color: #fecaca;
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .btn-chip:hover {
+      filter: brightness(0.96);
+    }
+
+    .image-message .image-wrapper {
+      margin-bottom: 6px;
+      max-width: 220px;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #d1d5db;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .image-message .image-wrapper img {
+      display: block;
+      max-width: 100%;
+      max-height: 240px;
+      object-fit: contain;
+      background: #e5e7eb;
+    }
+
+    .image-caption {
+      font-size: 13px;
+      margin-top: 4px;
+      white-space: pre-wrap;
+    }
+
+    .chat-shell::-webkit-scrollbar,
+    .chat-messages::-webkit-scrollbar {
+      width: 6px;
+    }
+    .chat-messages::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.7);
+      border-radius: 999px;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 0;
+        border-radius: 0;
+      }
+
+      .chat-shell {
+        height: 100%;
+        max-width: 100%;
+        border-radius: 0;
+      }
+
+      .chat-header-title { font-size: 18px; }
+      .chat-header-sub { font-size: 11px; }
+
+      .message-content { max-width: 82%; }
+    }
   </style>
 </head>
 <body>
-  <h2>Chatbot Kelurahan (Gemini)</h2>
-  <div id="chat">
-    <div class="msg" style="background-color: #f1f1f1;">
-      <div class="meta">Bot</div>
-      <div>Halo! Silakan ajukan pertanyaan Anda.</div>
-    </div>
-  </div>
-  <form id="f">
-    <input id="m" placeholder="Tulis pertanyaan..." style="width:70%"/>
-    <button type="submit">Send</button>
-  </form>
-  
-  <button id="clear" style="margin-top: 10px;">Bersihkan Chat</button>
+  <div class="chat-shell">
+    <header class="chat-header">
+      <div class="chat-header-title">🏛️ Chatbot Kelurahan</div>
+      <div class="chat-header-sub">Asisten Virtual Kelurahan Marga Sari, Balikpapan</div>
+    </header>
 
-  <div class="controls">
-    <h3>Upload data training (JSON)</h3>
-    <input type="file" id="file"/>
-    <button id="up">Upload</button>
-    <p>Format contoh di <code>/data/train.json</code>. Data dengan ID yang sama akan dilewati.</p>
+    <main class="chat-main">
+      <section id="chatMessages" class="chat-messages">
+        <div class="welcome">
+          <h2>Selamat Datang! 👋</h2>
+          <p>Tanyakan tentang pelayanan administrasi kelurahan</p>
+        </div>
+      </section>
+
+      <footer class="chat-footer">
+        <div id="errorMessage" class="error-message"></div>
+
+        <div class="mode-toggle-row">
+          <button id="textModeBtn" class="pill-toggle-btn active">
+            <span>⌨️</span> Mode Teks
+          </button>
+          <button id="voiceModeBtn" class="pill-toggle-btn">
+            <span>🎤</span> Mode Suara
+          </button>
+        </div>
+
+        <div class="input-row">
+          <button id="imageBtn" class="icon-btn" title="Upload Foto">📷</button>
+          <input type="file" id="imageInput" accept="image/*" style="display:none" />
+          <div class="input-wrapper">
+            <input
+              id="messageInput"
+              type="text"
+              placeholder="Tulis pesan..."
+              autocomplete="off"
+            />
+            <button id="voiceBtn" class="icon-btn" style="display:none" title="Rekam suara">🎤</button>
+            <button id="sendBtn" type="button">
+              <span>➤</span> Kirim
+            </button>
+          </div>
+        </div>
+      </footer>
+    </main>
   </div>
-  
-  <script src="app.js"></script>
+
+  <script>
+    (function () {
+      const chatMessages = document.getElementById('chatMessages');
+      const messageInput = document.getElementById('messageInput');
+      const sendBtn = document.getElementById('sendBtn');
+      const voiceBtn = document.getElementById('voiceBtn');
+      const textModeBtn = document.getElementById('textModeBtn');
+      const voiceModeBtn = document.getElementById('voiceModeBtn');
+      const errorMessage = document.getElementById('errorMessage');
+      const imageBtn = document.getElementById('imageBtn');
+      const imageInput = document.getElementById('imageInput');
+
+      const API_URL = window.location.origin + '/chat';
+      const API_IMAGE_URL = window.location.origin + '/chat-image';
+
+      let conversationHistory = [];
+      let currentMode = 'text';
+      let recognition = null;
+      let isRecording = false;
+
+      let pendingImageFile = null;
+      let pendingImageUrl = null;
+      let pendingPreviewBubble = null;
+
+      function timeNow() {
+        const d = new Date();
+        const h = String(d.getHours()).padStart(2, '0');
+        const m = String(d.getMinutes()).padStart(2, '0');
+        return h + ':' + m;
+      }
+
+      function escapeHtml(str) {
+        return str
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      function scrollToBottom() {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+
+      function hideError() {
+        errorMessage.classList.remove('active');
+        errorMessage.textContent = '';
+      }
+
+      function showError(msg) {
+        errorMessage.textContent = '❌ ' + msg;
+        errorMessage.classList.add('active');
+      }
+
+      function addTextMessage(text, sender) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'message ' + sender;
+
+        const content = document.createElement('div');
+        content.className = 'message-content';
+
+        const bodyHtml = escapeHtml(text).replace(/\n/g, '<br>');
+        content.innerHTML =
+          bodyHtml + '<div class="message-time">' + timeNow() + '</div>';
+
+        wrapper.appendChild(content);
+        chatMessages.appendChild(wrapper);
+        scrollToBottom();
+        return wrapper;
+      }
+
+      function addImageMessage(imageUrl, caption, sender) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'message ' + sender;
+
+        const content = document.createElement('div');
+        content.className = 'message-content image-message';
+
+        const imgPart =
+          '<div class="image-wrapper"><img src="' +
+          imageUrl +
+          '" alt="Gambar dikirim" /></div>';
+
+        const captionPart = caption
+          ? '<div class="image-caption">' +
+            escapeHtml(caption).replace(/\n/g, '<br>') +
+            '</div>'
+          : '';
+
+        content.innerHTML =
+          imgPart +
+          captionPart +
+          '<div class="message-time">' +
+          timeNow() +
+          '</div>';
+
+        wrapper.appendChild(content);
+        chatMessages.appendChild(wrapper);
+        scrollToBottom();
+        return wrapper;
+      }
+
+      function addTypingIndicator() {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'message bot';
+
+        const content = document.createElement('div');
+        content.className = 'message-content';
+
+        content.innerHTML =
+          '<div class="typing-indicator">' +
+          '<div class="dot"></div><div class="dot"></div><div class="dot"></div>' +
+          '</div>';
+
+        wrapper.appendChild(content);
+        chatMessages.appendChild(wrapper);
+        scrollToBottom();
+        return wrapper;
+      }
+
+      // ------ MODE TEKS / SUARA ------
+      function switchMode(mode) {
+        currentMode = mode;
+        if (mode === 'voice') {
+          textModeBtn.classList.remove('active');
+          voiceModeBtn.classList.add('active');
+          voiceBtn.style.display = 'inline-flex';
+          messageInput.placeholder = 'Klik mikrofon atau ketik pesan...';
+          if (!recognition) {
+            showError(
+              'Browser Anda tidak mendukung pengenalan suara. Gunakan Chrome / Edge.'
+            );
+          }
+        } else {
+          voiceModeBtn.classList.remove('active');
+          textModeBtn.classList.add('active');
+          voiceBtn.style.display = 'none';
+          messageInput.placeholder = 'Tulis pesan...';
+        }
+      }
+
+      textModeBtn.addEventListener('click', function () {
+        switchMode('text');
+      });
+
+      voiceModeBtn.addEventListener('click', function () {
+        switchMode('voice');
+      });
+
+      // ------ SPEECH RECOGNITION ------
+      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition =
+          window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.lang = 'id-ID';
+        recognition.continuous = false;
+        recognition.interimResults = false;
+
+        recognition.onresult = function (event) {
+          const transcript = event.results[0][0].transcript;
+          messageInput.value = transcript;
+          isRecording = false;
+          voiceBtn.classList.remove('recording');
+          if (currentMode === 'voice') {
+            setTimeout(sendMessage, 400);
+          }
+        };
+
+        recognition.onerror = function () {
+          isRecording = false;
+          voiceBtn.classList.remove('recording');
+          showError('Gagal mengenali suara. Coba lagi.');
+        };
+
+        recognition.onend = function () {
+          isRecording = false;
+          voiceBtn.classList.remove('recording');
+        };
+      }
+
+      voiceBtn.addEventListener('click', function () {
+        if (!recognition) {
+          showError('Pengenalan suara tidak tersedia di browser ini.');
+          return;
+        }
+        hideError();
+        if (isRecording) {
+          recognition.stop();
+        } else {
+          recognition.start();
+          isRecording = true;
+          voiceBtn.classList.add('recording');
+        }
+      });
+
+      // ------ IMAGE PREVIEW (CHATGPT-STYLE) ------
+      function clearPendingImage() {
+        if (pendingPreviewBubble) {
+          pendingPreviewBubble.remove();
+          pendingPreviewBubble = null;
+        }
+        if (pendingImageUrl) {
+          URL.revokeObjectURL(pendingImageUrl);
+          pendingImageUrl = null;
+        }
+        pendingImageFile = null;
+      }
+
+      imageBtn.addEventListener('click', function () {
+        imageInput.click();
+      });
+
+      imageInput.addEventListener('change', function () {
+        const file = imageInput.files[0];
+        if (!file) return;
+
+        hideError();
+        const welcome = chatMessages.querySelector('.welcome');
+        if (welcome) welcome.remove();
+
+        clearPendingImage();
+        pendingImageFile = file;
+        pendingImageUrl = URL.createObjectURL(file);
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'message user image-preview-bubble';
+
+        const content = document.createElement('div');
+        content.className = 'message-content';
+
+        content.innerHTML =
+          '<div class="image-preview-inner">' +
+          '<div class="image-preview-thumb">' +
+          '<img src="' +
+          pendingImageUrl +
+          '" alt="Preview gambar" />' +
+          '</div>' +
+          '<div class="image-preview-meta">' +
+          '<div><strong>Foto dipilih</strong></div>' +
+          '<div>Tambahkan deskripsi di kolom pesan, lalu tekan Kirim.</div>' +
+          '<div class="image-preview-buttons">' +
+          '<button type="button" class="btn-chip danger" data-action="delete">Hapus</button>' +
+          '<button type="button" class="btn-chip" data-action="change">Ganti Foto</button>' +
+          '</div>' +
+          '</div>' +
+          '</div>';
+
+        wrapper.appendChild(content);
+        chatMessages.appendChild(wrapper);
+        scrollToBottom();
+
+        pendingPreviewBubble = wrapper;
+
+        const delBtn = content.querySelector('[data-action="delete"]');
+        const changeBtn = content.querySelector('[data-action="change"]');
+
+        delBtn.addEventListener('click', function () {
+          clearPendingImage();
+          imageInput.value = '';
+        });
+
+        changeBtn.addEventListener('click', function () {
+          imageInput.click();
+        });
+      });
+
+      async function kirimGambar(file, description) {
+        hideError();
+        const typing = addTypingIndicator();
+
+        try {
+          const formData = new FormData();
+          formData.append('image', file);
+          if (description) formData.append('text', description);
+
+          const resp = await fetch(API_IMAGE_URL, {
+            method: 'POST',
+            body: formData
+          });
+
+          if (!resp.ok) throw new Error('Gagal menghubungi server.');
+
+          const data = await resp.json();
+          typing.remove();
+
+          if (!data.ok) {
+            addTextMessage(
+              'Maaf, gambar tidak bisa diproses: ' + (data.error || ''),
+              'bot'
+            );
+            return;
+          }
+
+          if (data.detected_title) {
+            addTextMessage(
+              '📄 Surat terdeteksi:\n' + data.detected_title,
+              'bot'
+            );
+          }
+
+          if (data.answer) {
+            addTextMessage(data.answer, 'bot');
+            if (currentMode === 'voice') {
+              speakText(data.answer);
+            }
+          } else if (data.result) {
+            addTextMessage(data.result, 'bot');
+          } else {
+            addTextMessage(
+              'Maaf, saya tidak menemukan data untuk surat tersebut.',
+              'bot'
+            );
+          }
+        } catch (err) {
+          console.error(err);
+          typing.remove();
+          showError(err.message || 'Terjadi kesalahan saat mengirim gambar.');
+        }
+      }
+
+      function speakText(text) {
+        if (!('speechSynthesis' in window)) return;
+        window.speechSynthesis.cancel();
+        const utt = new SpeechSynthesisUtterance(text);
+        utt.lang = 'id-ID';
+        utt.rate = 1.0;
+        utt.pitch = 1.0;
+        window.speechSynthesis.speak(utt);
+      }
+
+      // ------ SEND MESSAGE ------
+      async function sendMessage() {
+        const message = messageInput.value.trim();
+
+        // CASE 1: Ada gambar pending (ChatGPT style: gambar + deskripsi)
+        if (pendingImageFile) {
+          const caption = message;
+          // ubah preview jadi bubble final kecil + caption
+          if (pendingPreviewBubble) {
+            pendingPreviewBubble.remove();
+            pendingPreviewBubble = null;
+          }
+          addImageMessage(pendingImageUrl, caption, 'user');
+
+          const fileToSend = pendingImageFile;
+          const descToSend = caption;
+
+          // reset state UI
+          clearPendingImage();
+          imageInput.value = '';
+          messageInput.value = '';
+
+          sendBtn.disabled = true;
+          messageInput.disabled = true;
+
+          await kirimGambar(fileToSend, descToSend);
+
+          sendBtn.disabled = false;
+          messageInput.disabled = false;
+          messageInput.focus();
+          return;
+        }
+
+        // CASE 2: Teks biasa
+        if (!message) return;
+
+        hideError();
+        const welcome = chatMessages.querySelector('.welcome');
+        if (welcome) welcome.remove();
+
+        addTextMessage(message, 'user');
+        messageInput.value = '';
+        sendBtn.disabled = true;
+        messageInput.disabled = true;
+
+        const typing = addTypingIndicator();
+
+        try {
+          const resp = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              message,
+              history: conversationHistory.slice(-10)
+            })
+          });
+
+          if (!resp.ok) throw new Error('Gagal menghubungi server.');
+
+          const data = await resp.json();
+          typing.remove();
+
+          let answer = '';
+          if (data.ok && data.output &&
+              data.output.candidates &&
+              data.output.candidates[0] &&
+              data.output.candidates[0].content &&
+              data.output.candidates[0].content.parts &&
+              data.output.candidates[0].content.parts[0] &&
+              data.output.candidates[0].content.parts[0].text) {
+            answer = data.output.candidates[0].content.parts[0].text;
+          } else {
+            answer =
+              'Maaf, saya tidak bisa memproses pertanyaan Anda saat ini.';
+          }
+
+          conversationHistory.push({ role: 'user', parts: [{ text: message }] });
+          conversationHistory.push({ role: 'model', parts: [{ text: answer }] });
+          if (conversationHistory.length > 10) {
+            conversationHistory = conversationHistory.slice(-10);
+          }
+
+          addTextMessage(answer, 'bot');
+          if (currentMode === 'voice') {
+            speakText(answer);
+          }
+        } catch (err) {
+          console.error(err);
+          typing.remove();
+          showError(err.message || 'Terjadi kesalahan. Silakan coba lagi.');
+        } finally {
+          sendBtn.disabled = false;
+          messageInput.disabled = false;
+          messageInput.focus();
+        }
+      }
+
+      sendBtn.addEventListener('click', sendMessage);
+      messageInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          sendMessage();
+        }
+      });
+
+      // default: mode teks
+      switchMode('text');
+    })();
+  </script>
 </body>
 </html>
