@@ -126,20 +126,13 @@ const rateLimit = {
   }
 };
 
-// ======== [MODIFIED] DATA LOADING (FIX FOR VERCEL PATHS) =========
-// Menggunakan process.cwd() agar path absolut terdeteksi benar di lingkungan serverless Vercel
-const TRAIN_FILE = path.join(process.cwd(), 'data', 'train.json');
+// ======== DATA LOADING (BACKUP KEYWORD SEARCH) =========
+const TRAIN_FILE = process.env.TRAIN_DATA_FILE || './data/train.json';
 
 function readTrainData() {
   try {
     if (!fs.existsSync(TRAIN_FILE)) {
-      console.warn(`⚠️ Warning: ${TRAIN_FILE} not found. Checking fallback...`);
-      // Fallback: Cek di root directory (kadang Vercel memindahkan file saat build)
-      const fallbackPath = path.join(process.cwd(), 'train.json');
-      if (fs.existsSync(fallbackPath)) {
-        console.log(`✅ Loaded data from fallback path: ${fallbackPath}`);
-        return JSON.parse(fs.readFileSync(fallbackPath, 'utf8'));
-      }
+      console.warn(`⚠️ Warning: ${TRAIN_FILE} not found, using empty array`);
       return [];
     }
     const data = JSON.parse(fs.readFileSync(TRAIN_FILE, 'utf8'));
@@ -159,7 +152,7 @@ const STOP_WORDS = new Set([
   'bisakah','bisa','saya','saya','untuk','yang','dan','atau','dengan','minta','ingin',
   'butuh','halo','hai','hello','mohon','please','tolonglah','ap','ayo','dong','nih',
   'nih','kami','kita','anda','kamu','sih','kah','ya','deh','dong','serta','agar','supaya','dapat','para',
-  'cara','secara','di'
+  'cara'
 ]);
 
 function tokenizeText(text = '') {
@@ -200,17 +193,10 @@ function getBestDirectMatch(message, docs = []) {
   return best;
 }
 
-// ======== [MODIFIED] FUNGSI PENCARIAN KEYWORD (DENGAN ONLINE BOOSTING) =========
+// ======== FUNGSI PENCARIAN KEYWORD (OLD METHOD - FALLBACK) =========
 function findRelevantData(message, allData, maxResults = 3) {
   const lowerMessage = message.toLowerCase();
   const queryWords = lowerMessage.split(/\s+/);
-  
-  // [NEW] Deteksi intent khusus "Online"
-  const isOnlineQuery = lowerMessage.includes('online') || 
-                        lowerMessage.includes('web') || 
-                        lowerMessage.includes('website') ||
-                        lowerMessage.includes('aplikasi') ||
-                        lowerMessage.includes('internet');
   
   // Detect question patterns
   const isDefinitionQuestion = /^(apa|apakah)\s+(itu|kepanjangan|arti)\s+/i.test(message);
@@ -219,17 +205,16 @@ function findRelevantData(message, allData, maxResults = 3) {
     let score = 0;
     const text = (item.text || item.question || '').toLowerCase();
     const answer = (item.answer || item.response || '').toLowerCase();
-    const tags = (item.tags || []).map(t => t.toLowerCase()); // Normalize tags
+    const tags = (item.tags || []).join(' ').toLowerCase();
     const kategori = (item.kategori_utama || '').toLowerCase();
-    const tagsString = tags.join(' ');
-
+    
     // Special handling for definition questions
     if (isDefinitionQuestion) {
       const termMatch = message.match(/(?:apa|apakah)\s+(?:itu|kepanjangan|arti)\s+(.+?)(?:\?|$)/i);
       if (termMatch) {
         const term = termMatch[1].toLowerCase().trim();
         if (text.includes(term)) score += 10;
-        if (kategori.includes('istilah') && (text.includes(term) || tagsString.includes(term))) {
+        if (kategori.includes('istilah') && (text.includes(term) || tags.includes(term))) {
           score += 15;
         }
       }
@@ -239,18 +224,9 @@ function findRelevantData(message, allData, maxResults = 3) {
     queryWords.forEach(word => {
       if (word.length < 3) return;
       if (text.includes(word)) score += 2;
-      if (tagsString.includes(word)) score += 2;
+      if (tags.includes(word)) score += 2;
       if (answer.includes(word)) score += 1;
     });
-
-    // [NEW] Logic Boosting untuk "Online"
-    // Jika user tanya online DAN data ini mengandung kata 'online' di text/tag, beri skor TINGGI.
-    // Ini memastikan ID 78 (Domisili Online) menang lawan ID 13 (Domisili biasa).
-    if (isOnlineQuery) {
-       if (text.includes('online') || tags.includes('online') || tags.includes('layanan online')) {
-         score += 50; // Boost sangat besar
-       }
-    }
     
     return { item, score };
   });
@@ -262,22 +238,7 @@ function findRelevantData(message, allData, maxResults = 3) {
     .map(s => s.item);
 }
 
-function mergeDocLists(primary = [], secondary = []) {
-  const seen = new Set();
-  const result = [];
-  const pushDoc = (doc) => {
-    if (!doc) return;
-    const key = doc.id || doc.text || doc.question || JSON.stringify(doc).slice(0, 50);
-    if (seen.has(key)) return;
-    seen.add(key);
-    result.push(doc);
-  };
-  primary.forEach(pushDoc);
-  secondary.forEach(pushDoc);
-  return result;
-}
-
-const DIRECT_ANSWER_THRESHOLD = parseFloat(process.env.DIRECT_ANSWER_THRESHOLD || '0.35');
+const DIRECT_ANSWER_THRESHOLD = parseFloat(process.env.DIRECT_ANSWER_THRESHOLD || '0.55');
 
 // ======== RETRY LOGIC =========
 async function generateWithRetry(url, payload, modelName, maxRetries = 2) {
@@ -364,7 +325,7 @@ app.get('/', (req, res) => {
   });
 });
 
-// UI Chat Interface (KODE UI TIDAK DIUBAH SAMA SEKALI)
+// UI Chat Interface
 app.get('/ui', (req, res) => {
   res.send(`<!DOCTYPE html>
 <html lang="id">
@@ -736,11 +697,10 @@ app.post('/chat', async (req, res) => {
   const cacheKey = makeCacheKey(message);
   const cached = await getCache(cacheKey);
   
-  const respondFromCache = () => {
-    if (!cached) return null;
-    console.log('♻️ Returning cached response (no API call)');
+  if (cached) {
+    console.log('✅ Returning cached response (no API call)');
     return res.json({ ...cached, cached: true });
-  };
+  }
   
   // Helper untuk save to cache dan return response
   const replyAndCache = async (payload) => {
@@ -750,34 +710,6 @@ app.post('/chat', async (req, res) => {
       console.warn('⚠️  Cache set failed:', err?.message);
     }
     return res.json(payload);
-  };
-
-  const respondWithDirectDoc = async (doc, score, label = 'direct-data') => {
-    if (!doc) return null;
-    const directAnswer = doc.answer || doc.response;
-    if (!directAnswer) return null;
-    return replyAndCache({
-      ok: true,
-      model: label,
-      ragSource,
-      directMatchScore: score,
-      directMatchId: doc.id || null,
-      output: {
-        candidates: [{
-          content: { parts: [{ text: directAnswer }] }
-        }]
-      }
-    });
-  };
-
-  const tryDirectAnswer = async (docs, label = 'direct-data') => {
-    if (!docs || docs.length === 0) return null;
-    const directMatch = getBestDirectMatch(message, docs);
-    if (directMatch && directMatch.item && directMatch.score >= DIRECT_ANSWER_THRESHOLD) {
-      console.log(`🎯 Direct data hit (${label}) score ${(directMatch.score * 100).toFixed(1)}% -> ${directMatch.item.text || directMatch.item.question}`);
-      return respondWithDirectDoc(directMatch.item, directMatch.score, label);
-    }
-    return null;
   };
   
   // ============================================
@@ -808,52 +740,97 @@ app.post('/chat', async (req, res) => {
     ragSource = 'fallback-keyword';
   }
 
-  // [MODIFIED] BOOSTING: Selalu gabungkan dengan hasil Keyword Search yang sudah di-boost "Online"-nya
-  const keywordBoosted = findRelevantData(message, trainingData, 5); // Ambil top 5 keyword
-  const directDocs = mergeDocLists(relevantData, keywordBoosted); // Gabungkan semantic + keyword
-
-  let directResponse = await tryDirectAnswer(directDocs, 'direct-data-initial');
-  if (directResponse) return directResponse;
-
-  if (process.env.DIRECT_SEARCH_EXPANDED !== 'off') {
-    const expandedDocs = findRelevantData(message, trainingData, 50);
-    const mergedExpanded = mergeDocLists(directDocs, expandedDocs);
-    directResponse = await tryDirectAnswer(mergedExpanded, 'direct-data-expanded');
-    if (directResponse) return directResponse;
+  const directMatch = getBestDirectMatch(message, relevantData);
+  if (directMatch && directMatch.item && directMatch.score >= DIRECT_ANSWER_THRESHOLD) {
+    const directAnswer = directMatch.item.answer || directMatch.item.response;
+    if (directAnswer) {
+      console.log(`🎯 Direct data hit (score: ${(directMatch.score * 100).toFixed(1)}%) -> ${directMatch.item.text || directMatch.item.question}`);
+      return replyAndCache({
+        ok: true,
+        model: 'direct-data',
+        ragSource,
+        directMatchScore: directMatch.score,
+        output: {
+          candidates: [{
+            content: {
+              parts: [{ text: directAnswer }]
+            }
+          }]
+        }
+      });
+    }
   }
-
-  const fullDirectResponse = await tryDirectAnswer(trainingData, 'direct-data-full');
-  if (fullDirectResponse) return fullDirectResponse;
-
-  const cachedHandled = respondFromCache();
-  if (cachedHandled) return cachedHandled;
   
   // Build grounding context
-  // [MODIFIED] Menambahkan format ID agar lebih jelas debug-nya
-  const grounding = directDocs.length > 0
-    ? "Data referensi (Gunakan ini sebagai sumber kebenaran MUTLAK):\n" + 
-      directDocs.map(d => 
-        `[ID: ${d.id} | Kategori: ${d.kategori_utama || d.kategori}]\nTanya: ${d.text || d.question}\nJawab: ${d.answer || d.response}`
+  const grounding = relevantData.length > 0
+    ? "Data referensi (Gunakan ini sebagai sumber kebenaran):\n" + 
+      relevantData.map(d => 
+        `[Kategori: ${d.kategori_utama || d.kategori}]\nTanya: ${d.text || d.question}\nJawab: ${d.answer || d.response}`
       ).join('\n---\n')
     : "";
 
-  // [MODIFIED] SYSTEM INSTRUCTION (STRICT RULES FOR ONLINE/OFFLINE)
+  // System instruction (FINAL VERSION - Bahasa Indonesia WAJIB)
   const systemInstruction = `Anda adalah Asisten Virtual Kelurahan Marga Sari, Balikpapan.
 
-ATURAN UTAMA (WAJIB DIPATUHI):
-1. Jawab pertanyaan HANYA berdasarkan "DATA REFERENSI" di bawah.
-2. JANGAN GUNAKAN pengetahuan umum Anda jika bertentangan dengan Data Referensi.
-   - Contoh: Jika data referensi bilang "Bisa Online", MAKA JAWAB "BISA ONLINE" (meskipun biasanya layanan kelurahan itu manual).
-3. Jika Data Referensi menyebutkan layanan ONLINE tersedia, Anda WAJIB merekomendasikan opsi online tersebut sebagai yang utama.
-4. Gaya bahasa: Formal, sopan, membantu, dan menggunakan Bahasa Indonesia yang baik.
+CAKUPAN LAYANAN YANG BISA DIJAWAB:
+✅ Kependudukan: KTP, e-KTP, KK, KIA, Akta Kelahiran, Akta Kematian, pindah domisili, SKPWNI
+✅ Surat Kelurahan: Surat Domisili, Surat Keterangan Usaha, Surat Belum Menikah, Surat Penghasilan Tidak Tetap, Surat Janda/Duda
+✅ Perizinan: SIM, SKCK, Paspor, IMB/PBG (SIMBG), NIB (OSS), Sertifikat Tanah (BPN)
+✅ Pajak & Kendaraan: NPWP, PBB, Pajak Kendaraan (STNK/BPKB), Samsat, Balik Nama Kendaraan
+✅ Layanan Publik: BPJS Kesehatan, KIS, Kartu Kuning (AK1), PDAM, PLN
+✅ Administrasi Nikah: Persyaratan nikah di KUA, Surat Pengantar Nikah (N1, N2, N4)
+✅ Pengaduan: LAPOR!, Call Center 112, Layanan Pengaduan Online
+✅ Informasi Instansi: Lokasi, alamat, jam kerja, kontak Disdukcapil, Polres, Samsat, BPPDRD, dll
 
-DATA REFERENSI (SUMBER KEBENARAN):
-==================================
-${grounding}
-==================================
+PENANGANAN BAHASA (ATURAN KETAT):
+1. Bahasa Respon Utama: Bahasa Indonesia. Semua jawaban Anda WAJIB ditulis dalam Bahasa Indonesia yang formal, sopan, dan profesional.
+2. Aturan Input: Anda dapat memahami pertanyaan yang diajukan dalam bahasa lain (termasuk Bahasa Jawa).
+3. Aturan Eksekusi Jawaban:
+   - JIKA user bertanya dalam bahasa lain (misal: "Pripun damel KTP?"), Anda TETAP HARUS menjawab dalam Bahasa Indonesia (misal: "Untuk membuat KTP, syaratnya adalah...").
+   - JANGAN PERNAH membalas menggunakan bahasa yang sama dengan input user jika itu bukan Bahasa Indonesia.
 
-Jawablah pertanyaan user berikut berdasarkan data di atas:
-"${message}"`;
+BATASAN KETAT:
+❌ TOLAK pertanyaan di luar topik: resep masakan, tips kecantikan, teknologi gadget, hiburan, olahraga, kesehatan medis, investasi, cryptocurrency, dll
+❌ Format penolakan: "Maaf, sebagai Asisten Virtual Kelurahan Marga Sari, saya hanya dapat membantu informasi terkait layanan kelurahan dan administrasi kependudukan di Balikpapan. Apakah ada yang bisa saya bantu terkait layanan kelurahan?"
+
+PENANGANAN PERTANYAAN TIDAK LENGKAP:
+📋 JIKA user bertanya tidak lengkap (misal: "cara membuat?" tanpa menyebut apa):
+   → GUNAKAN CONTEXT dari chat history untuk melanjutkan percakapan
+   → JIKA tidak ada context → TANYAKAN BALIK: "Untuk membantu Anda, boleh saya tahu dokumen apa yang ingin Anda buat? Misalnya: KTP, KK, Surat Keterangan, NPWP, atau yang lainnya?"
+
+CARA MENJAWAB (PENTING - IKUTI FORMAT INI):
+1. Identifikasi topik dari pertanyaan (misal: NPWP, SKCK, KTP, dll)
+2. Cek data referensi di bawah - GUNAKAN data tersebut sebagai sumber utama jawaban
+3. Struktur jawaban:
+   - Pembukaan singkat (1 kalimat)
+   - Lokasi/Instansi yang menangani (jika relevan)
+   - Persyaratan (numbered list jika ada syarat)
+   - Prosedur/Cara pengajuan (numbered list untuk langkah-langkah)
+   - Informasi tambahan (jika perlu)
+   - Penutup singkat dengan emoji (opsional)
+
+GAYA BAHASA:
+• Formal, sopan, profesional
+• Padat, jelas, to the point
+• Maksimal 3-4 paragraf pendek
+• Gunakan numbered list (1. 2. 3.) untuk syarat/langkah
+• Gunakan bullet points (•) untuk pilihan
+• Maksimal 1 emoji di akhir (👍 atau 📄)
+
+CONTOH JAWABAN YANG BAIK:
+"Sebagai Asisten Virtual Kelurahan Marga Sari, saya akan bantu berikan panduan umum mengenai proses pembuatan SKCK ini, ya.
+
+Proses pembuatan SKCK dilakukan di Polres Balikpapan (bukan di kelurahan).
+
+Syarat-syarat yang umumnya dibutuhkan meliputi:
+1. Kartu Tanda Penduduk (KTP)
+2. Kartu Keluarga (KK)
+3. Pasfoto
+4. Sidik Jari
+
+Untuk memastikan semua persyaratan dan prosedur terbaru, terutama jika Anda ingin mendaftar secara online, disarankan untuk menghubungi langsung Polres Balikpapan atau mengunjungi situs resmi mereka. Terima kasih. 👍"
+
+${grounding ? '\n📚 DATA REFERENSI (WAJIB DIGUNAKAN JIKA RELEVAN):\n' + grounding + '\n\nJawab berdasarkan data referensi di atas. Jangan membuat informasi sendiri.' : ''}`;
 
   // Load API Key
   const apiKey = process.env.GEMINI_API_KEY;
@@ -891,13 +868,18 @@ Jawablah pertanyaan user berikut berdasarkan data di atas:
           parts: [{ text: systemInstruction }]
         });
         
+        contents.push({
+          role: "model",
+          parts: [{ text: "Understood. Saya siap membantu sebagai Asisten Virtual Kelurahan Marga Sari." }]
+        });
+        
         // Add history if exists
         if (history && Array.isArray(history) && history.length > 0) {
           const recentHistory = history.slice(-5);
           contents.push(...recentHistory);
         }
         
-        // Add current message (meskipun sudah ada di prompt, ditambahkan lagi untuk konteks chat)
+        // Add current message
         contents.push({
           role: "user",
           parts: [{ text: message }]
@@ -907,7 +889,7 @@ Jawablah pertanyaan user berikut berdasarkan data di atas:
           contents: contents,
           generationConfig: {
             maxOutputTokens: 500,
-            temperature: 0.3, // [MODIFIED] Lower temperature for more factual responses
+            temperature: 0.7,
             topP: 0.95,
             topK: 40
           }
