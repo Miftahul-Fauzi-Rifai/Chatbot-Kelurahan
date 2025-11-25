@@ -126,7 +126,7 @@ const rateLimit = {
   }
 };
 
-// ======== [MODIFIED] DATA LOADING (FIX FOR VERCEL PATHS) =========
+// ======== DATA LOADING (FIX FOR VERCEL PATHS) =========
 // Menggunakan process.cwd() agar path absolut terdeteksi benar di lingkungan serverless Vercel
 const TRAIN_FILE = path.join(process.cwd(), 'data', 'train.json');
 
@@ -200,12 +200,12 @@ function getBestDirectMatch(message, docs = []) {
   return best;
 }
 
-// ======== [MODIFIED] FUNGSI PENCARIAN KEYWORD (DENGAN ONLINE BOOSTING) =========
+// ======== FUNGSI PENCARIAN KEYWORD (DENGAN ONLINE BOOSTING) =========
 function findRelevantData(message, allData, maxResults = 3) {
   const lowerMessage = message.toLowerCase();
   const queryWords = lowerMessage.split(/\s+/);
   
-  // [NEW] Deteksi intent khusus "Online"
+  // Deteksi intent khusus "Online"
   const isOnlineQuery = lowerMessage.includes('online') || 
                         lowerMessage.includes('web') || 
                         lowerMessage.includes('website') ||
@@ -243,9 +243,7 @@ function findRelevantData(message, allData, maxResults = 3) {
       if (answer.includes(word)) score += 1;
     });
 
-    // [NEW] Logic Boosting untuk "Online"
-    // Jika user tanya online DAN data ini mengandung kata 'online' di text/tag, beri skor TINGGI.
-    // Ini memastikan ID 78 (Domisili Online) menang lawan ID 13 (Domisili biasa).
+    // Logic Boosting untuk "Online"
     if (isOnlineQuery) {
        if (text.includes('online') || tags.includes('online') || tags.includes('layanan online')) {
          score += 50; // Boost sangat besar
@@ -707,7 +705,35 @@ app.get('/status', (req, res) => {
   });
 });
 
-// ======== MAIN CHAT ENDPOINT (UPDATED WITH SMART SEARCH) =========
+// ======== HELPER: CONTEXT AWARENESS (BARU) =========
+// Fungsi ini mendeteksi apakah user bertanya "syaratnya apa" tanpa menyebut topik
+function isFollowUpQuestion(message) {
+  const lower = message.toLowerCase();
+  const followUpTriggers = [
+    'syarat', 'caranya', 'biayanya', 'berapa', 'dimana', 
+    'dokumen', 'berkas', 'bikinnya', 'buatnya', 'gimana',
+    'itu', 'saja', 'online', 'offline', 'bisa gak', 'apakah'
+  ];
+  
+  // Jika pesan sangat pendek (kurang dari 5 kata) ATAU mengandung kata pemicu
+  const isShort = message.split(/\s+/).length <= 5;
+  const hasTrigger = followUpTriggers.some(t => lower.includes(t));
+  
+  return isShort || hasTrigger;
+}
+
+function getLastUserTopic(history) {
+  if (!history || !Array.isArray(history) || history.length === 0) return '';
+  // Ambil pesan user terakhir dari history
+  for (let i = history.length - 1; i >= 0; i--) {
+    if (history[i].role === 'user') {
+      return history[i].parts[0].text;
+    }
+  }
+  return '';
+}
+
+// ======== MAIN CHAT ENDPOINT (UPDATED WITH CONTEXT FIX) =========
 app.post('/chat', async (req, res) => {
   const { message, history } = req.body || {};
   
@@ -729,18 +755,38 @@ app.post('/chat', async (req, res) => {
   }
   
   console.log(`🔑 Available API Keys: ${API_KEYS.length}`);
+
+  // ============================================
+  // [FIX] CONTEXTUAL QUERY BUILDER
+  // ============================================
+  // Masalah: User tanya "Syaratnya apa?", mesin bingung syarat apa.
+  // Solusi: Jika pertanyaan ambigu, gabungkan dengan chat terakhir user.
+  
+  let searchQuery = message;
+  let isContextualSearch = false;
+
+  if (history && history.length > 0 && isFollowUpQuestion(message)) {
+    const lastTopic = getLastUserTopic(history);
+    if (lastTopic) {
+      // Gabungkan pesan sekarang dengan topik sebelumnya untuk pencarian data
+      searchQuery = `${lastTopic} ${message}`;
+      console.log(`🔗 Contextual Search Active: "${message}" -> "${searchQuery}"`);
+      isContextualSearch = true;
+    }
+  }
   
   // ============================================
   // LAYER 0: CACHE CHECK (Hemat kuota Gemini!)
   // ============================================
-  const cacheKey = makeCacheKey(message);
+  // Gunakan searchQuery untuk cache key agar "syaratnya apa" untuk KTP beda dengan Domisili
+  const cacheKey = makeCacheKey(searchQuery);
   const cached = await getCache(cacheKey);
   
-  const respondFromCache = () => {
-    if (!cached) return null;
+  // Jika ini context search, jangan terlalu percaya cache lama kecuali spesifik
+  if (cached && !isContextualSearch) {
     console.log('♻️ Returning cached response (no API call)');
     return res.json({ ...cached, cached: true });
-  };
+  }
   
   // Helper untuk save to cache dan return response
   const replyAndCache = async (payload) => {
@@ -772,8 +818,14 @@ app.post('/chat', async (req, res) => {
 
   const tryDirectAnswer = async (docs, label = 'direct-data') => {
     if (!docs || docs.length === 0) return null;
-    const directMatch = getBestDirectMatch(message, docs);
-    if (directMatch && directMatch.item && directMatch.score >= DIRECT_ANSWER_THRESHOLD) {
+    
+    // [FIX] Persulit Direct Answer untuk pertanyaan pendek/kontekstual agar tidak salah tebak
+    // Jika user tanya "syaratnya apa" (Contextual), threshold naik jadi 0.85 (harus sangat mirip)
+    // Jika user tanya "syarat KTP" (Lengkap), threshold tetap 0.35
+    const threshold = isContextualSearch ? 0.85 : DIRECT_ANSWER_THRESHOLD;
+
+    const directMatch = getBestDirectMatch(searchQuery, docs);
+    if (directMatch && directMatch.item && directMatch.score >= threshold) {
       console.log(`🎯 Direct data hit (${label}) score ${(directMatch.score * 100).toFixed(1)}% -> ${directMatch.item.text || directMatch.item.question}`);
       return respondWithDirectDoc(directMatch.item, directMatch.score, label);
     }
@@ -782,41 +834,41 @@ app.post('/chat', async (req, res) => {
   
   // ============================================
   // SMART CONTEXT: Menggunakan Semantic Search (RAG)
+  // Gunakan 'searchQuery' (yang sudah diperkaya), BUKAN 'message' asli
   // ============================================
   let relevantData = [];
   let ragSource = 'none';
 
   try {
     // 1. Coba cari pakai "Otak Cerdas" (Vector/Embedding)
-    // Perlu memastikan semanticSearch diimpor di atas
-    const ragResults = await semanticSearch(message);
+    const ragResults = await semanticSearch(searchQuery);
     
     if (ragResults.length > 0) {
-      console.log(`🔍 Smart Search: Found ${ragResults.length} relevant docs`);
+      console.log(`🔍 Smart Search: Found ${ragResults.length} relevant docs for: "${searchQuery}"`);
       relevantData = ragResults.map(res => res.doc);
       ragSource = 'semantic';
     } else {
       // 2. Jika tidak ketemu, fallback ke "Otak Lama" (Keyword)
       console.log('⚠️ Smart Search miss, falling back to keyword search');
-      relevantData = findRelevantData(message, trainingData, 3);
+      relevantData = findRelevantData(searchQuery, trainingData, 3);
       ragSource = 'keyword';
     }
   } catch (e) {
     console.error('❌ Smart Search Error:', e.message);
     // Fallback aman jika RAG error
-    relevantData = findRelevantData(message, trainingData, 3);
+    relevantData = findRelevantData(searchQuery, trainingData, 3);
     ragSource = 'fallback-keyword';
   }
 
   // [MODIFIED] BOOSTING: Selalu gabungkan dengan hasil Keyword Search yang sudah di-boost "Online"-nya
-  const keywordBoosted = findRelevantData(message, trainingData, 5); // Ambil top 5 keyword
+  const keywordBoosted = findRelevantData(searchQuery, trainingData, 5); // Ambil top 5 keyword
   const directDocs = mergeDocLists(relevantData, keywordBoosted); // Gabungkan semantic + keyword
 
   let directResponse = await tryDirectAnswer(directDocs, 'direct-data-initial');
   if (directResponse) return directResponse;
 
   if (process.env.DIRECT_SEARCH_EXPANDED !== 'off') {
-    const expandedDocs = findRelevantData(message, trainingData, 50);
+    const expandedDocs = findRelevantData(searchQuery, trainingData, 50);
     const mergedExpanded = mergeDocLists(directDocs, expandedDocs);
     directResponse = await tryDirectAnswer(mergedExpanded, 'direct-data-expanded');
     if (directResponse) return directResponse;
@@ -825,8 +877,8 @@ app.post('/chat', async (req, res) => {
   const fullDirectResponse = await tryDirectAnswer(trainingData, 'direct-data-full');
   if (fullDirectResponse) return fullDirectResponse;
 
-  const cachedHandled = respondFromCache();
-  if (cachedHandled) return cachedHandled;
+  const cachedHandled = await getCache(cacheKey);
+  if (cachedHandled && !isContextualSearch) return res.json({ ...cachedHandled, cached: true });
   
   // Build grounding context
   // [MODIFIED] Menambahkan format ID agar lebih jelas debug-nya
@@ -837,22 +889,21 @@ app.post('/chat', async (req, res) => {
       ).join('\n---\n')
     : "";
 
-  // [MODIFIED] SYSTEM INSTRUCTION (STRICT RULES FOR ONLINE/OFFLINE)
+  // [MODIFIED] SYSTEM INSTRUCTION (STRICT RULES FOR ONLINE/OFFLINE & CONTEXT)
   const systemInstruction = `Anda adalah Asisten Virtual Kelurahan Marga Sari, Balikpapan.
 
 ATURAN UTAMA (WAJIB DIPATUHI):
 1. Jawab pertanyaan HANYA berdasarkan "DATA REFERENSI" di bawah.
-2. JANGAN GUNAKAN pengetahuan umum Anda jika bertentangan dengan Data Referensi.
-   - Contoh: Jika data referensi bilang "Bisa Online", MAKA JAWAB "BISA ONLINE" (meskipun biasanya layanan kelurahan itu manual).
-3. Jika Data Referensi menyebutkan layanan ONLINE tersedia, Anda WAJIB merekomendasikan opsi online tersebut sebagai yang utama.
-4. Gaya bahasa: Formal, sopan, membantu, dan menggunakan Bahasa Indonesia yang baik.
+2. Jika Data Referensi menyarankan ONLINE, tawarkan itu sebagai opsi utama.
+3. KONTEKS: Jika user bertanya "Syaratnya apa?" atau "Caranya gimana?", lihat percakapan sebelumnya untuk mengetahui layanan apa yang dimaksud (misal: KTP, Domisili, dll).
+4. Jika tidak ada data di referensi yang cocok, katakan jujur Anda belum tahu.
 
 DATA REFERENSI (SUMBER KEBENARAN):
 ==================================
 ${grounding}
 ==================================
 
-Jawablah pertanyaan user berikut berdasarkan data di atas:
+Jawablah pertanyaan user berikut:
 "${message}"`;
 
   // Load API Key
@@ -906,8 +957,8 @@ Jawablah pertanyaan user berikut berdasarkan data di atas:
         const payload = {
           contents: contents,
           generationConfig: {
-            maxOutputTokens: 500,
-            temperature: 0.3, // [MODIFIED] Lower temperature for more factual responses
+            maxOutputTokens: 800, // Sedikit diperbanyak untuk jawaban prosedural
+            temperature: 0.3,
             topP: 0.95,
             topK: 40
           }
@@ -945,7 +996,7 @@ Jawablah pertanyaan user berikut berdasarkan data di atas:
     console.log('🔄 Layer 4: All Gemini models failed, trying RAG semantic fallback...');
     
     try {
-      const ragResult = await localRAG(message);
+      const ragResult = await localRAG(searchQuery); // Pakai searchQuery (Contextual)
 
       if (ragResult?.ok && ragResult?.answer) {
         console.log(`✅ Layer 4 SUCCESS: RAG Fallback (${ragResult.sources.length} sources)`);
@@ -963,7 +1014,8 @@ Jawablah pertanyaan user berikut berdasarkan data di atas:
     // RAG failed - use keyword fallback (Layer 5)
     console.log('🔄 Layer 5: RAG failed, using keyword fallback...');
     
-    const lowerMessage = message.toLowerCase();
+    // Gunakan searchQuery agar keyword match lebih akurat
+    const lowerMessage = searchQuery.toLowerCase();
     const queryWords = lowerMessage.split(/\s+/).filter(w => w.length > 2);
     const commonWords = ['cara', 'bagaimana', 'apa', 'dimana', 'berapa', 'apakah', 'bisa', 'saya', 'membuat', 'mengurus', 'untuk'];
     const specificWords = queryWords.filter(w => !commonWords.includes(w));
@@ -1016,7 +1068,7 @@ Jawablah pertanyaan user berikut berdasarkan data di atas:
         candidates: [{
           content: {
             parts: [{ 
-              text: `Maaf, saya belum menemukan jawaban yang tepat untuk pertanyaan Anda. Bisa dijelaskan lebih rinci agar saya bisa bantu lebih baik?\n\nUntuk informasi lebih detail, Anda juga bisa menghubungi kantor Kelurahan Marga Sari langsung (Senin-Jumat, 08:00-16:00 WITA).\n\nTerima kasih.` 
+              text: `Maaf, saya kurang paham detail pertanyaan Anda. Apakah maksud Anda terkait layanan tertentu? (Misal: "Syarat KTP" atau "Cara Domisili").\n\nBisa diperjelas agar saya bisa bantu lebih baik? Terima kasih.` 
             }]
           }
         }]
