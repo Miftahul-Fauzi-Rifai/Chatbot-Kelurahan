@@ -147,52 +147,6 @@ function readTrainData() {
 // Load data saat startup
 const trainingData = readTrainData();
 
-const STOP_WORDS = new Set([
-  'apa','apakah','bagaimana','gimana','dimana','dimanakah','berapa','tolong','mohon',
-  'bisakah','bisa','saya','saya','untuk','yang','dan','atau','dengan','minta','ingin',
-  'butuh','halo','hai','hello','mohon','please','tolonglah','ap','ayo','dong','nih',
-  'nih','kami','kita','anda','kamu','sih','kah','ya','deh','dong','serta','agar','supaya','dapat','para',
-  'cara'
-]);
-
-function tokenizeText(text = '') {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9\s]/g, ' ')
-    .split(/\s+/)
-    .filter(word => word.length >= 3 && !STOP_WORDS.has(word));
-}
-
-function computeDirectMatchScore(message, item) {
-  const queryWords = new Set(tokenizeText(message));
-  if (queryWords.size === 0) return 0;
-
-  const haystack = [
-    item.text || item.question || '',
-    item.answer || item.response || '',
-    (item.tags || []).join(' '),
-    item.kategori_utama || item.kategori || ''
-  ].join(' ').toLowerCase();
-
-  let hits = 0;
-  queryWords.forEach(word => {
-    if (haystack.includes(word)) hits += 1;
-  });
-
-  return hits / queryWords.size;
-}
-
-function getBestDirectMatch(message, docs = []) {
-  let best = null;
-  docs.forEach(doc => {
-    const score = computeDirectMatchScore(message, doc);
-    if (!best || score > best.score) {
-      best = { item: doc, score };
-    }
-  });
-  return best;
-}
-
 // ======== FUNGSI PENCARIAN KEYWORD (OLD METHOD - FALLBACK) =========
 function findRelevantData(message, allData, maxResults = 3) {
   const lowerMessage = message.toLowerCase();
@@ -237,8 +191,6 @@ function findRelevantData(message, allData, maxResults = 3) {
     .slice(0, maxResults)
     .map(s => s.item);
 }
-
-const DIRECT_ANSWER_THRESHOLD = parseFloat(process.env.DIRECT_ANSWER_THRESHOLD || '0.55');
 
 // ======== RETRY LOGIC =========
 async function generateWithRetry(url, payload, modelName, maxRetries = 2) {
@@ -738,27 +690,6 @@ app.post('/chat', async (req, res) => {
     // Fallback aman jika RAG error
     relevantData = findRelevantData(message, trainingData, 3);
     ragSource = 'fallback-keyword';
-  }
-
-  const directMatch = getBestDirectMatch(message, relevantData);
-  if (directMatch && directMatch.item && directMatch.score >= DIRECT_ANSWER_THRESHOLD) {
-    const directAnswer = directMatch.item.answer || directMatch.item.response;
-    if (directAnswer) {
-      console.log(`🎯 Direct data hit (score: ${(directMatch.score * 100).toFixed(1)}%) -> ${directMatch.item.text || directMatch.item.question}`);
-      return replyAndCache({
-        ok: true,
-        model: 'direct-data',
-        ragSource,
-        directMatchScore: directMatch.score,
-        output: {
-          candidates: [{
-            content: {
-              parts: [{ text: directAnswer }]
-            }
-          }]
-        }
-      });
-    }
   }
   
   // Build grounding context
