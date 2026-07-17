@@ -11,9 +11,10 @@ README.md
 VERCEL_DEPLOYMENT.md
 UPSTASH_REDIS_SETUP.md
 
-# Data backup (hanya perlu yang optimized)
-data/train.json
-data/train_backup.json
+# Data backup (train.json WAJIB di-deploy karena dipakai server_production.js
+# sebagai sumber utama keyword search & direct-answer. Jangan di-ignore lagi!)
+# data/train.json
+# data/train_backup.json
 data/kosakata_jawa.json
 
 # Uploads folder (tidak diperlukan di serverless)
