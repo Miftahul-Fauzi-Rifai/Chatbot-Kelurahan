@@ -658,7 +658,6 @@ app.get('/ui', (req, res) => {
 </html>`);
 });
 
-
 // ======== HEALTH CHECK ENDPOINT (untuk Render monitoring) =========
 app.get('/health', (req, res) => {
   const apiKeysConfigured = API_KEYS.length;
