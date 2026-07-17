@@ -10,7 +10,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 // UPDATE IMPORT: Menambahkan semanticSearch
 import { localRAG, getRAGStatus, semanticSearch } from './rag_handler.js';
-import { makeCacheKey, getCache, setCache, getCacheStats } from './utils/cache.js';
+import { makeCacheKey, getCache, setCache, getCacheStats, clearCache } from './utils/cache.js';
 
 dotenv.config();
 
@@ -203,7 +203,13 @@ function getBestDirectMatch(message, docs = []) {
 // ======== FUNGSI PENCARIAN KEYWORD (DENGAN ONLINE BOOSTING) =========
 function findRelevantData(message, allData, maxResults = 3) {
   const lowerMessage = message.toLowerCase();
-  const queryWords = lowerMessage.split(/\s+/);
+  // [FIX] Filter stopword juga di sini, bukan cuma length<3.
+  // Sebelumnya kata umum seperti "bisa", "apa", "aja" ikut jadi kata kunci
+  // dan cocok ke HAMPIR SEMUA dokumen (karena kata itu muncul di mana-mana),
+  // menyebabkan pertanyaan meta seperti "kamu bisa apa aja" nyasar ke topik acak.
+  const queryWords = lowerMessage
+    .split(/\s+/)
+    .filter(w => w.length >= 3 && !STOP_WORDS.has(w));
   
   // Deteksi intent khusus "Online"
   const isOnlineQuery = lowerMessage.includes('online') || 
@@ -705,6 +711,23 @@ app.get('/status', (req, res) => {
   });
 });
 
+// ======== ADMIN: CLEAR CACHE =========
+// Dipakai setelah deploy fix, supaya jawaban lama yang salah (sudah kesimpen
+// di cache Redis sampai 6 jam) tidak terus muncul. Wajib kirim header
+// x-admin-secret yang cocok dengan ADMIN_SECRET di environment variable.
+app.post('/admin/cache/clear', async (req, res) => {
+  const secret = req.headers['x-admin-secret'];
+  if (!process.env.ADMIN_SECRET || secret !== process.env.ADMIN_SECRET) {
+    return res.status(401).json({ ok: false, error: 'Unauthorized' });
+  }
+  try {
+    await clearCache();
+    return res.json({ ok: true, message: 'Cache berhasil dibersihkan' });
+  } catch (e) {
+    return res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
 // ======== HELPER: CONTEXT AWARENESS (BARU) =========
 // Fungsi ini mendeteksi apakah user bertanya "syaratnya apa" tanpa menyebut topik
 function isFollowUpQuestion(message) {
@@ -797,6 +820,86 @@ app.post('/chat', async (req, res) => {
     }
     return res.json(payload);
   };
+
+  // ============================================
+  // LAYER GREETING: Deteksi sapaan (tidak butuh API sama sekali)
+  // ============================================
+  // Masalah: "hi"/"halo" dianggap stopword/terlalu pendek sehingga
+  // selalu jatuh ke Layer 6 (generic "kurang paham"). Sapaan singkat
+  // sebaiknya dijawab ramah tanpa perlu panggil Gemini/RAG.
+  function isGreetingMessage(text = '') {
+    const cleaned = text.toLowerCase().trim().replace(/[^a-z\s]/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!cleaned) return false;
+
+    const greetingWords = [
+      'hi', 'hai', 'halo', 'hallo', 'hello', 'hey', 'hy',
+      'pagi', 'siang', 'sore', 'malam',
+      'selamat pagi', 'selamat siang', 'selamat sore', 'selamat malam',
+      'assalamualaikum', 'permisi', 'min', 'admin', 'tes', 'test'
+    ];
+
+    const wordCount = cleaned.split(' ').length;
+    // Hanya anggap sapaan jika pesan pendek (maks 4 kata) DAN
+    // seluruh isi pesan cocok dengan salah satu kata sapaan.
+    if (wordCount > 4) return false;
+
+    return greetingWords.some(g => cleaned === g || cleaned.startsWith(g + ' ') || cleaned.endsWith(' ' + g));
+  }
+
+  if (isGreetingMessage(message)) {
+    console.log('👋 Layer Greeting: Pesan terdeteksi sebagai sapaan');
+    return res.json({
+      ok: true,
+      model: 'greeting-static',
+      output: {
+        candidates: [{
+          content: {
+            parts: [{
+              text: `Halo! 👋 Saya Asisten Virtual Kelurahan Marga Sari, Balikpapan.\n\nSaya bisa bantu info seputar:\n• Kependudukan (KTP, KK, Akta Kelahiran, pindah domisili)\n• Surat Kelurahan (Domisili, Usaha, dll)\n• Perizinan (SIM, SKCK, Paspor, IMB)\n• Pajak & Kendaraan (NPWP, PBB, STNK)\n• Layanan Publik (BPJS, PDAM, PLN)\n\nSilakan tanyakan kebutuhan Anda, misalnya "Syarat KTP" atau "Cara buat Domisili". Terima kasih! 😊`
+            }]
+          }
+        }]
+      }
+    });
+  }
+
+  // ============================================
+  // LAYER KAPASITAS: Deteksi pertanyaan meta "kamu bisa apa?"
+  // ============================================
+  // Masalah: Pertanyaan seperti "km bisa apa aja" / "apa saja yang bisa
+  // kamu bantu" bukan pertanyaan tentang layanan kelurahan tertentu,
+  // tapi tentang KEMAMPUAN BOT ITU SENDIRI. Kalau dibiarkan lewat
+  // keyword search, kata-kata umum di dalamnya bisa nyasar match ke
+  // dokumen acak. Jadi ditangani langsung di sini, tanpa API.
+  function isCapabilityQuestion(text = '') {
+    const cleaned = text.toLowerCase().trim();
+    const patterns = [
+      /\b(km|kamu|anda|bot|chatbot)\b.*\bbisa\b.*\b(apa|bantu)\b/,
+      /\bapa\s*(saja|aja)?\s*yang\s*(bisa|dapat)\s*(km|kamu|anda|bot)\b/,
+      /\bfitur\s*(apa|kamu|nya)\b/,
+      /\b(kegunaan|kemampuan|fungsi)\s*(km|kamu|anda|bot|kamu apa)\b/,
+      /^(bisa\s*)?bantu\s*apa\b/,
+      /\bapa\s*saja\s*yang\s*bisa\s*(km|kamu|anda|bot)\s*(bantu|beri\s*tahu|jawab)\b/
+    ];
+    return patterns.some(p => p.test(cleaned));
+  }
+
+  if (isCapabilityQuestion(message)) {
+    console.log('🤖 Layer Kapasitas: Pesan terdeteksi sebagai pertanyaan kemampuan bot');
+    return res.json({
+      ok: true,
+      model: 'capability-static',
+      output: {
+        candidates: [{
+          content: {
+            parts: [{
+              text: `Saya Asisten Virtual Kelurahan Marga Sari, Balikpapan. Saya bisa bantu info seputar:\n\n✅ Kependudukan: KTP, KK, KIA, Akta Kelahiran/Kematian, pindah domisili\n✅ Surat Kelurahan: Surat Domisili, Surat Keterangan Usaha, Surat Belum Menikah, Surat Penghasilan Tidak Tetap, Surat Janda/Duda\n✅ Perizinan: SIM, SKCK, Paspor, IMB/PBG, NIB\n✅ Pajak & Kendaraan: NPWP, PBB, Pajak Kendaraan (STNK/BPKB), Samsat\n✅ Layanan Publik: BPJS Kesehatan, KIS, Kartu Kuning, PDAM, PLN\n✅ Administrasi Nikah: Persyaratan nikah di KUA\n✅ Pengaduan: LAPOR!, Call Center 112\n\nCoba tanyakan salah satu topik di atas, misalnya "Syarat KTP" atau "Cara buat Surat Domisili". 😊`
+            }]
+          }
+        }]
+      }
+    });
+  }
 
   const respondWithDirectDoc = async (doc, score, label = 'direct-data') => {
     if (!doc) return null;
@@ -1074,9 +1177,10 @@ Jawablah pertanyaan user berikut:
     
     // Gunakan searchQuery agar keyword match lebih akurat
     const lowerMessage = searchQuery.toLowerCase();
-    const queryWords = lowerMessage.split(/\s+/).filter(w => w.length > 2);
-    const commonWords = ['cara', 'bagaimana', 'apa', 'dimana', 'berapa', 'apakah', 'bisa', 'saya', 'membuat', 'mengurus', 'untuk'];
-    const specificWords = queryWords.filter(w => !commonWords.includes(w));
+    // [FIX] Pakai STOP_WORDS yang sama dengan layer lain (dulu cuma 11 kata,
+    // kurang lengkap, jadi kata umum bisa lolos jadi "kata spesifik" palsu)
+    const queryWords = lowerMessage.split(/\s+/).filter(w => w.length > 2 && !STOP_WORDS.has(w));
+    const specificWords = queryWords;
     
     const matches = trainingData.map(item => {
       const lowerText = (item.text || '').toLowerCase();
